@@ -1,0 +1,250 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.jeesuite</groupId>
+	<artifactId>jeesuite-passport</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<description>SSO Unified authentication platform</description>
+	<name>jeesuite-passport</name>
+	<url>http://www.jeesuite.com</url>
+
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>vakin jiang</name>
+			<email>vakinge@gmail.com</email>
+			<organization>github</organization>
+			<organizationUrl>https://github.com/vakinge</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>
+         scm:git:https://github.com/vakinge/jeesuite-passport.git
+      </connection>
+		<developerConnection>
+         scm:git:https://github.com/vakinge/jeesuite-passport.git
+      </developerConnection>
+		<url>https://github.com/vakinge/jeesuite-passport</url>
+		<tag>v1.0</tag>
+	</scm>
+
+	<modules>
+		<module>jeesuite-passport-client</module>
+		<module>jeesuite-passport-server</module>
+		<module>jeesuite-passport-base</module>
+	</modules>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<compiler.jdk.version>1.8</compiler.jdk.version>
+		<output.encoding>utf-8</output.encoding>
+		<spring.version>4.3.7.RELEASE</spring.version>
+		<jedis.version>2.9.0</jedis.version>
+		<mybatis.version>3.4.2</mybatis.version>
+		<mapper.version>3.3.9</mapper.version>
+		<druid.version>1.0.16</druid.version>
+		<shiro.version>1.2.3</shiro.version>
+		<junit.version>4.12</junit.version>
+		<jeesuite.cache.version>1.1.5</jeesuite.cache.version>
+		<jeesuite.mybatis.version>1.1.5</jeesuite.mybatis.version>
+		<jeesuite.spring.version>1.1.5</jeesuite.spring.version>
+		<jeesuite.springweb.version>1.1.5</jeesuite.springweb.version>
+		<jeesuite.common.version>1.1.5</jeesuite.common.version>
+		<zkclient.version>0.10</zkclient.version>
+		<zookeeper.version>3.4.9</zookeeper.version>
+		<springboot.version>1.5.2.RELEASE</springboot.version>
+		<jeesuite.starter.version>1.1.5</jeesuite.starter.version>
+	</properties>
+
+	<dependencyManagement>
+
+		<dependencies>
+			<dependency>
+				<groupId>com.jeesuite</groupId>
+				<artifactId>jeesuite-common</artifactId>
+				<version>${jeesuite.common.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jeesuite</groupId>
+				<artifactId>jeesuite-spring</artifactId>
+				<version>${jeesuite.spring.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.jeesuite</groupId>
+				<artifactId>jeesuite-springweb</artifactId>
+				<version>${jeesuite.springweb.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.jeesuite</groupId>
+				<artifactId>jeesuite-cache</artifactId>
+				<version>${jeesuite.cache.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.jeesuite</groupId>
+				<artifactId>jeesuite-kafka</artifactId>
+				<version>${jeesuite.kafka.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>log4j</groupId>
+						<artifactId>log4j</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>com.jeesuite</groupId>
+				<artifactId>jeesuite-mybatis</artifactId>
+				<version>${jeesuite.mybatis.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jeesuite</groupId>
+				<artifactId>jeesuite-filesystem</artifactId>
+				<version>1.1.5-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>4.3.7.RELEASE</version>
+				<optional>true</optional>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<version>4.3.7.RELEASE</version>
+				<optional>true</optional>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-jwt</artifactId>
+				<version>1.0.8.RELEASE</version>
+			</dependency>
+
+		</dependencies>
+
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.jeesuite</groupId>
+			<artifactId>jeesuite-common</artifactId>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>${compiler.jdk.version}</source>
+							<target>${compiler.jdk.version}</target>
+							<encoding>${output.encoding}</encoding>
+						</configuration>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+						</configuration>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.9.1</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<additionalparam>-Xdoclint:none</additionalparam>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+
+		</profile>
+	</profiles>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${compiler.jdk.version}</source>
+					<target>${compiler.jdk.version}</target>
+					<encoding>${output.encoding}</encoding>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<distributionManagement>
+		<!-- mvn clean deploy -P release -DskipTests=true -->
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+</project>
