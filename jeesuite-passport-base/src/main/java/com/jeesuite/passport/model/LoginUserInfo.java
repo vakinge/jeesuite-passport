@@ -1,12 +1,10 @@
-package com.jeesuite.passport.dto;
+package com.jeesuite.passport.model;
 
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-public class Account implements Serializable {
+public class LoginUserInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -20,9 +18,8 @@ public class Account implements Serializable {
 
     private String mobile;
 
-    @JsonIgnore
-    private String password;
-
+    private String sourceType;
+    
     private String avatar;
     
 	public Integer getId() {
@@ -65,12 +62,12 @@ public class Account implements Serializable {
 		this.mobile = mobile;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getSourceType() {
+		return sourceType;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setSourceType(String sourceType) {
+		this.sourceType = sourceType;
 	}
 
 	public String getAvatar() {

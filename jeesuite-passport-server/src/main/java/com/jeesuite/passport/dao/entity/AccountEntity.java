@@ -1,15 +1,22 @@
 package com.jeesuite.passport.dao.entity;
 
-import com.jeesuite.mybatis.core.BaseEntity;
 import java.util.Date;
-import javax.persistence.*;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Table;
+
+import com.jeesuite.mybatis.core.BaseEntity;
 
 @Table(name = "account")
 public class AccountEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String username;
+    
+    private String nickname;
 
     private String email;
 
@@ -17,7 +24,8 @@ public class AccountEntity extends BaseEntity {
 
     private String password;
 
-    private Short type;
+    
+    private String avatar;
     
     @Column(name = "outer_user_id")
     private String outerUserId;
@@ -30,19 +38,19 @@ public class AccountEntity extends BaseEntity {
     private Date createdAt;
 
     @Column(name = "updated_at")
-    private Long updatedAt;
+    private Date updatedAt;
 
     /**
      * @return id
      */
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
     /**
      * @param id
      */
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -102,20 +110,6 @@ public class AccountEntity extends BaseEntity {
         this.password = password;
     }
 
-    /**
-     * @return type
-     */
-    public Short getType() {
-        return type;
-    }
-
-    /**
-     * @param type
-     */
-    public void setType(Short type) {
-        this.type = type;
-    }
-
     public String getOuterUserId() {
 		return outerUserId;
 	}
@@ -169,14 +163,32 @@ public class AccountEntity extends BaseEntity {
     /**
      * @return updated_at
      */
-    public Long getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
     /**
      * @param updatedAt
      */
-    public void setUpdatedAt(Long updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
+	}
+    
+    
 }

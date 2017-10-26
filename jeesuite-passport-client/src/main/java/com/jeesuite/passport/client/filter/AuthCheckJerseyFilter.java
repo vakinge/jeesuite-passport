@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -28,6 +29,9 @@ public class AuthCheckJerseyFilter implements ContainerRequestFilter,ContainerRe
     @Context
     private HttpServletRequest request;
     
+    @Context
+    private HttpServletResponse response;
+    
     
 	public AuthCheckJerseyFilter() {
 		checker = new AuthChecker();
@@ -36,7 +40,7 @@ public class AuthCheckJerseyFilter implements ContainerRequestFilter,ContainerRe
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
-		checker.process(request);
+		checker.process(request,response);
 	}
 
 	

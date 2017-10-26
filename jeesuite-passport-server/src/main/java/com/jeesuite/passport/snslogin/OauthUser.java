@@ -10,6 +10,8 @@ public class OauthUser implements Serializable {
 	private String nickname;
 	private String avatar;
 	private String gender; // male/female/unknow
+	private String unionId;
+	private String snsType;
 
 	public String getOpenId() {
 		return openId;
@@ -41,6 +43,27 @@ public class OauthUser implements Serializable {
 
 	public void setGender(String gender) {
 		this.gender = gender;
+	}
+	
+	public String getUnionId() {
+		return unionId;
+	}
+
+	public void setUnionId(String unionId) {
+		this.unionId = unionId;
+	}
+	
+
+	public String getSnsType() {
+		return snsType;
+	}
+
+	public void setSnsType(String snsType) {
+		this.snsType = snsType;
+	}
+
+	public String userInfoToUrlQueryString(){
+		return String.format("nickname=%s&gender=%s&avatar=%s", nickname,gender,avatar);
 	}
 
 }

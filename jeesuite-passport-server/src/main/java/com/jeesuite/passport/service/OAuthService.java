@@ -8,9 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.jeesuite.cache.CacheExpires;
 import com.jeesuite.cache.command.RedisString;
+import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.PassportConstants;
-import com.jeesuite.passport.dao.entity.AppEntity;
-import com.jeesuite.passport.dao.mapper.AppEntityMapper;
 import com.jeesuite.passport.dto.Account;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 
@@ -24,9 +23,7 @@ public class OAuthService {
 
 	@Autowired
 	private AccountService accountService;
-	
-	@Autowired
-	private AppEntityMapper appMapper;
+
 	
 	public void storeAuthCode(String authCode, String username) {
 		new  RedisString(String.format(PassportConstants.AUTHCODE_CACHE_KEY, authCode)).set(username, CacheExpires.IN_5MINS);
@@ -51,18 +48,8 @@ public class OAuthService {
 	}
 
 	public long createExpireIn() {
-		return 3600L;
+		return ResourceUtils.getInt("auth.session.expire.seconds", 86400);
 	}
-
-	public boolean checkClientId(String clientId) {
-		AppEntity entity = appMapper.findByClientId(clientId);
-		return entity != null;
-	}
-
-	public boolean checkClientSecret(String clientId,String clientSecret) {
-		AppEntity entity = appMapper.findByClientId(clientId);
-		return entity != null && entity.getClientSecret().equals(clientSecret);
-	}
-
+	
 
 }

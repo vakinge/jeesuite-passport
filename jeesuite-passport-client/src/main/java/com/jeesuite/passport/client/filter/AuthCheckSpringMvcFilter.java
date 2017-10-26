@@ -13,7 +13,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.json.JsonUtils;
 import com.jeesuite.passport.client.AuthChecker;
-import com.jeesuite.springweb.WrapperResponseEntity;
+import com.jeesuite.passport.client.ClientConfig;
+import com.jeesuite.springweb.model.WrapperResponseEntity;
 
 public class AuthCheckSpringMvcFilter extends OncePerRequestFilter{
 	
@@ -28,7 +29,7 @@ public class AuthCheckSpringMvcFilter extends OncePerRequestFilter{
 			throws ServletException, IOException {
 		
 		try {			
-			checker.process(request);
+			checker.process(request,response);
 			
 			filterChain.doFilter(request, response);
 		} catch (JeesuiteBaseException e) {
@@ -36,7 +37,9 @@ public class AuthCheckSpringMvcFilter extends OncePerRequestFilter{
 				responseOutWithJson(response, JsonUtils.toJson(new WrapperResponseEntity(e.getCode(), e.getMessage())));
 			}else{
 				String redirectUri = request.getRequestURL().toString();
-				response.sendRedirect("http://sso.vakin.io/auth/login?redirect_uri="+redirectUri);
+				
+				String loginUrl = ClientConfig.authServerBasePath() + "/auth/login?redirect_uri=" + redirectUri;
+				response.sendRedirect(loginUrl);
 			}
 		}
 	}

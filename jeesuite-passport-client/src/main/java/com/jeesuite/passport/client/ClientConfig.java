@@ -3,12 +3,6 @@
  */
 package com.jeesuite.passport.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.jeesuite.common.http.HttpUtils;
-import com.jeesuite.common.json.JsonUtils;
-import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.common.util.ResourceUtils;
 
 /**
@@ -18,54 +12,14 @@ import com.jeesuite.common.util.ResourceUtils;
  */
 public class ClientConfig {
 	
-	private static Map<String, String> configs = new HashMap<String, String>();
-	
-	static{
-		fetchFromServer();
-	}
-	
 	private static String clientId;
 	private static String clientSecret;
-	private static String safeDomain;
 	private static String redirctUri;
 	private static String authServerBasePath;
 	
-	@SuppressWarnings("unchecked")
-	private static synchronized void fetchFromServer(){
-		if(!configs.isEmpty())return;
-		try {
-			configs.put("auth.client.id", ResourceUtils.getProperty("auth.client.id"));
-			configs.put("auth.client.secret", ResourceUtils.getProperty("auth.client.secret"));
-			configs.put("auth.redirect.uri", ResourceUtils.getProperty("auth.redirect.uri"));
-			configs.put("auth.server.baseurl", ResourceUtils.getProperty("auth.server.baseurl"));
-			clientId = configs.get("auth.client.id");
-			clientSecret = configs.get("auth.client.secret");
-			
-			String url = ClientConfig.authServerBasePath() + "/clientside/sync_config?client_id=%s&sign=%s";
-			String sign = DigestUtils.md5WithSalt(clientId, clientSecret);
-			url = String.format(url, clientId,sign);
-			String json = HttpUtils.get(url).getBody();
-			@SuppressWarnings("rawtypes")
-			Map remoteConfigs = JsonUtils.toObject(json, Map.class);
-			if(remoteConfigs.containsKey("error")){
-				throw new RuntimeException(configs.get("error"));
-			}
-			configs.putAll(remoteConfigs);
-		} catch (Exception e) {
-			configs.clear();
-			throw new RuntimeException(e);
-		}
-		
-	}
 	
 	public static String get(String key) {
-		if(configs.isEmpty()){
-			fetchFromServer();
-		}
-		if (configs.containsKey(key)) {
-			return configs.get(key);
-		}
-        return null;
+        return ResourceUtils.getProperty(key);
 	}
 	
 	public static int getInt(String key,int defaultVal){
@@ -82,37 +36,38 @@ public class ClientConfig {
 
 	public static String clientId(){
 		if(clientId == null){
-			clientId = configs.get("auth.client.id");
+			clientId = ResourceUtils.getProperty("auth.client.id");
 		}
 		return clientId;
 	}
 	
 	public static String clientSecret(){
 		if(clientSecret == null){
-			clientSecret = configs.get("auth.client.secret");
+			clientSecret = ResourceUtils.getProperty("auth.client.secret");
 		}
 		return clientSecret;
-	}
-	
-	public static String safeDomain() {
-		if(safeDomain == null){
-			safeDomain = configs.get("auth.safe.domain");
-		}
-		return safeDomain;
 	}
 
 	public static String redirctUri(){
 		if(redirctUri == null){
-			redirctUri = configs.get("auth.redirect.uri");
+			redirctUri = ResourceUtils.getProperty("auth.redirect.uri","/login_callback");
 		}
 		return redirctUri;
 	}
 	
 	public static String authServerBasePath(){
 		if(authServerBasePath == null){
-			authServerBasePath = configs.get("auth.server.baseurl");
+			authServerBasePath = ResourceUtils.getProperty("auth.server.baseurl");
 			if(authServerBasePath.endsWith("/"))authServerBasePath = authServerBasePath.substring(0, authServerBasePath.length() - 1);
 		}
 		return authServerBasePath;
+	}
+
+	public static String defaultLoginSuccessRedirctUri() {
+		return ResourceUtils.getProperty("auth.login-success.default.redirect.uri","");
+	}
+	
+	public static String snsLoginRegUri() {
+		return ResourceUtils.getProperty("auth.sns.register.uri","");
 	}
 }

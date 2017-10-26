@@ -10,21 +10,24 @@ public class SnsLoginState implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private String appId;
+	private String domain;
 	private String snsType;
-	private boolean regAction;
 	@Transient
 	private String state;
-	private String regPageUrl;
-	private String successDirectUrl;
+	private String regPageUri;
+	private String successDirectUri;
+	private String orignUrl;
 	
+	public SnsLoginState() {}
 
-	public SnsLoginState(String appId, String snsType, boolean regAction, String regPageUrl, String successDirectUrl) {
+	public SnsLoginState(String appId,String domain, String snsType, String regPageUri, String successDirectUri,String orignUrl) {
 		this.state = UUID.randomUUID().toString().replaceAll("-", "");
 		this.appId = appId;
+		this.domain = domain;
 		this.snsType = snsType;
-		this.regAction = regAction;
-		this.regPageUrl = regPageUrl;
-		this.successDirectUrl = successDirectUrl;
+		this.regPageUri = regPageUri;
+		this.successDirectUri = successDirectUri;
+		this.orignUrl = orignUrl;
 	}
 
 	public String getAppId() {
@@ -35,6 +38,14 @@ public class SnsLoginState implements Serializable{
 		this.appId = appId;
 	}
 	
+	public String getDomain() {
+		return domain;
+	}
+
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+
 	public String getSnsType() {
 		return snsType;
 	}
@@ -44,20 +55,12 @@ public class SnsLoginState implements Serializable{
 	}
 	
 
-	public boolean isRegAction() {
-		return regAction;
+	public String getRegPageUri() {
+		return regPageUri;
 	}
 
-	public void setRegAction(boolean regAction) {
-		this.regAction = regAction;
-	}
-
-	public String getRegPageUrl() {
-		return regPageUrl;
-	}
-
-	public void setRegPageUrl(String regPageUrl) {
-		this.regPageUrl = regPageUrl;
+	public void setRegPageUri(String regPageUri) {
+		this.regPageUri = regPageUri;
 	}
 
 	public String getState() {
@@ -68,13 +71,20 @@ public class SnsLoginState implements Serializable{
 		this.state = state;
 	}
 
-	public String getSuccessDirectUrl() {
-		return successDirectUrl;
+	public String getSuccessDirectUri() {
+		return successDirectUri;
 	}
 
-	public void setSuccessDirectUrl(String successDirectUrl) {
-		this.successDirectUrl = successDirectUrl;
+	public void setSuccessDirectUri(String successDirectUri) {
+		this.successDirectUri = successDirectUri;
 	}
-	
+
+	public String getOrignUrl() {
+		return orignUrl;
+	}
+
+	public void setOrignUrl(String orignUrl) {
+		this.orignUrl = orignUrl;
+	}
 	
 }

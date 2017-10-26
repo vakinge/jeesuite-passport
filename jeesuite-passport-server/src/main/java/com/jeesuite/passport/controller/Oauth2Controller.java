@@ -9,8 +9,7 @@ import java.net.URISyntaxException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.oltu.oauth2.as.issuer.MD5Generator;
-import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.oltu.oauth2.as.request.OAuthAuthzRequest;
 import org.apache.oltu.oauth2.as.request.OAuthTokenRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
@@ -35,8 +34,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jeesuite.passport.Constants;
+import com.jeesuite.passport.dao.entity.AppEntity;
 import com.jeesuite.passport.dto.Account;
+import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
+import com.jeesuite.passport.service.AppService;
 import com.jeesuite.passport.service.OAuthService;
 
 
@@ -52,7 +54,8 @@ public class Oauth2Controller extends BaseAuthController{
 	@Autowired
     private OAuthService oAuthService;
 	
-      
+	@Autowired
+    private AppService appService;
 
 	@RequestMapping(value = "authorize")
 	public Object authorize( Model model, HttpServletRequest request ) throws URISyntaxException, OAuthSystemException {
@@ -61,7 +64,8 @@ public class Oauth2Controller extends BaseAuthController{
 			//构建OAuth 授权请求
 			OAuthAuthzRequest oauthRequest = new OAuthAuthzRequest(request);
 			//检查提交的客户端id是否正确
-            if (!oAuthService.checkClientId(oauthRequest.getClientId())) {
+			AppEntity app = appService.findByClientId(oauthRequest.getClientId());
+            if (app == null) {
                 OAuthResponse response =
                         OAuthASResponse.errorResponse(HttpServletResponse.SC_BAD_REQUEST)
                                 .setError(OAuthError.TokenResponse.INVALID_CLIENT)
@@ -85,8 +89,7 @@ public class Oauth2Controller extends BaseAuthController{
 			String authCode = null;
 			if ( oauthRequest.getResponseType().equals(ResponseType.CODE.toString()) ) {
 				String username = request.getParameter(OAuth.OAUTH_USERNAME); //获取用户名
-				OAuthIssuerImpl oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
-				authCode = oauthIssuerImpl.authorizationCode();
+				authCode = TokenGenerator.generate();
 				oAuthService.storeAuthCode(authCode, username);
 				
 			}
@@ -131,8 +134,9 @@ public class Oauth2Controller extends BaseAuthController{
 	            //构建OAuth请求
 	            OAuthTokenRequest oauthRequest = new OAuthTokenRequest(request);
 
+	            AppEntity app = appService.findByClientId(oauthRequest.getClientId());
 	            //检查提交的客户端id是否正确
-	            if (!oAuthService.checkClientId(oauthRequest.getClientId())) {
+	            if (app == null) {
 	                OAuthResponse response =
 	                        OAuthASResponse.errorResponse(HttpServletResponse.SC_BAD_REQUEST)
 	                                .setError(OAuthError.TokenResponse.INVALID_CLIENT)
@@ -142,7 +146,8 @@ public class Oauth2Controller extends BaseAuthController{
 	            }
 
 	            // 检查客户端安全KEY是否正确
-	            if (!oAuthService.checkClientSecret(oauthRequest.getClientId(),oauthRequest.getClientSecret())) {
+	            if (StringUtils.isBlank(oauthRequest.getClientSecret())
+	            		|| !oauthRequest.getClientSecret().equals(app.getClientSecret())) {
 	                OAuthResponse response =
 	                        OAuthASResponse.errorResponse(HttpServletResponse.SC_UNAUTHORIZED)
 	                                .setError(OAuthError.TokenResponse.UNAUTHORIZED_CLIENT)
@@ -167,7 +172,7 @@ public class Oauth2Controller extends BaseAuthController{
 	            //生成Access Token
 	            Account account = oAuthService.findAccountByAuthCode(authCode);
 	            
-	            LoginSession loginSession = createLoginSesion(null,account);
+	            LoginSession loginSession = createLoginSesion(request,account);
 
 	            //生成OAuth响应
 	            OAuthResponse response = OAuthASResponse

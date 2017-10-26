@@ -16,10 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.passport.dao.entity.AppEntity;
 import com.jeesuite.passport.service.AppService;
-import com.jeesuite.common.util.DigestUtils;
-import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.springboot.starter.cache.CacheProperties;
 
 /**
@@ -59,8 +58,6 @@ public class ClientSideController {
 		result.put("auth.redis.password", cacheProperties.getPassword());
 		result.put("auth.redis.database", String.valueOf(cacheProperties.getDatabase()));
 		result.put("auth.redis.masterName", cacheProperties.getMasterName());
-		
-		result.put("auth.safe.domain", ResourceUtils.getProperty("auth.safe.domain"));
 		
 		return result;
 	}

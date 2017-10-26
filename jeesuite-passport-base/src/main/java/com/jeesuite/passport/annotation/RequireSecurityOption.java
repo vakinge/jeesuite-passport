@@ -7,9 +7,11 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RequiresPermissions {
+public @interface RequireSecurityOption {
 
-	String[] value();
+	String[] permissons() default {};
 	
-	int userType() default -1;
+	boolean innerInvokeOnly() default false;
+	
+	boolean requireLogin() default false;
 }

@@ -4,11 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.jeesuite.passport.snslogin.OauthConnector;
 import com.jeesuite.passport.snslogin.OauthUser;
 
-public class WechatConnector extends OauthConnector {
+public class WinxinConnector extends OauthConnector {
 
-	public static final String SNS_TYPE = "wechat";
+	public static final String SNS_TYPE = "weixin";
 	
-	public WechatConnector( String appkey, String appSecret) {
+	public WinxinConnector( String appkey, String appSecret) {
 		super(appkey, appSecret);
 	}
 
@@ -97,6 +97,7 @@ public class WechatConnector extends OauthConnector {
 		user.setOpenId(openId);
 		int sex = json.getIntValue("sex");
 		user.setGender(sex == 1 ? "male" : "female");
+		user.setUnionId(json.getString("unionid"));
 
 		return user;
 	}

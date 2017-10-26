@@ -2,11 +2,8 @@ package com.jeesuite.passport.snslogin;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jeesuite.passport.helper.HttpUtils;
 
-import com.jeesuite.common.http.HttpRequestEntity;
-import com.jeesuite.common.http.HttpUtils;
 
 public abstract class OauthConnector {
 
@@ -14,8 +11,6 @@ public abstract class OauthConnector {
 	// 第二步，通过code，获取access token
 	// 第三步，通过 access token 获取用户的open_id
 	// 第四步，通过 open_id 获取用户信息
-	private static final Logger LOGGER = LoggerFactory.getLogger(OauthConnector.class);
-
 	private String clientId;
 	private String clientSecret;
 	private String redirectUri;
@@ -51,20 +46,11 @@ public abstract class OauthConnector {
 	}
 
 	protected String httpGet(String url) {
-		try {
-			return HttpUtils.get(url).getBody();
-		} catch (Exception e) {
-			LOGGER.error("httpGet error", e);
-		}
-		return null;
+		return HttpUtils.httpGet(url);
 	}
+	
 	protected String httpPost(String url,Map<String, String> params) {
-		try {
-			return HttpUtils.post(url, HttpRequestEntity.create().textParams(params)).getBody();
-		} catch (Exception e) {
-			LOGGER.error("httpGet error", e);
-		}
-		return null;
+		return HttpUtils.httpPost(url, params);
 	}
 
 	public abstract String createAuthorizeUrl(String state);

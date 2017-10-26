@@ -4,29 +4,32 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jeesuite.common.util.DigestUtils;
 
-public class Account implements Serializable {
+import io.swagger.annotations.ApiModelProperty;
+
+public class AccountParam implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@ApiModelProperty(value = "id,mobile必填一个")
 	private Integer id;
-
+	@ApiModelProperty(value = "登录用户名")
     private String username;
-    
+    @ApiModelProperty(value = "昵称")
     private String nickname;
 
     private String email;
-
+    @ApiModelProperty(value = "id,mobile必填一个")
     private String mobile;
 
-    @JsonIgnore
     private String password;
 
+    @ApiModelProperty(value = "用户头像")
     private String avatar;
     
 	public Integer getId() {
-		return id;
+		return id == null ? 0 : id;
 	}
 
 	public void setId(Integer id) {
@@ -81,4 +84,8 @@ public class Account implements Serializable {
 		this.avatar = avatar;
 	}
 
+	public static boolean validatePassword(String orignPassword,String cryptPassword){
+		String orignToCrypt = DigestUtils.md5(orignPassword);
+		return StringUtils.equalsIgnoreCase(orignToCrypt, cryptPassword);
+	}
 }

@@ -3,24 +3,18 @@
  */
 package com.jeesuite.passport.client;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.jeesuite.cache.redis.JedisProvider;
-import com.jeesuite.cache.redis.JedisProviderFactory;
-import com.jeesuite.cache.redis.sentinel.JedisSentinelProvider;
-import com.jeesuite.cache.redis.standalone.JedisStandaloneProvider;
 import com.jeesuite.passport.exception.UnauthorizedException;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.model.LoginSession;
-
-import redis.clients.jedis.BinaryJedis;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * @description <br>
@@ -28,83 +22,45 @@ import redis.clients.jedis.JedisPoolConfig;
  * @date 2017年3月20日
  */
 public class AuthChecker {
+	
+	private static Logger log = LoggerFactory.getLogger(AuthChecker.class);
+	
+	private Pattern anonUriPattern;
 
-	private List<String> ignoreUris = new ArrayList<>();
-	private List<String> ignoreUrisWithWildcard = new ArrayList<>();
-
-	public AuthChecker(String[] ignoreCheckUris) {
-		ignoreUrisWithWildcard.add("/oauth2");
-		for (String uri : ignoreCheckUris) {
-			if (StringUtils.isEmpty(uri))
-				continue;
-			if (uri.endsWith("*")) {
-				ignoreUrisWithWildcard.add(uri.replaceAll("\\*", ""));
-			} else {
-				ignoreUris.add(uri);
-			}
+	public AuthChecker(String ignoreCheckUris) {
+		String regex = "/oauth2/.*";
+		if(StringUtils.isNotBlank(ignoreCheckUris)){
+			regex = regex + "|" + ignoreCheckUris.replaceAll(";", "|").replaceAll("\\*+", ".*");
 		}
-		//
-		initAuthCacheRedis();
+		anonUriPattern = Pattern.compile(regex);
 	}
 	
 	public AuthChecker() {
-		this(StringUtils.trimToEmpty(ClientConfig.get(ClientConstants.AUTH_IGNORE_URIS)).split(",|;"));
+		this(StringUtils.trimToEmpty(ClientConfig.get(ClientConstants.AUTH_IGNORE_URIS)));
 	}
 	
 	
 
-	public LoginSession process(HttpServletRequest request) {
+	public LoginSession process(HttpServletRequest request,HttpServletResponse response) {
+		
 		// 是否需要鉴权
-		boolean requered = ignoreUris.contains(request.getRequestURI());
-		if (!requered) {
-			for (String uri : ignoreUrisWithWildcard) {
-				if (requered = uri.startsWith(uri))
-					break;
-			}
-		}
+		boolean requered = !anonUriPattern.matcher(request.getRequestURI()).matches();
 
-		String authId = AuthSessionHelper.getAuthId(request);
-		if (requered && StringUtils.isBlank(authId)) {
-			throw new UnauthorizedException();
-		}
+		String sessionId = AuthSessionHelper.getSessionId(request);
+		LoginSession sesion = AuthSessionHelper.validateSessionIfNotCreateAnonymous(sessionId);
 		
-		LoginSession loginSession = null;
-
-		if(StringUtils.isNotBlank(authId)){
-			loginSession = AuthSessionHelper.getLoginSession(authId);
+		//如果是首次生成session
+		if(StringUtils.isBlank(sessionId) && sesion.isAnonymous()){
+			String domain = request.getServerName();
+			AuthSessionHelper.createSessionCookies(sesion.getSessionId(), domain, sesion.getExpiresIn());
+			log.debug("createSessionCookie:{}",sesion.getSessionId());
 		}
-		
-		if (requered && loginSession == null) {
-			throw new UnauthorizedException();
-		}
-
-		return loginSession;
-	}
-
-	private void initAuthCacheRedis() {
-		// 从服务器同步配置
-		JedisPoolConfig poolConfig = new JedisPoolConfig();
-		poolConfig.setMaxIdle(1);
-		poolConfig.setMinEvictableIdleTimeMillis(60 * 1000);
-		poolConfig.setMaxTotal(ClientConfig.getInt("auth.redis.pool.max", 15));
-		poolConfig.setMaxWaitMillis(30 * 1000);
-		
-		String mode = ClientConfig.get("auth.redis.mode");
-		String[] servers = ClientConfig.get("auth.redis.servers").split(",");
-		int timeout = ClientConfig.getInt("auth.redis.conn.timeout", 3000);
-		String password = ClientConfig.get("auth.redis.password");
-		int database = ClientConfig.getInt("auth.redis.database", 0);
-		String masterName = ClientConfig.get("auth.redis.masterName");
 				
-		JedisProvider<Jedis, BinaryJedis> provider = null;
-		
-		String clientName = AuthSessionHelper.AUTH_CACHE_GROUP + "_" + ClientConfig.clientId();
-		if(JedisSentinelProvider.MODE.equals(mode)){
-			provider = new JedisSentinelProvider(AuthSessionHelper.AUTH_CACHE_GROUP, poolConfig, servers, timeout, password, database, clientName, masterName);
-		}else if(JedisStandaloneProvider.MODE.equals(mode)){
-			provider = new JedisStandaloneProvider(AuthSessionHelper.AUTH_CACHE_GROUP, poolConfig, servers,timeout, password, database, clientName);
+		if (requered && sesion.isAnonymous()) {
+			throw new UnauthorizedException();
 		}
-		JedisProviderFactory.addProvider(provider);
+
+		return sesion;
 	}
 
 }

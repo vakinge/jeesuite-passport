@@ -1,84 +1,57 @@
 package com.jeesuite.passport.dto;
 
-import java.io.Serializable;
+import io.swagger.annotations.ApiModelProperty;
 
-import org.apache.commons.lang3.StringUtils;
+public class RegUserParam {
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+	private String username;
 
-public class Account implements Serializable {
+	private String nickname;
 
-	private static final long serialVersionUID = 1L;
+	private String email;
 
-	private Integer id;
+	private String mobile;
 
-    private String username;
-    
-    private String nickname;
-
-    private String email;
-
-    private String mobile;
-
-    @JsonIgnore
-    private String password;
-
-    private String avatar;
-    
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
+	@ApiModelProperty(value = "密码",required = true)
+	private String password;
+	@ApiModelProperty(value = "用户头像")
+	private String avatar;
 	public String getUsername() {
-		return StringUtils.isBlank(username) ? mobile : username;
+		return username;
 	}
-
 	public void setUsername(String username) {
 		this.username = username;
 	}
-
 	public String getNickname() {
 		return nickname;
 	}
-
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
-
 	public String getEmail() {
 		return email;
 	}
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
 	public String getMobile() {
 		return mobile;
 	}
-
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
 	}
-
 	public String getPassword() {
 		return password;
 	}
-
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
 	public String getAvatar() {
 		return avatar;
 	}
-
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
 	}
-
+	
+	
 }
