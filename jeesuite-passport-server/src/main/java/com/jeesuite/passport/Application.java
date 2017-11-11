@@ -6,9 +6,11 @@ import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.jeesuite.passport.filter.AuthSessionFilter;
 import com.jeesuite.springboot.starter.cache.EnableJeesuiteCache;
 import com.jeesuite.springboot.starter.mybatis.EnableJeesuiteMybatis;
 
@@ -22,6 +24,12 @@ import com.jeesuite.springboot.starter.mybatis.EnableJeesuiteMybatis;
 @EnableTransactionManagement
 //@EnableCircuitBreaker
 public class Application implements HealthIndicator{
+	
+	
+	@Bean 
+	public AuthSessionFilter authSessionFilter(){
+		return new AuthSessionFilter();
+	}
 	
 	
     public static void main(String[] args) {

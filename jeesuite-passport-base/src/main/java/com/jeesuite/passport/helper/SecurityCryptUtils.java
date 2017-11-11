@@ -11,6 +11,7 @@ public class SecurityCryptUtils {
 
 	private static String cryptType;
 	private static String cryptKey = "a9H0k4w0";
+	private static String passwordSalt = "q@#tr5~d2&P6#_9G";
 	
 	static{
 		cryptType = ResourceUtils.getProperty("auth.crypt.type", "DES");
@@ -20,9 +21,8 @@ public class SecurityCryptUtils {
 		}
 	}
 	
-	public static String passwordEncrypt(String password,String salt) {
-		//return DigestUtils.md5(password.concat(CRYPT_KEY).concat(salt));
-		return DigestUtils.md5(password);
+	public static String cryptPassword(String password,String salt) {
+		return DigestUtils.md5(password.concat(passwordSalt).concat(salt));
 	}
 	
 	public static String encrypt(String data) {

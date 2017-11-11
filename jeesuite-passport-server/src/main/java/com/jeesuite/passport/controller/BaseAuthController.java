@@ -1,9 +1,5 @@
 package com.jeesuite.passport.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +14,7 @@ import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.dto.Account;
 import com.jeesuite.passport.helper.AuthSessionHelper;
-import com.jeesuite.passport.helper.SecurityCryptUtils;
+import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.passport.service.AccountService;
 import com.jeesuite.springweb.utils.WebUtils;
@@ -29,7 +25,6 @@ public abstract class BaseAuthController {
 	protected AccountService accountService;
 	
 	private static String rootDomain;//根域名
-	private List<String> allowDomains = new ArrayList<>(Arrays.asList(ResourceUtils.getProperty("auth.allow.domains", "").split(";|；")));
 	
 	@Value("${auth.cookies.domian}")
 	protected String authCookiesDomain;
@@ -39,14 +34,7 @@ public abstract class BaseAuthController {
 	 * @param domain
 	 */
 	protected boolean validateOrignDomain(String domain){
-		if(domain.contains(authCookiesDomain))return true;
-		for (String ad : allowDomains) {
-			if(domain.contains(ad)){
-				return true;
-			}
-		}
-		
-		return false;
+		return true;
 	}
 	
 	protected Account validateUser( HttpServletRequest request ,Model model) {
@@ -57,14 +45,8 @@ public abstract class BaseAuthController {
 			return null;
 		}
 		
-		Account account = accountService.findAcctountByLoginName(username);
+		Account account = accountService.checkAndGetAccount(username,password);
 		if(account == null){
-			model.addAttribute(Constants.ERROR, "登录失败:用户名或密码错误");
-			return null;
-		}
-		
-		String expectPassword = SecurityCryptUtils.passwordEncrypt(password, String.valueOf(account.getId()));
-		if(!expectPassword.equalsIgnoreCase(account.getPassword())){
 			model.addAttribute(Constants.ERROR, "登录失败:用户名或密码错误");
 			return null;
 		}
@@ -98,13 +80,18 @@ public abstract class BaseAuthController {
 		if(StringUtils.contains(orignDomain, authCookiesDomain)){
 			session = createLoginSesion(request,account);
 			//
-			Cookie cookie = AuthSessionHelper.createSessionCookies(session.getSessionId(), getRootDomain(request), session.getExpiresIn());
+			Cookie cookie = AuthSessionHelper.createSessionCookies(session.getSessionId(), authCookiesDomain, session.getExpiresIn());
 			response.addCookie(cookie);
 			redirectUri = String.format("%s?orign_url=%s", redirectUri,orignUrl);
 		}else{
 			session = createLoginSesion(request,account);
 			orignUrl = StringUtils.trimToEmpty(orignUrl);
-			redirectUri = String.format("%s?session_id=%s&expires_in=%s&orign_url=%s", redirectUri,session.getSessionId(),session.getExpiresIn(),orignUrl);
+			StringBuilder urlBuiler = new StringBuilder(redirectUri);
+			urlBuiler.append("?session_id=").append(session.getSessionId());
+			urlBuiler.append("&expires_in=").append(session.getExpiresIn());
+			urlBuiler.append("&orign_url=").append(orignUrl);
+			urlBuiler.append("&auth_code=").append(TokenGenerator.generateWithSign());
+			redirectUri = urlBuiler.toString();
 		}
 		
 		return redirectTo(redirectUri);

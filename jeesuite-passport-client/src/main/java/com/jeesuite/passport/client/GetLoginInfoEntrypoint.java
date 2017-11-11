@@ -21,6 +21,7 @@ import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.json.JsonUtils;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.model.LoginUserInfo;
+import com.jeesuite.springweb.client.SimpleRestTemplateBuilder;
 import com.jeesuite.springweb.model.WrapperResponse;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.WebUtils;
@@ -35,8 +36,8 @@ public class GetLoginInfoEntrypoint extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	
-	@Autowired
-	private RestTemplate restTemplate;
+	//@Autowired
+	private RestTemplate restTemplate = new SimpleRestTemplateBuilder().build();
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

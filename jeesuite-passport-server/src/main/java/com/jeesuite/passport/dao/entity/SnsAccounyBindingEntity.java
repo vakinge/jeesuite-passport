@@ -28,6 +28,9 @@ public class SnsAccounyBindingEntity extends BaseEntity {
     private String openId;
 
     private Boolean enabled = true;
+    
+    @Column(name = "source_app_id")
+    private Integer sourceAppId;
 
     @Column(name = "created_at",updatable = false)
     private Date createdAt;
@@ -146,4 +149,14 @@ public class SnsAccounyBindingEntity extends BaseEntity {
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+	public Integer getSourceAppId() {
+		return sourceAppId;
+	}
+
+	public void setSourceAppId(Integer sourceAppId) {
+		this.sourceAppId = sourceAppId;
+	}
+    
+    
 }

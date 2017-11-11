@@ -27,18 +27,33 @@ public class AccountEntity extends BaseEntity {
     
     private String avatar;
     
-    @Column(name = "outer_user_id")
-    private String outerUserId;
+    @Column(name = "source_app_id")
+    private Integer sourceAppId;
 
     private Boolean enabled;
 
     private Boolean deleted;
 
-    @Column(name = "created_at")
-    private Date createdAt;
-
     @Column(name = "updated_at")
     private Date updatedAt;
+    
+    /**
+     * 注册ip
+     */
+    @Column(name = "reg_ip",updatable = false )
+    private String regIp;
+
+    @Column(name = "reg_at",updatable = false )
+    private Date regAt;
+
+    /**
+     * 最后登录ip
+     */
+    @Column(name = "last_login_ip")
+    private String lastLoginIp;
+
+    @Column(name = "last_login_at")
+    private Date lastLoginAt;
 
     /**
      * @return id
@@ -110,14 +125,6 @@ public class AccountEntity extends BaseEntity {
         this.password = password;
     }
 
-    public String getOuterUserId() {
-		return outerUserId;
-	}
-
-	public void setOuterUserId(String outerUserId) {
-		this.outerUserId = outerUserId;
-	}
-
 	/**
      * @return enabled
      */
@@ -144,20 +151,6 @@ public class AccountEntity extends BaseEntity {
      */
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
-    }
-
-    /**
-     * @return created_at
-     */
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    /**
-     * @param createdAt
-     */
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
     }
 
     /**
@@ -188,6 +181,38 @@ public class AccountEntity extends BaseEntity {
 
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
+	}
+
+	public String getRegIp() {
+		return regIp;
+	}
+
+	public void setRegIp(String regIp) {
+		this.regIp = regIp;
+	}
+
+	public Date getRegAt() {
+		return regAt;
+	}
+
+	public void setRegAt(Date regAt) {
+		this.regAt = regAt;
+	}
+
+	public String getLastLoginIp() {
+		return lastLoginIp;
+	}
+
+	public void setLastLoginIp(String lastLoginIp) {
+		this.lastLoginIp = lastLoginIp;
+	}
+
+	public Date getLastLoginAt() {
+		return lastLoginAt;
+	}
+
+	public void setLastLoginAt(Date lastLoginAt) {
+		this.lastLoginAt = lastLoginAt;
 	}
     
     

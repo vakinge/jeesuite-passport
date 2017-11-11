@@ -66,6 +66,14 @@ public class AccountService {
 		return null;
 	}
 	
+	public Account checkAndGetAccount(String loginName,String password){
+		AccountEntity entity = accountMapper.findByLoginName(loginName);
+		if(entity == null || !entity.getPassword().equals(cryptPassword(password, entity.getRegAt()))){
+		   return null;
+		}
+		return BeanCopyUtils.copy(entity, Account.class);
+	}
+	
 	@Transactional
 	public Account createAccount(Account account){
 		AccountEntity accountEntity = null;
@@ -93,10 +101,10 @@ public class AccountService {
 		}
 		
 		accountEntity = BeanCopyUtils.copy(account, AccountEntity.class);
+		accountEntity.setRegAt(new Date());
 		if(StringUtils.isNotBlank(accountEntity.getPassword())){
-			accountEntity.setPassword(SecurityCryptUtils.passwordEncrypt(accountEntity.getPassword(), String.valueOf(accountEntity.getId())));
+			accountEntity.setPassword(cryptPassword(accountEntity.getPassword(), accountEntity.getRegAt()));
 		}
-		accountEntity.setCreatedAt(new Date());
 		accountMapper.insertSelective(accountEntity);
 		
 		account.setId(accountEntity.getId());
@@ -133,10 +141,10 @@ public class AccountService {
 				if(StringUtils.isBlank(accountEntity.getAvatar()))accountEntity.setAvatar(oauthUser.getAvatar());
 				
 				if(StringUtils.isBlank(accountEntity.getPassword())){
-					accountEntity.setPassword(SecurityCryptUtils.passwordEncrypt(accountEntity.getPassword(), ""));
+					accountEntity.setPassword(cryptPassword(accountEntity.getPassword(), accountEntity.getRegAt()));
 				}
 				
-				accountEntity.setCreatedAt(new Date());
+				accountEntity.setRegAt(new Date());
 				
 				accountMapper.insertSelective(accountEntity);
 			}
@@ -147,7 +155,7 @@ public class AccountService {
 			bindingEntity.setOpenId(oauthUser.getOpenId());
 			bindingEntity.setUnionId(oauthUser.getUnionId());
 			bindingEntity.setEnabled(true);
-			bindingEntity.setCreatedAt(accountEntity.getCreatedAt());
+			bindingEntity.setCreatedAt(accountEntity.getRegAt());
 			snsAccounyBindingMapper.insertSelective(bindingEntity);
 			account = BeanCopyUtils.copy(accountEntity, Account.class);
 			
@@ -158,29 +166,23 @@ public class AccountService {
 	@Transactional
 	public void updateAccount(AccountParam account){
 		
-		if(account.getId() <= 0 && StringUtils.isBlank(account.getMobile())){
-			throw new JeesuiteBaseException(4001, "userId或mobile必填一个");
-		}
-		AccountEntity accountEntity;
-		if(account.getId() > 0){
-			accountEntity = accountMapper.selectByPrimaryKey(account.getId());
-		}else{
-			accountEntity = accountMapper.findByMobile(account.getMobile());
-		}
+		
+		AccountEntity accountEntity = accountMapper.selectByPrimaryKey(account.getId());
+		
 		if(accountEntity == null)throw new JeesuiteBaseException(4001, "账号不存在");
 		
 		AccountEntity existAccount = null;
-		if(StringUtils.isNotBlank(account.getMobile()) && StringUtils.isBlank(accountEntity.getMobile())){
+		if(StringUtils.isNotBlank(account.getMobile()) && !account.getMobile().equals(accountEntity.getMobile())){
 			existAccount = accountMapper.findByMobile(account.getMobile());
-			if(existAccount != null && !existAccount.getId().equals(accountEntity.getId())){
+			if(existAccount != null){
 				throw new JeesuiteBaseException(4003, "该手机号码已注册");
 			}
 			accountEntity.setMobile(account.getMobile());
 		}
 		
-		if(StringUtils.isNotBlank(account.getEmail())){
+		if(StringUtils.isNotBlank(account.getEmail()) && !account.getEmail().equals(accountEntity.getEmail())){
 			existAccount = accountMapper.findByLoginName(account.getEmail());
-			if(existAccount != null && !existAccount.getId().equals(accountEntity.getId())){
+			if(existAccount != null){
 				throw new JeesuiteBaseException(4003, "该邮箱已注册");
 			}
 			accountEntity.setEmail(account.getEmail());
@@ -194,8 +196,8 @@ public class AccountService {
 			accountEntity.setNickname(account.getNickname());
 		}
 		
-		if(StringUtils.isNotBlank(accountEntity.getPassword())){
-			accountEntity.setPassword(SecurityCryptUtils.passwordEncrypt(accountEntity.getPassword(), String.valueOf(accountEntity.getId())));
+		if(StringUtils.isNotBlank(account.getPassword())){
+			accountEntity.setPassword(cryptPassword(account.getPassword(), accountEntity.getRegAt()));
 		}
 		
 		accountEntity.setUpdatedAt(new Date());
@@ -204,4 +206,8 @@ public class AccountService {
 	}
 
 
+	private static String cryptPassword(String password,Date regAt){
+		String salt = String.valueOf(regAt.getTime() / 1000);
+		return SecurityCryptUtils.cryptPassword(password, salt);
+	}
 }
