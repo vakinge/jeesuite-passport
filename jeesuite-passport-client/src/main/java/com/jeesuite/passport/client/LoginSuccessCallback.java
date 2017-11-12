@@ -19,7 +19,9 @@ import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.json.JsonUtils;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.helper.AuthSessionHelper;
+import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.AccessToken;
+import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.WebUtils;
 
@@ -48,26 +50,25 @@ public class LoginSuccessCallback extends HttpServlet {
 	}
 
 	
-	//TODO 安全性验证
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {	
 		
 		boolean setCookies = false;
-		int expiresIn = 3600;
+		int expiresIn = LoginSession.SESSION_EXPIRE_SECONDS;
 		String sessionId = req.getParameter(PassportConstants.PARAM_SESSION_ID);
 		String code = req.getParameter(PassportConstants.PARAM_CODE);
-		String redirectUri = req.getParameter(PassportConstants.PARAM_ORIGN_URL);
+		String redirectUri = req.getParameter(PassportConstants.PARAM_origin_url);
 		String loginType = req.getParameter(PassportConstants.PARAM_LOGIN_TYPE);
+		String ticket = req.getParameter(PassportConstants.PARAM_TICKET);
 		
 		if(StringUtils.isNotBlank(sessionId)){
 			//验证session合法性
 			try {
-				AuthSessionHelper.validateSessionId(sessionId, true);
+				TokenGenerator.validate(ticket, true);
 			} catch (JeesuiteBaseException e) {
 				WebUtils.responseOutHtml(resp, e.getMessage());
 				return;
 			}
-			
 			setCookies = true;
 			expiresIn = Integer.parseInt(req.getParameter(PassportConstants.PARAM_EXPIRE_IN));
 			if("jsonp".equals(loginType)){

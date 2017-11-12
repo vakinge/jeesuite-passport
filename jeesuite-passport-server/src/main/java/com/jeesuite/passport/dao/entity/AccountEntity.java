@@ -28,7 +28,7 @@ public class AccountEntity extends BaseEntity {
     private String avatar;
     
     @Column(name = "source_app_id")
-    private Integer sourceAppId;
+    private String sourceAppId;
 
     private Boolean enabled;
 
@@ -213,6 +213,14 @@ public class AccountEntity extends BaseEntity {
 
 	public void setLastLoginAt(Date lastLoginAt) {
 		this.lastLoginAt = lastLoginAt;
+	}
+
+	public String getSourceAppId() {
+		return sourceAppId;
+	}
+
+	public void setSourceAppId(String sourceAppId) {
+		this.sourceAppId = sourceAppId;
 	}
     
     

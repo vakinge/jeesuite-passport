@@ -1,7 +1,9 @@
 package com.jeesuite.passport;
 
 import com.jeesuite.passport.exception.UnauthorizedException;
+import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.model.LoginSession;
+import com.jeesuite.passport.model.LoginUserInfo;
 import com.jeesuite.springweb.RequestContextHelper;
 
 public class LoginContext {
@@ -19,6 +21,18 @@ public class LoginContext {
 //			}
 		}
 		return loginSession;
+	}
+	
+	/**
+	 * 获取登录用户详细信息
+	 */
+	public static LoginUserInfo getLoginUserInfo(){
+		LoginSession session = getLoginSession();
+		if(session == null)return null;
+		if(session.getUserInfo() != null){
+			return session.getUserInfo();
+		}
+		return AuthSessionHelper.getLoginSession(session.getSessionId()).getUserInfo();
 	}
 	
 	public static void setLoginSession(LoginSession loginSession){

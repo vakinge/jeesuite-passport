@@ -1,5 +1,7 @@
 package com.jeesuite.passport.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,7 @@ import com.jeesuite.passport.snslogin.OauthUser;
 import com.jeesuite.springweb.annotation.CorsEnabled;
 import com.jeesuite.springweb.model.WrapperResponse;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
+import com.jeesuite.springweb.utils.IpUtils;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -51,13 +54,16 @@ public class UserController {
 	@CorsEnabled
 	@RequestMapping(value = "register/bind", method = RequestMethod.POST)
 	@ApiOperation(value = "第三方账号绑定创建账号", notes = "### 调用范围 \n - 匿名 \n - 可跨域", httpMethod = "POST")
-	public @ResponseBody WrapperResponseEntity createUserThreepartBind(@RequestBody AccountBindParam param){
+	public @ResponseBody WrapperResponseEntity createUserThreepartBind(HttpServletRequest request,@RequestBody AccountBindParam param){
 		if(StringUtils.isBlank(param.getAuthTicket()))throw new ForbiddenAccessException();
 		RedisObject redis = new RedisObject(param.getAuthTicket());
 		OauthUser oauthUser = redis.get();
 		if(oauthUser == null){
 			throw new JeesuiteBaseException(4001, "ticket过期或者不存在");
 		}
+		
+		param.setAppId(oauthUser.getFromClientId());
+		param.setIpAddr(IpUtils.getIpAddr(request));
 		accountService.createAccountByOauthInfo(oauthUser, param);
 		//删除ticket
 		redis.remove();

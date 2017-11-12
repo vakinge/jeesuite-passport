@@ -10,8 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,8 +19,6 @@ import com.jeesuite.cache.CacheExpires;
 import com.jeesuite.cache.command.RedisString;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.PassportConstants;
-import com.jeesuite.passport.annotation.RequireSecurityOption;
-import com.jeesuite.passport.dto.TicketCheckParam;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
@@ -53,7 +49,6 @@ public class AuthCommonController{
 			return null;
 		}
 		
-		AuthSessionHelper.validateSessionId(sessionId, true);
 		LoginSession session = AuthSessionHelper.getLoginSession(sessionId);
 		
 		if(session == null){
@@ -65,31 +60,9 @@ public class AuthCommonController{
 		StringBuilder urlBuiler = new StringBuilder(url);
 		urlBuiler.append("?session_id=").append(sessionId);
 		urlBuiler.append("&expires_in=").append(session.getExpiresIn());
+		urlBuiler.append("&ticket=").append(TokenGenerator.generateWithSign());
 		
 		return "redirect:"+urlBuiler.toString();
-	}
-	
-	@CorsEnabled
-	@RequireSecurityOption(innerInvokeOnly = true,requireLogin = false)
-	@RequestMapping(value = "ticket_apply/{action}", method = RequestMethod.GET)
-	public @ResponseBody WrapperResponseEntity applyAuthTicket(@PathVariable("action") String action){
-		String ticket = TokenGenerator.generate();
-		new RedisString(ticket).set(action, CacheExpires.IN_1MIN);
-		return new WrapperResponseEntity(ticket);
-	}
-	
-	@CorsEnabled
-	@RequireSecurityOption(innerInvokeOnly = true,requireLogin = false)
-	@RequestMapping(value = "ticket_check", method = RequestMethod.POST)
-	public @ResponseBody WrapperResponseEntity validateTicket(@RequestBody TicketCheckParam param){
-		if(StringUtils.isAnyBlank(param.getTicket(),param.getContent())){
-			return new WrapperResponseEntity(4001,"输入参数错误");
-		}
-		String cont = new RedisString(param.getTicket()).get();
-		if(StringUtils.equals(param.getContent(), cont)) {
-			return new WrapperResponseEntity(true);
-		}
-		return new WrapperResponseEntity(4001,"ticket验证错误");
 	}
 	
 	

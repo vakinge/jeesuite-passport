@@ -30,10 +30,10 @@ public class TokenGenerator {
 		try {
 			timestamp = Long.parseLong(SecurityCryptUtils.decrypt(token).substring(6));
 		} catch (Exception e) {
-			throw new JeesuiteBaseException(4005, "sessionId格式不正确");
+			throw new JeesuiteBaseException(4005, "格式不正确");
 		}
 		if(validateExpire && System.currentTimeMillis() - timestamp > EXPIRE){
-			throw new JeesuiteBaseException(4005, "sessionId过期");
+			throw new JeesuiteBaseException(4005, "token已过期");
 		}
 	}
 	

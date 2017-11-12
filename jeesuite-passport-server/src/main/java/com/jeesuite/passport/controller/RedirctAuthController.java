@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.dto.Account;
 import com.jeesuite.springweb.utils.WebUtils;
@@ -32,9 +33,17 @@ public class RedirctAuthController extends BaseAuthController{
 				return "error";
 			}
 			
+			String clientId = request.getParameter(PassportConstants.PARAM_CLIENT_ID);
+			String orignDomain = WebUtils.getDomain(referer);
+			try {				
+				validateOrignDomain(clientId,orignDomain);
+			} catch (JeesuiteBaseException e) {
+				model.addAttribute("error", e.getMessage());
+				return "error";
+			}
+			
 			String returnUrl;
 			//同域
-			String orignDomain = WebUtils.getDomain(referer);
 			if(StringUtils.contains(orignDomain, authCookiesDomain)){
 				returnUrl = referer;
 			}else{
@@ -49,7 +58,7 @@ public class RedirctAuthController extends BaseAuthController{
 				}
 			}
 			
-			model.addAttribute("orign_url", referer);
+			model.addAttribute("origin_url", referer);
 			model.addAttribute(OAuth.OAUTH_REDIRECT_URI, returnUrl);
 			return "login";
 		}
@@ -60,7 +69,7 @@ public class RedirctAuthController extends BaseAuthController{
 			return "error";
 		}
 		
-		String orignUrl = request.getParameter("orign_url");
+		String orignUrl = request.getParameter("origin_url");
 		//验证用户
 		Account account = validateUser(request,model);
 		if(account == null){

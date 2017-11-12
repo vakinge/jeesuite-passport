@@ -10,8 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.dto.Account;
+import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.WebUtils;
@@ -31,9 +33,11 @@ public class JsonpAuthController extends BaseAuthController {
 		String setCookiesUri = request.getParameter(OAuth.OAUTH_REDIRECT_URI);
 		if(StringUtils.isBlank(setCookiesUri))setCookiesUri = "/login_callback";
 		
-		boolean isAllowDomain = validateOrignDomain(segs[1]);
-		if(!isAllowDomain){
-			WrapperResponseEntity entity = new WrapperResponseEntity(403, "未授权域名["+segs[1]+"]");
+		String clientId = request.getParameter(PassportConstants.PARAM_CLIENT_ID);
+		try {
+			validateOrignDomain(clientId,segs[1]);
+		} catch (JeesuiteBaseException e) {
+			WrapperResponseEntity entity = new WrapperResponseEntity(e.getCode(), e.getMessage());
 			WebUtils.responseOutJsonp(response, PassportConstants.JSONP_LOGIN_CALLBACK_FUN_NAME, entity);
 			return null;
 		}
@@ -55,6 +59,7 @@ public class JsonpAuthController extends BaseAuthController {
 		//TODO JWT 
 		//urlBuiler.append("&userinfo=").append(session.toEncodeString());
 		urlBuiler.append("&login_type=jsonp");
+		urlBuiler.append("&ticket=").append(TokenGenerator.generateWithSign());
 		return redirectTo(urlBuiler.toString());
 	}
 

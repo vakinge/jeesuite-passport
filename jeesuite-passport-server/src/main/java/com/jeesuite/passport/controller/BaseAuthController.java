@@ -10,19 +10,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
 
+import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.Constants;
+import com.jeesuite.passport.dao.entity.AppEntity;
 import com.jeesuite.passport.dto.Account;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.passport.service.AccountService;
+import com.jeesuite.passport.service.AppService;
 import com.jeesuite.springweb.utils.WebUtils;
 
 public abstract class BaseAuthController {
 
 	@Autowired
 	protected AccountService accountService;
+	
+	@Autowired
+	protected AppService appService;
 	
 	private static String rootDomain;//根域名
 	
@@ -33,8 +39,11 @@ public abstract class BaseAuthController {
 	 * 验证来源域名合法性
 	 * @param domain
 	 */
-	protected boolean validateOrignDomain(String domain){
-		return true;
+	protected void validateOrignDomain(String clientId,String domain){
+		AppEntity appEntity = appService.findByClientId(clientId);
+		if(appEntity == null)throw new JeesuiteBaseException(4001,"App不存在，clientId["+clientId+"]");
+		if(StringUtils.isBlank(appEntity.getAllowDomains()) 
+				|| !appEntity.getAllowDomains().contains(domain))throw new JeesuiteBaseException(4001,"未授权域名["+domain + "]");
 	}
 	
 	protected Account validateUser( HttpServletRequest request ,Model model) {
@@ -82,15 +91,15 @@ public abstract class BaseAuthController {
 			//
 			Cookie cookie = AuthSessionHelper.createSessionCookies(session.getSessionId(), authCookiesDomain, session.getExpiresIn());
 			response.addCookie(cookie);
-			redirectUri = String.format("%s?orign_url=%s", redirectUri,orignUrl);
+			redirectUri = String.format("%s?origin_url=%s", redirectUri,orignUrl);
 		}else{
 			session = createLoginSesion(request,account);
 			orignUrl = StringUtils.trimToEmpty(orignUrl);
 			StringBuilder urlBuiler = new StringBuilder(redirectUri);
 			urlBuiler.append("?session_id=").append(session.getSessionId());
 			urlBuiler.append("&expires_in=").append(session.getExpiresIn());
-			urlBuiler.append("&orign_url=").append(orignUrl);
-			urlBuiler.append("&auth_code=").append(TokenGenerator.generateWithSign());
+			urlBuiler.append("&origin_url=").append(orignUrl);
+			urlBuiler.append("&ticket=").append(TokenGenerator.generateWithSign());
 			redirectUri = urlBuiler.toString();
 		}
 		

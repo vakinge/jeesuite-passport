@@ -14,10 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.jeesuite.cache.command.RedisString;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.helper.AuthSessionHelper;
+import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.springweb.utils.WebUtils;
 
@@ -49,17 +49,10 @@ public class SSOSyncLoginEntrypoint extends HttpServlet {
 			return;
 		}
 		
-		//验证session合法性
 		try {
-			AuthSessionHelper.validateSessionId(sessionId, false);
+			TokenGenerator.validate(ticket, true);
 		} catch (JeesuiteBaseException e) {
-			WebUtils.responseOutHtml(resp, "非法请求[sessionId不合法]");
-			return;
-		}
-		
-		String ticketContent = new RedisString(ticket).get();
-		if(!act.equals(ticketContent)){
-			WebUtils.responseOutHtml(resp, "非法请求[ticket不合法]");
+			WebUtils.responseOutHtml(resp, e.getMessage());
 			return;
 		}
 		

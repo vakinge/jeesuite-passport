@@ -18,8 +18,6 @@ public class LoginUserInfo implements Serializable {
 
     private String mobile;
 
-    private String sourceType;
-    
     private String avatar;
     
 	public Integer getId() {
@@ -60,14 +58,6 @@ public class LoginUserInfo implements Serializable {
 
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
-	}
-
-	public String getSourceType() {
-		return sourceType;
-	}
-
-	public void setSourceType(String sourceType) {
-		this.sourceType = sourceType;
 	}
 
 	public String getAvatar() {

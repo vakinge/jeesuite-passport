@@ -30,7 +30,7 @@ public class SnsAccounyBindingEntity extends BaseEntity {
     private Boolean enabled = true;
     
     @Column(name = "source_app_id")
-    private Integer sourceAppId;
+    private String sourceAppId;
 
     @Column(name = "created_at",updatable = false)
     private Date createdAt;
@@ -150,11 +150,11 @@ public class SnsAccounyBindingEntity extends BaseEntity {
         this.updatedAt = updatedAt;
     }
 
-	public Integer getSourceAppId() {
+	public String getSourceAppId() {
 		return sourceAppId;
 	}
 
-	public void setSourceAppId(Integer sourceAppId) {
+	public void setSourceAppId(String sourceAppId) {
 		this.sourceAppId = sourceAppId;
 	}
     

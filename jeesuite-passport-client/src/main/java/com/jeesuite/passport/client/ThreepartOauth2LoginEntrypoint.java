@@ -47,7 +47,7 @@ public class ThreepartOauth2LoginEntrypoint extends HttpServlet {
 		
 		String redirectUri = WebUtils.getBaseUrl(req) + ClientConfig.redirctUri();
 		String scope = req.getParameter("scope");
-		String url = String.format(ClientConfig.authServerBasePath() + "/snslogin/%s?app_id=%s&reg_uri=%s&redirect_uri=%s&scope=%s&orign_url=%s", 
+		String url = String.format(ClientConfig.authServerBasePath() + "/snslogin/%s?client_id=%s&reg_uri=%s&redirect_uri=%s&scope=%s&origin_url=%s", 
 				                  snsType,
 				                  ClientConfig.clientId(),
 				                  ClientConfig.snsLoginRegUri(),

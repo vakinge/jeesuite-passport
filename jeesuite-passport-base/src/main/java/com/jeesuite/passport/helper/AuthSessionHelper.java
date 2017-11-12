@@ -9,38 +9,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jeesuite.cache.CacheExpires;
-import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.model.LoginSession;
 
 public class AuthSessionHelper {
 	
-	private static final int EXPIRE = 1000*60*3;
 	private static final String NULL = "null";
 	
-	public static void main(String[] args) {
-		String sessionId = generateSessionId(true);
-		System.out.println(sessionId);
-		
-		validateSessionId("RTdFOTNDREU5QzMzOTBCOTA4RjAxQ0RGMTc4NTQ5RDEwMzE1NDBGNDBCNzlCMEIw",true);
-	}
-	
 	public static String generateSessionId(boolean anonymous){
-		String str = DigestUtils.md5Short(TokenGenerator.generate()).concat(String.valueOf(System.currentTimeMillis()));	
-		return SecurityCryptUtils.encrypt(str);
-	}
-	
-	public static void validateSessionId(String seesionId,boolean validateExpire){
-		long timestamp = 0;
-		try {
-			timestamp = Long.parseLong(SecurityCryptUtils.decrypt(seesionId).substring(6));
-		} catch (Exception e) {
-			throw new JeesuiteBaseException(4005, "sessionId格式不正确");
-		}
-		if(validateExpire && System.currentTimeMillis() - timestamp > EXPIRE){
-			throw new JeesuiteBaseException(4005, "sessionId过期");
-		}
+		return TokenGenerator.generate();
 	}
 	
 	public static LoginSession getLoginSession(String sessionId){

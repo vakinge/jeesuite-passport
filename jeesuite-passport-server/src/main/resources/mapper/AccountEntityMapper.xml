@@ -11,7 +11,7 @@
     <result column="nickname" property="nickname" jdbcType="VARCHAR" />
     <result column="avatar" property="avatar" jdbcType="VARCHAR" />
     <result column="type" property="type" jdbcType="VARCHAR" />
-    <result column="source_app_id" property="sourceAppId" jdbcType="INTEGER"/>
+    <result column="source_app_id" property="sourceAppId" jdbcType="VARCHAR"/>
     <result column="enabled" property="enabled" jdbcType="BIT" />
     <result column="deleted" property="deleted" jdbcType="BIT" />
     <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />

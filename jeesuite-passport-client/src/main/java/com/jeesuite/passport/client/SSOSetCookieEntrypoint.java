@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.helper.AuthSessionHelper;
+import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.WebUtils;
@@ -46,9 +47,10 @@ public class SSOSetCookieEntrypoint extends HttpServlet {
 			return;
 		}
 		
-		//验证session合法性
+		String ticket = req.getParameter(PassportConstants.PARAM_TICKET);
+		//验证合法性
 		try {
-			AuthSessionHelper.validateSessionId(sessionId, true);
+			TokenGenerator.validate(ticket, true);
 		} catch (JeesuiteBaseException e) {
 			WebUtils.responseOutJsonp(resp, PassportConstants.JSONP_SETCOOKIE_CALLBACK_FUN_NAME, new WrapperResponseEntity(e.getCode(),e.getMessage()));
 			return;

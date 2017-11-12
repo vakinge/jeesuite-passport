@@ -8,7 +8,7 @@ import com.jeesuite.common.util.DigestUtils;
 
 import io.swagger.annotations.ApiModelProperty;
 
-public class AccountParam implements Serializable {
+public class AccountParam extends RequestMetadata implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

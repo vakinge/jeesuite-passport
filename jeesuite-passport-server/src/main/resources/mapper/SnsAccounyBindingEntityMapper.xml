@@ -11,7 +11,7 @@
     <result column="union_id" property="unionId" jdbcType="VARCHAR" />
     <result column="open_id" property="openId" jdbcType="VARCHAR" />
     <result column="enabled" property="enabled" jdbcType="BIT" />
-    <result column="source_app_id" property="sourceAppId" jdbcType="INTEGER"/>
+    <result column="source_app_id" property="sourceAppId" jdbcType="VARCHAR"/>
     <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
     <result column="updated_at" property="updatedAt" jdbcType="BIGINT" />
   </resultMap>

@@ -25,6 +25,7 @@ import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.dto.Account;
+import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.snslogin.OauthConnector;
 import com.jeesuite.passport.snslogin.OauthUser;
@@ -34,6 +35,7 @@ import com.jeesuite.passport.snslogin.connector.QQConnector;
 import com.jeesuite.passport.snslogin.connector.WeiboConnector;
 import com.jeesuite.passport.snslogin.connector.WeixinGzhConnector;
 import com.jeesuite.passport.snslogin.connector.WinxinConnector;
+import com.jeesuite.springweb.utils.IpUtils;
 import com.jeesuite.springweb.utils.WebUtils;
 
 
@@ -50,10 +52,10 @@ public class ThreePartAuthController extends BaseAuthController implements Envir
 	
 	@RequestMapping(value = "{type}", method = RequestMethod.GET)
 	public String redirect(HttpServletRequest request,@PathVariable("type") String type
-			,@RequestParam(value="app_id",required=false) String appId
+			,@RequestParam(value="client_id",required=false) String clientId
 			,@RequestParam(value="reg_uri",required=false) String regPageUri
 			,@RequestParam("redirect_uri") String redirectUri
-			,@RequestParam(value="orign_url",required=false) String orignUrl){
+			,@RequestParam(value="origin_url",required=false) String orignUrl){
 		
 		boolean isWxGzh = WeixinGzhConnector.SNS_TYPE.equals(type);
 
@@ -64,12 +66,10 @@ public class ThreePartAuthController extends BaseAuthController implements Envir
 		}
 		
 		String orignDomain = WebUtils.getDomain(redirectUri);
-		boolean isAllowDomain = validateOrignDomain(orignDomain);
-		if(!isAllowDomain){
-			throw new JeesuiteBaseException(403,"未授权域名["+orignDomain+"]");
-		}
+		//
+		validateOrignDomain(clientId,orignDomain);
 		
-		SnsLoginState loginState = new SnsLoginState(appId,orignDomain, type, regPageUri, redirectUri,orignUrl);
+		SnsLoginState loginState = new SnsLoginState(clientId,orignDomain, type, regPageUri, redirectUri,orignUrl);
 		new RedisObject(loginState.getState()).set(loginState, CacheExpires.IN_1MIN);
 		
 		String callBackUri = getCallbackUri(request,type);
@@ -109,6 +109,7 @@ public class ThreePartAuthController extends BaseAuthController implements Envir
 			return Constants.ERROR; 
 		}
 		oauthUser.setSnsType(loginState.getSnsType());
+		oauthUser.setFromClientId(loginState.getAppId());
 		//根据openid 找用户
 		Account account = accountService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
 		
@@ -128,7 +129,10 @@ public class ThreePartAuthController extends BaseAuthController implements Envir
 				return "/user/bind";
 			}else{
 				//创建用户并登陆
-				account = accountService.createAccountByOauthInfo(oauthUser,null);
+				AccountBindParam bindParam = new AccountBindParam();
+				bindParam.setAppId(loginState.getAppId());
+				bindParam.setIpAddr(IpUtils.getIpAddr(request));
+				account = accountService.createAccountByOauthInfo(oauthUser,bindParam);
 				//
 				return createSessionAndSetResponse(request, response, account, loginState.getSuccessDirectUri(),loginState.getOrignUrl());
 			}
