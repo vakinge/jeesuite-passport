@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jeesuite.passport.Constants;
-import com.jeesuite.passport.dao.entity.AppEntity;
+import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.Account;
 import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
@@ -64,7 +64,7 @@ public class Oauth2Controller extends BaseAuthController{
 			//构建OAuth 授权请求
 			OAuthAuthzRequest oauthRequest = new OAuthAuthzRequest(request);
 			//检查提交的客户端id是否正确
-			AppEntity app = appService.findByClientId(oauthRequest.getClientId());
+			ClientConfigEntity app = appService.findByClientId(oauthRequest.getClientId());
             if (app == null) {
                 OAuthResponse response =
                         OAuthASResponse.errorResponse(HttpServletResponse.SC_BAD_REQUEST)
@@ -134,7 +134,7 @@ public class Oauth2Controller extends BaseAuthController{
 	            //构建OAuth请求
 	            OAuthTokenRequest oauthRequest = new OAuthTokenRequest(request);
 
-	            AppEntity app = appService.findByClientId(oauthRequest.getClientId());
+	            ClientConfigEntity app = appService.findByClientId(oauthRequest.getClientId());
 	            //检查提交的客户端id是否正确
 	            if (app == null) {
 	                OAuthResponse response =

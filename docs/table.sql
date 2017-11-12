@@ -56,8 +56,8 @@ CREATE TABLE `account_r_roles` (
 -- ----------------------------
 --  Table structure for `app`
 -- ----------------------------
-DROP TABLE IF EXISTS `app`;
-CREATE TABLE `app` (
+DROP TABLE IF EXISTS `client_config`;
+CREATE TABLE `client_config` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(32) DEFAULT NULL,
   `client_id` varchar(32) DEFAULT NULL,
@@ -68,7 +68,8 @@ CREATE TABLE `app` (
   `allow_domains` varchar(200) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` bigint(13) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `client_id_uq_index` (`client_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------

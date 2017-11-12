@@ -97,7 +97,7 @@ public class AuthSessionHelper {
 	}
     
     public static Cookie createSessionCookies(String sessionId,String domain,int expire){
-		Cookie cookie = new Cookie(PassportConstants.AYG_SESSION_NAME,sessionId);  
+		Cookie cookie = new Cookie(PassportConstants.DEFAULT_SESSION_NAME,sessionId);  
 		cookie.setDomain(domain);
 		cookie.setPath("/");
 		cookie.setHttpOnly(true);
@@ -120,7 +120,7 @@ public class AuthSessionHelper {
 			Cookie[] cookies = request.getCookies();
 			if(cookies == null)return null;
 			for (Cookie cookie : cookies) {
-				if(PassportConstants.AYG_SESSION_NAME.equals(cookie.getName())){
+				if(PassportConstants.DEFAULT_SESSION_NAME.equals(cookie.getName())){
 					sessionId = cookie.getValue();
 					break;
 				}

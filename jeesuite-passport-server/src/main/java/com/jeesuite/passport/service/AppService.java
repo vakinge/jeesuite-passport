@@ -6,8 +6,8 @@ package com.jeesuite.passport.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.jeesuite.passport.dao.entity.AppEntity;
-import com.jeesuite.passport.dao.mapper.AppEntityMapper;
+import com.jeesuite.passport.dao.entity.ClientConfigEntity;
+import com.jeesuite.passport.dao.mapper.ClientConfigEntityMapper;
 
 /**
  * @description <br>
@@ -18,16 +18,16 @@ import com.jeesuite.passport.dao.mapper.AppEntityMapper;
 public class AppService  {
 
 	@Autowired
-	private AppEntityMapper appMapper;
+	private ClientConfigEntityMapper clientConfigMapper;
 
-	public AppEntity getApp(int id) {
-		AppEntity entity = appMapper.selectByPrimaryKey(id);
+	public ClientConfigEntity getApp(int id) {
+		ClientConfigEntity entity = clientConfigMapper.selectByPrimaryKey(id);
 		return entity;
 	}
 
 
-	public AppEntity findByClientId(String clientId) {
-		AppEntity entity = appMapper.findByClientId(clientId);
+	public ClientConfigEntity findByClientId(String clientId) {
+		ClientConfigEntity entity = clientConfigMapper.findByClientId(clientId);
 		return entity;
 	}
 

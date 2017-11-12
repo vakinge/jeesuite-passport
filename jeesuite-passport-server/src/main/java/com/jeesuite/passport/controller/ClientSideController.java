@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.common.util.DigestUtils;
-import com.jeesuite.passport.dao.entity.AppEntity;
+import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.service.AppService;
 import com.jeesuite.springboot.starter.cache.CacheProperties;
 
@@ -42,7 +42,7 @@ public class ClientSideController {
 		String clientId = request.getParameter(OAuth.OAUTH_CLIENT_ID);
 		String sign = request.getParameter("sign");
 		
-		AppEntity app = appService.findByClientId(clientId);
+		ClientConfigEntity app = appService.findByClientId(clientId);
 		if(app == null){
 			result.put("error", "未找到clientId注册APP信息");
 			return result;

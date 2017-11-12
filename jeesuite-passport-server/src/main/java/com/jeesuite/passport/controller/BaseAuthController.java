@@ -13,7 +13,7 @@ import org.springframework.ui.Model;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.Constants;
-import com.jeesuite.passport.dao.entity.AppEntity;
+import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.Account;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.helper.TokenGenerator;
@@ -40,7 +40,7 @@ public abstract class BaseAuthController {
 	 * @param domain
 	 */
 	protected void validateOrignDomain(String clientId,String domain){
-		AppEntity appEntity = appService.findByClientId(clientId);
+		ClientConfigEntity appEntity = appService.findByClientId(clientId);
 		if(appEntity == null)throw new JeesuiteBaseException(4001,"App不存在，clientId["+clientId+"]");
 		if(StringUtils.isBlank(appEntity.getAllowDomains()) 
 				|| !appEntity.getAllowDomains().contains(domain))throw new JeesuiteBaseException(4001,"未授权域名["+domain + "]");

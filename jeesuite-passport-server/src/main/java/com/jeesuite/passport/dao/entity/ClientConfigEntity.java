@@ -4,8 +4,8 @@ import com.jeesuite.mybatis.core.BaseEntity;
 import java.util.Date;
 import javax.persistence.*;
 
-@Table(name = "app")
-public class AppEntity extends BaseEntity {
+@Table(name = "client_config")
+public class ClientConfigEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
