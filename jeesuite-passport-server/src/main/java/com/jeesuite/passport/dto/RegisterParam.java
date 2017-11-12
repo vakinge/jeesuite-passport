@@ -2,7 +2,7 @@ package com.jeesuite.passport.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 
-public class RegUserParam {
+public class RegisterParam {
 
 	private String username;
 
@@ -16,6 +16,9 @@ public class RegUserParam {
 	private String password;
 	@ApiModelProperty(value = "用户头像")
 	private String avatar;
+	
+	private String verifyCode;
+	
 	public String getUsername() {
 		return username;
 	}
@@ -51,6 +54,12 @@ public class RegUserParam {
 	}
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
+	}
+	public String getVerifyCode() {
+		return verifyCode;
+	}
+	public void setVerifyCode(String verifyCode) {
+		this.verifyCode = verifyCode;
 	}
 	
 	

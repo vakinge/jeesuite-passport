@@ -22,6 +22,7 @@ import com.jeesuite.passport.dao.mapper.SnsAccounyBindingEntityMapper;
 import com.jeesuite.passport.dto.Account;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.AccountParam;
+import com.jeesuite.passport.dto.RequestMetadata;
 import com.jeesuite.passport.helper.SecurityCryptUtils;
 import com.jeesuite.passport.snslogin.OauthUser;
 import com.jeesuite.passport.snslogin.connector.WeixinGzhConnector;
@@ -75,7 +76,7 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public Account createAccount(Account account){
+	public Account createAccount(Account account,RequestMetadata metadata){
 		AccountEntity accountEntity = null;
 		if(FormatValidateUtils.isMobile(account.getMobile())){
 			accountEntity = accountMapper.findByMobile(account.getMobile());

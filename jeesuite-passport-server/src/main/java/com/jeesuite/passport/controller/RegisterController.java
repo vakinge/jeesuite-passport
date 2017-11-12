@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
+import com.jeesuite.common.util.BeanCopyUtils;
+import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.dto.Account;
 import com.jeesuite.passport.dto.AccountBindParam;
+import com.jeesuite.passport.dto.RegisterParam;
+import com.jeesuite.passport.dto.RequestMetadata;
 import com.jeesuite.passport.exception.ForbiddenAccessException;
 import com.jeesuite.passport.service.AccountService;
 import com.jeesuite.passport.snslogin.OauthUser;
@@ -37,8 +41,10 @@ public class RegisterController {
 	}
 	
 	@RequestMapping(value = "register", method = RequestMethod.POST)
-	public WrapperResponseEntity register(){
+	public @ResponseBody WrapperResponseEntity register(HttpServletRequest request,@RequestBody RegisterParam param){
+		//验证码
 		
+		accountService.createAccount(BeanCopyUtils.copy(param, Account.class),RequestMetadata.build(request));
 		return new WrapperResponseEntity();
 	}
 	

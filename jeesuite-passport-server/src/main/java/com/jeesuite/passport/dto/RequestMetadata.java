@@ -2,7 +2,11 @@ package com.jeesuite.passport.dto;
 
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jeesuite.passport.PassportConstants;
+import com.jeesuite.springweb.utils.IpUtils;
 
 public class RequestMetadata {
 
@@ -14,11 +18,12 @@ public class RequestMetadata {
 	private Date time;
 	
 	public RequestMetadata() {}
-	public RequestMetadata(String ipAddr, String appId, Date time) {
-		super();
-		this.ipAddr = ipAddr;
-		this.appId = appId;
-		this.time = time;
+	
+	public static RequestMetadata build(HttpServletRequest request){
+		RequestMetadata metadata = new RequestMetadata();
+		metadata.setIpAddr(IpUtils.getIpAddr(request));
+		metadata.setAppId(request.getParameter(request.getParameter(PassportConstants.PARAM_CLIENT_ID)));
+		return metadata;
 	}
 	public String getIpAddr() {
 		return ipAddr;
