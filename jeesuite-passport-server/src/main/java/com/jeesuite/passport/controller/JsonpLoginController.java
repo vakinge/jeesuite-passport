@@ -19,8 +19,8 @@ import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.WebUtils;
 
 @Controller
-@RequestMapping(value = "/jsonp/auth")
-public class JsonpAuthController extends BaseAuthController {
+@RequestMapping(value = "/jsonp")
+public class JsonpLoginController extends BaseLoginController {
 
 
 	@RequestMapping(value = "login")

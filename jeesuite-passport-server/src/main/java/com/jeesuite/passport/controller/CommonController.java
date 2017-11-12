@@ -28,7 +28,7 @@ import com.jeesuite.springweb.utils.WebUtils;
 
 @Controller  
 @RequestMapping(value = "/")
-public class AuthCommonController{
+public class CommonController{
 
 	private String[] setSsoCookieUris = org.springframework.util.StringUtils.tokenizeToStringArray(ResourceUtils.getProperty("auth.set-sso-cookie.uris"), ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
 	

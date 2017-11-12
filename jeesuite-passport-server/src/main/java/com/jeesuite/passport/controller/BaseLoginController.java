@@ -22,7 +22,7 @@ import com.jeesuite.passport.service.AccountService;
 import com.jeesuite.passport.service.AppService;
 import com.jeesuite.springweb.utils.WebUtils;
 
-public abstract class BaseAuthController {
+public abstract class BaseLoginController {
 
 	@Autowired
 	protected AccountService accountService;

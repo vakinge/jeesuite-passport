@@ -35,7 +35,7 @@ public class GetLoginInfoEntrypoint extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private static String getStatusUrl = ClientConfig.authServerBasePath() + "/user/login_status/";
-	private static String getInfoUrl = ClientConfig.authServerBasePath() + "/user/info/";
+	private static String getInfoUrl = ClientConfig.authServerBasePath() + "/user/profile/";
 	
 	//@Autowired
 	private RestTemplate restTemplate = new SimpleRestTemplateBuilder().build();

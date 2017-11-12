@@ -42,7 +42,7 @@ import com.jeesuite.springweb.utils.WebUtils;
 
 @Controller
 @RequestMapping("/snslogin")
-public class ThreePartAuthController extends BaseAuthController implements EnvironmentAware{
+public class SnsLoginController extends BaseLoginController implements EnvironmentAware{
 	
 	@Value("${sns.login.bind}")
 	private boolean snsLoginBind;

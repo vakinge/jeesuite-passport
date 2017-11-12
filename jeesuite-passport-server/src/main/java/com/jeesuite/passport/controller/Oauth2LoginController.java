@@ -49,7 +49,7 @@ import com.jeesuite.passport.service.OAuthService;
  */
 @Controller  
 @RequestMapping(value = "/oauth2")
-public class Oauth2Controller extends BaseAuthController{ 
+public class Oauth2LoginController extends BaseLoginController{ 
 	
 	@Autowired
     private OAuthService oAuthService;

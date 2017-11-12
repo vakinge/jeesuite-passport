@@ -57,7 +57,7 @@ public class LoginSuccessCallback extends HttpServlet {
 		int expiresIn = LoginSession.SESSION_EXPIRE_SECONDS;
 		String sessionId = req.getParameter(PassportConstants.PARAM_SESSION_ID);
 		String code = req.getParameter(PassportConstants.PARAM_CODE);
-		String redirectUri = req.getParameter(PassportConstants.PARAM_origin_url);
+		String redirectUri = req.getParameter(PassportConstants.PARAM_ORIGIN_URL);
 		String loginType = req.getParameter(PassportConstants.PARAM_LOGIN_TYPE);
 		String ticket = req.getParameter(PassportConstants.PARAM_TICKET);
 		

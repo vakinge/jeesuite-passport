@@ -17,8 +17,8 @@ import com.jeesuite.passport.dto.Account;
 import com.jeesuite.springweb.utils.WebUtils;
 
 @Controller  
-@RequestMapping(value = "/auth")
-public class RedirctAuthController extends BaseAuthController{
+@RequestMapping(value = "/")
+public class LoginController extends BaseLoginController{
 
 	
 	
@@ -58,7 +58,8 @@ public class RedirctAuthController extends BaseAuthController{
 				}
 			}
 			
-			model.addAttribute("origin_url", referer);
+			model.addAttribute(PassportConstants.PARAM_ORIGIN_URL, referer);
+			model.addAttribute(PassportConstants.PARAM_CLIENT_ID, clientId);
 			model.addAttribute(OAuth.OAUTH_REDIRECT_URI, returnUrl);
 			return "login";
 		}
@@ -69,7 +70,7 @@ public class RedirctAuthController extends BaseAuthController{
 			return "error";
 		}
 		
-		String orignUrl = request.getParameter("origin_url");
+		String orignUrl = request.getParameter(PassportConstants.PARAM_ORIGIN_URL);
 		//验证用户
 		Account account = validateUser(request,model);
 		if(account == null){
