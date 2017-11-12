@@ -8,9 +8,7 @@
 	</appenders>
 
 	<loggers>
-		<logger name="com.jeesuite" level="${sys:log.framework.level}"></logger>
-	    <logger name="com.jeesuiteframwork" level="${sys:log.framework.level}"></logger>
-		<logger name="com.jeesuite" level="${sys:log.service.level}"></logger>
+		<logger name="com.jeesuite" level="debug"></logger>
 		<root level="info">
 			<appender-ref ref="Console" />
 		</root>

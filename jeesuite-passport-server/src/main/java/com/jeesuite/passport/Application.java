@@ -1,8 +1,6 @@
 package com.jeesuite.passport;
 
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -23,7 +21,7 @@ import com.jeesuite.springboot.starter.mybatis.EnableJeesuiteMybatis;
 @EnableDiscoveryClient
 @EnableTransactionManagement
 //@EnableCircuitBreaker
-public class Application implements HealthIndicator{
+public class Application {
 	
 	
 	@Bean 
@@ -45,10 +43,4 @@ public class Application implements HealthIndicator{
         System.out.println("...............................................................");
        
     }
-
-	@Override
-	public Health health() {
-		return Health.up().withDetail("redis", "ok-"+System.currentTimeMillis()).build();  
-	}
-    
 }

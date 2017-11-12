@@ -34,6 +34,8 @@ import com.jeesuite.springweb.utils.WebUtils;
 public class GetLoginInfoEntrypoint extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+	private static String getStatusUrl = ClientConfig.authServerBasePath() + "/user/login_status/";
+	private static String getInfoUrl = ClientConfig.authServerBasePath() + "/user/info/";
 	
 	//@Autowired
 	private RestTemplate restTemplate = new SimpleRestTemplateBuilder().build();
@@ -52,13 +54,13 @@ public class GetLoginInfoEntrypoint extends HttpServlet {
 		String act = req.getPathInfo().substring(1);
         try {
         	if("status".equals(act)){
-    			ResponseEntity<WrapperResponseEntity> entity = restTemplate.getForEntity("http://PASSPORT-SERVICE/user/login_status/"+sessionId, WrapperResponseEntity.class);
+    			ResponseEntity<WrapperResponseEntity> entity = restTemplate.getForEntity(getStatusUrl+sessionId, WrapperResponseEntity.class);
     			WebUtils.responseOutJson(resp, JsonUtils.toJson(entity.getBody()));
     		}else if("info".equals(act)){
     			ParameterizedTypeReference<WrapperResponse<LoginUserInfo>> arearesponseType = new ParameterizedTypeReference<WrapperResponse<LoginUserInfo>>() {
     			};
     			
-    			WrapperResponse<LoginUserInfo> response = restTemplate.exchange("http://PASSPORT-SERVICE/user/info/"+sessionId,HttpMethod.GET, null, arearesponseType).getBody();
+    			WrapperResponse<LoginUserInfo> response = restTemplate.exchange(getInfoUrl+sessionId,HttpMethod.GET, null, arearesponseType).getBody();
     			WebUtils.responseOutJson(resp, JsonUtils.toJson(response.getData()));
     		}
 		} catch (JeesuiteBaseException e) {
