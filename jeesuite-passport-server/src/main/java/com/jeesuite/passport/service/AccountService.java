@@ -102,7 +102,7 @@ public class AccountService {
 		}
 		
 		accountEntity = BeanCopyUtils.copy(account, AccountEntity.class);
-		accountEntity.setRegAt(new Date());
+		accountEntity.setRegAt(metadata.getTime());
 		if(StringUtils.isNotBlank(accountEntity.getPassword())){
 			accountEntity.setPassword(cryptPassword(accountEntity.getPassword(), accountEntity.getRegAt()));
 		}
@@ -145,7 +145,7 @@ public class AccountService {
 					accountEntity.setPassword(cryptPassword(accountEntity.getPassword(), accountEntity.getRegAt()));
 				}
 				
-				accountEntity.setRegAt(new Date());
+				accountEntity.setRegAt(bindParam.getTime());
 				
 				accountMapper.insertSelective(accountEntity);
 			}
@@ -156,8 +156,9 @@ public class AccountService {
 			bindingEntity.setOpenId(oauthUser.getOpenId());
 			bindingEntity.setUnionId(oauthUser.getUnionId());
 			bindingEntity.setEnabled(true);
-			bindingEntity.setCreatedAt(accountEntity.getRegAt());
+			bindingEntity.setCreatedAt(bindParam.getTime());
 			snsAccounyBindingMapper.insertSelective(bindingEntity);
+			
 			account = BeanCopyUtils.copy(accountEntity, Account.class);
 			
 		}
