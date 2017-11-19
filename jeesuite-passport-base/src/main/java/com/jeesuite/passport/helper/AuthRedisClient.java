@@ -14,7 +14,6 @@ import com.jeesuite.cache.redis.standalone.JedisStandaloneProvider;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.http.HttpUtils;
 import com.jeesuite.common.json.JsonUtils;
-import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.common.util.ResourceUtils;
 
 import redis.clients.jedis.BinaryJedis;
@@ -137,7 +136,7 @@ public class AuthRedisClient {
 			String clientSecret = ResourceUtils.getProperty("auth.client.secret");
 			
 			String url = authServerBasePath() + "/clientside/sync_config?client_id=%s&sign=%s";
-			String sign = DigestUtils.md5WithSalt(clientId, clientSecret);
+			String sign = SecurityCryptUtils.generateSign(clientSecret, clientId);
 			url = String.format(url, clientId,sign);
 			String json = null;
 			try {

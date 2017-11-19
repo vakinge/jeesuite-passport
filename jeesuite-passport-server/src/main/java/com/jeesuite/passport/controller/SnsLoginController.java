@@ -24,8 +24,8 @@ import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.PassportConstants;
-import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.dto.AccountBindParam;
+import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.snslogin.OauthConnector;
 import com.jeesuite.passport.snslogin.OauthUser;
@@ -44,7 +44,7 @@ import com.jeesuite.springweb.utils.WebUtils;
 @RequestMapping("/snslogin")
 public class SnsLoginController extends BaseLoginController implements EnvironmentAware{
 	
-	@Value("${sns.login.bind}")
+	@Value("${sns.login.next.bind:false}")
 	private boolean snsLoginBind;
 	private Map<String, OauthConnector> oauthConnectors = new HashMap<>();
 	private WeixinGzhConnector weixinGzhConnector = new WeixinGzhConnector();
@@ -124,25 +124,25 @@ public class SnsLoginController extends BaseLoginController implements Environme
 		}
 		
 		//跳转去绑定页面
-		if(StringUtils.isNotBlank(loginState.getRegPageUri())){//业务系统自定义绑定页面
+		if(snsLoginBind || StringUtils.isNotBlank(loginState.getRegPageUri())){//业务系统自定义绑定页面
 			String ticket = TokenGenerator.generate();
-			new RedisObject(ticket).set(oauthUser, CacheExpires.IN_HALF_HOUR);
-			return "redirect:" + loginState.getRegPageUri() + "?auth_ticket=" + ticket + "&" + oauthUser.userInfoToUrlQueryString();
-		}else{
+			new RedisObject(ticket).set(oauthUser, CacheExpires.IN_5MINS);
 			if(snsLoginBind){
+				model.addAttribute("authTicket", ticket);
 				model.addAttribute("oauthUser", oauthUser);
 				model.addAttribute("redirect_uri", loginState.getSuccessDirectUri());
-				return "/user/bind";
-			}else{
-				//创建用户并登陆
-				AccountBindParam bindParam = new AccountBindParam();
-				bindParam.setAppId(loginState.getAppId());
-				bindParam.setIpAddr(IpUtils.getIpAddr(request));
-				account = accountService.createUserByOauthInfo(oauthUser,bindParam);
-				//
-				return createSessionAndSetResponse(request, response, account, loginState.getSuccessDirectUri(),loginState.getOrignUrl());
+				return "bind";
+			}else{				
+				return "redirect:" + loginState.getRegPageUri() + "?auth_ticket=" + ticket + "&" + oauthUser.userInfoToUrlQueryString();
 			}
-			
+		}else{
+			//创建用户并登陆
+			AccountBindParam bindParam = new AccountBindParam();
+			bindParam.setAppId(loginState.getAppId());
+			bindParam.setIpAddr(IpUtils.getIpAddr(request));
+			account = accountService.createUserByOauthInfo(oauthUser,bindParam);
+			//
+			return createSessionAndSetResponse(request, response, account, loginState.getSuccessDirectUri(),loginState.getOrignUrl());
 		}
 		 
 	}

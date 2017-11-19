@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
+import com.jeesuite.passport.helper.SecurityCryptUtils;
 import com.jeesuite.passport.service.AppService;
 import com.jeesuite.springboot.starter.cache.CacheProperties;
 
@@ -47,7 +48,7 @@ public class ClientSideController {
 			result.put("error", "未找到clientId注册APP信息");
 			return result;
 		}
-		String expectSign = DigestUtils.md5WithSalt(clientId, app.getClientSecret());
+		String expectSign = SecurityCryptUtils.generateSign(app.getClientSecret(), clientId);
 		if(!StringUtils.equals(sign, expectSign)){
 			result.put("error", "签名错误");
 			return result;

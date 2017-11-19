@@ -9,20 +9,22 @@ import javax.persistence.Table;
 
 import com.jeesuite.mybatis.core.BaseEntity;
 
-@Table(name = "account")
-public class AccountEntity extends BaseEntity {
+@Table(name = "users")
+public class UserEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "username",updatable=false)
     private String username;
-    
     private String email;
-
     private String mobile;
-
     private String password;
-    
+    private String realname;
+    private String nickname;
+    private String avatar;
+    private Integer age;
+    private String gender;
+    private Date birthday;
     @Column(name = "source_app_id",updatable=false)
     private String sourceAppId;
 
@@ -201,6 +203,54 @@ public class AccountEntity extends BaseEntity {
 
 	public void setSourceAppId(String sourceAppId) {
 		this.sourceAppId = sourceAppId;
+	}
+
+	public String getRealname() {
+		return realname;
+	}
+
+	public void setRealname(String realname) {
+		this.realname = realname;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
+	}
+
+	public Integer getAge() {
+		return age;
+	}
+
+	public void setAge(Integer age) {
+		this.age = age;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
 	}
     
     

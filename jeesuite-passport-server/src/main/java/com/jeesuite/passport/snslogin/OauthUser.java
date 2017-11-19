@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class OauthUser implements Serializable {
 
+	private static final String UNKOWN = "unkown";
+
 	private static final long serialVersionUID = 1L;
 
 	private String fromClientId;
@@ -48,7 +50,7 @@ public class OauthUser implements Serializable {
 	}
 
 	public String getGender() {
-		return "unkown".equals(gender) ? null : gender;
+		return UNKOWN.equals(gender) ? null : gender;
 	}
 
 	public void setGender(String gender) {

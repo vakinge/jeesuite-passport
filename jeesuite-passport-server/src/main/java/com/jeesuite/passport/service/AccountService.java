@@ -14,16 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.BeanCopyUtils;
 import com.jeesuite.common.util.FormatValidateUtils;
-import com.jeesuite.passport.dao.entity.AccountEntity;
 import com.jeesuite.passport.dao.entity.SnsAccounyBindingEntity;
 import com.jeesuite.passport.dao.entity.SnsAccounyBindingEntity.SnsType;
-import com.jeesuite.passport.dao.entity.UserDetailEntity;
-import com.jeesuite.passport.dao.mapper.AccountEntityMapper;
+import com.jeesuite.passport.dao.entity.UserEntity;
 import com.jeesuite.passport.dao.mapper.SnsAccounyBindingEntityMapper;
-import com.jeesuite.passport.dao.mapper.UserDetailEntityMapper;
-import com.jeesuite.passport.dto.UserInfo;
+import com.jeesuite.passport.dao.mapper.UserEntityMapper;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RequestMetadata;
+import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.helper.SecurityCryptUtils;
 import com.jeesuite.passport.snslogin.OauthUser;
 import com.jeesuite.passport.snslogin.connector.WeixinGzhConnector;
@@ -38,33 +36,28 @@ public class AccountService {
 
 	
 	@Autowired
-	private AccountEntityMapper accountMapper;
-	@Autowired
-	private UserDetailEntityMapper userDetailMapper;
+	private UserEntityMapper accountMapper;
 	@Autowired
 	private SnsAccounyBindingEntityMapper snsAccounyBindingMapper;
 
 
 	public UserInfo findAcctountById(int id) {
-		AccountEntity entity = accountMapper.selectByPrimaryKey(id);
+		UserEntity entity = accountMapper.selectByPrimaryKey(id);
 		return buildUserInfo(entity);
 	}
 	
 	public UserInfo findByWxUnionId(String unionId) {
-		AccountEntity entity = accountMapper.findByWxUnionId(unionId);
+		UserEntity entity = accountMapper.findByWxUnionId(unionId);
 		return buildUserInfo(entity);
 	}
 	
 	public UserInfo findAcctountByLoginName(String loginName) {
-		AccountEntity entity = accountMapper.findByLoginName(loginName);
+		UserEntity entity = accountMapper.findByLoginName(loginName);
 		return buildUserInfo(entity);
 	}
 
-	private UserInfo buildUserInfo(AccountEntity entity) {
-		UserDetailEntity detailEntity = userDetailMapper.selectByPrimaryKey(entity.getId());
-		UserInfo userInfo = BeanCopyUtils.copy(detailEntity, UserInfo.class);
-		userInfo.setMobile(entity.getMobile());
-		userInfo.setEmail(entity.getEmail());
+	private UserInfo buildUserInfo(UserEntity entity) {
+		UserInfo userInfo = BeanCopyUtils.copy(entity, UserInfo.class);
 		return userInfo;
 	}
 	
@@ -72,23 +65,23 @@ public class AccountService {
 		type = WeixinGzhConnector.SNS_TYPE.equals(type) ? SnsType.weixin.name() : type;
 		SnsAccounyBindingEntity bindingEntity = snsAccounyBindingMapper.findBySnsOpenId(type, openId);
 		if(bindingEntity != null){
-			AccountEntity accountEntity = accountMapper.selectByPrimaryKey(bindingEntity.getUserId());
+			UserEntity accountEntity = accountMapper.selectByPrimaryKey(bindingEntity.getUserId());
 			return buildUserInfo(accountEntity);
 		}
 		return null;
 	}
 	
 	public UserInfo checkAndGetAccount(String loginName,String password){
-		AccountEntity entity = accountMapper.findByLoginName(loginName);
+		UserEntity entity = accountMapper.findByLoginName(loginName);
 		if(entity == null || !entity.getPassword().equals(cryptPassword(password, entity.getRegAt()))){
 		   return null;
 		}
-		return BeanCopyUtils.copy(entity,UserInfo.class);
+		return buildUserInfo(entity);
 	}
 	
 	@Transactional
 	public UserInfo createUser(UserInfo userInfo,RequestMetadata metadata){
-		AccountEntity accountEntity = null;
+		UserEntity accountEntity = null;
 		if(FormatValidateUtils.isMobile(userInfo.getMobile())){
 			accountEntity = accountMapper.findByMobile(userInfo.getMobile());
 			if(accountEntity != null){
@@ -112,20 +105,14 @@ public class AccountService {
 			}
 		}
 		
-		accountEntity = BeanCopyUtils.copy(userInfo, AccountEntity.class);
+		accountEntity = BeanCopyUtils.copy(userInfo, UserEntity.class);
 		accountEntity.setRegAt(metadata.getTime());
+		accountEntity.setRegIp(metadata.getIpAddr());
+		accountEntity.setSourceAppId(metadata.getAppId());
 		if(StringUtils.isNotBlank(accountEntity.getPassword())){
 			accountEntity.setPassword(cryptPassword(accountEntity.getPassword(), accountEntity.getRegAt()));
 		}
 		accountMapper.insertSelective(accountEntity);
-		
-		//
-		UserDetailEntity userDetail = new UserDetailEntity(); 
-		userDetail.setUserId(accountEntity.getId());
-		userDetail.setNickname(userInfo.getNickname());
-		userDetail.setAvatar(userInfo.getAvatar());
-		userDetail.setCreatedAt(accountEntity.getRegAt());
-		userDetailMapper.insertSelective(userDetail);
 		
 		userInfo.setId(accountEntity.getId());
 		return userInfo;
@@ -138,7 +125,7 @@ public class AccountService {
 		UserInfo account = findAcctountBySnsOpenId(snsType, oauthUser.getOpenId());
 		if(account == null){
 			
-			AccountEntity accountEntity = null;
+			UserEntity accountEntity = null;
 			//先按unionId查找是否有已存在的用户
 			if(StringUtils.isNotBlank(oauthUser.getUnionId())){
 				List<SnsAccounyBindingEntity> sameAccounyBinds = snsAccounyBindingMapper.findByUnionId(oauthUser.getUnionId());
@@ -152,25 +139,17 @@ public class AccountService {
 			
 			if(accountEntity == null){
 				if(bindParam == null){					
-					accountEntity = new AccountEntity();
+					accountEntity = new UserEntity();
 				}else{
-					accountEntity = BeanCopyUtils.copy(bindParam, AccountEntity.class);
+					accountEntity = BeanCopyUtils.copy(bindParam, UserEntity.class);
 				}
-				if(StringUtils.isBlank(accountEntity.getPassword())){
+				accountEntity.setSourceAppId(bindParam.getAppId());
+				accountEntity.setRegIp(bindParam.getIpAddr());
+				accountEntity.setRegAt(bindParam.getTime());
+				if(StringUtils.isNotBlank(accountEntity.getPassword())){
 					accountEntity.setPassword(cryptPassword(accountEntity.getPassword(), accountEntity.getRegAt()));
 				}
-				accountEntity.setRegAt(bindParam.getTime());
 				accountMapper.insertSelective(accountEntity);
-				
-				UserDetailEntity userDetail = new UserDetailEntity(); 
-				userDetail.setUserId(accountEntity.getId());
-				userDetail.setNickname(oauthUser.getNickname());
-				userDetail.setAvatar(oauthUser.getAvatar());
-				if(StringUtils.isNotBlank(oauthUser.getGender())){					
-					userDetail.setGender(oauthUser.getGender());
-				}
-				userDetail.setCreatedAt(accountEntity.getRegAt());
-				userDetailMapper.insertSelective(userDetail);
 			}
 			//
 			SnsAccounyBindingEntity bindingEntity = new SnsAccounyBindingEntity();
@@ -191,59 +170,48 @@ public class AccountService {
 	@Transactional
 	public void updateAccount(UserInfo userInfo){
 		
-		AccountEntity accountEntity = accountMapper.selectByPrimaryKey(userInfo.getId());
+		UserEntity accountEntity = accountMapper.selectByPrimaryKey(userInfo.getId());
 		if(accountEntity == null)throw new JeesuiteBaseException(4001, "账号不存在");
-		UserDetailEntity detailEntity = userDetailMapper.selectByPrimaryKey(userInfo.getId());
 		
-		boolean updateAccount = false;
-		boolean updateDetail = false;
-		AccountEntity existAccount = null;
+		UserEntity existAccount = null;
 		if(StringUtils.isNotBlank(userInfo.getMobile()) && !userInfo.getMobile().equals(accountEntity.getMobile())){
 			existAccount = accountMapper.findByMobile(userInfo.getMobile());
 			if(existAccount != null){
 				throw new JeesuiteBaseException(4003, "该手机号码已注册");
 			}
 			accountEntity.setMobile(userInfo.getMobile());
-			updateAccount = true;
 		}
-		
 		if(StringUtils.isNotBlank(userInfo.getEmail()) && !userInfo.getEmail().equals(accountEntity.getEmail())){
 			existAccount = accountMapper.findByLoginName(userInfo.getEmail());
 			if(existAccount != null){
 				throw new JeesuiteBaseException(4003, "该邮箱已注册");
 			}
 			accountEntity.setEmail(userInfo.getEmail());
-			updateAccount = true;
 		}
-		
 		if(StringUtils.isNotBlank(userInfo.getPassword())){
 			accountEntity.setPassword(cryptPassword(userInfo.getPassword(), accountEntity.getRegAt()));
-			updateAccount = true;
 		}
-		
-		if(StringUtils.isNotBlank(userInfo.getGender())){
-			detailEntity.setGender(userInfo.getGender());
-			updateDetail = true;
-		}
-		
 		if(StringUtils.isNotBlank(userInfo.getAvatar())){
-			detailEntity.setAvatar(userInfo.getAvatar());
-			updateDetail = true;
+			accountEntity.setAvatar(userInfo.getAvatar());
 		}
-		
-		if(StringUtils.isNotBlank(userInfo.getNickname())){
-			detailEntity.setNickname(userInfo.getNickname());
-			updateDetail = true;
+        if(StringUtils.isNotBlank(userInfo.getGender())){
+        	accountEntity.setGender(userInfo.getGender());
 		}
-		
+        if(StringUtils.isNotBlank(userInfo.getNickname())){
+        	accountEntity.setNickname(userInfo.getNickname());
+		}
+        if(StringUtils.isNotBlank(userInfo.getRealname())){
+        	accountEntity.setRealname(userInfo.getRealname());
+		} 
+        if(userInfo.getAge() != null){
+        	accountEntity.setAge(userInfo.getAge());
+		}
+        if(userInfo.getBirthday() != null){
+        	accountEntity.setBirthday(userInfo.getBirthday());
+        }
 		accountEntity.setUpdatedAt(new Date());
 		
-		if(updateAccount){
-			accountMapper.updateByPrimaryKeySelective(accountEntity);
-		}
-		if(updateDetail){
-			userDetailMapper.updateByPrimaryKeySelective(detailEntity);
-		}
+		accountMapper.updateByPrimaryKeySelective(accountEntity);
 	}
 
 

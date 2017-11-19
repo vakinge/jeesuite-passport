@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jeesuite.passport.dao.mapper.AccountEntityMapper" >
-  <resultMap id="BaseResultMap" type="com.jeesuite.passport.dao.entity.AccountEntity" >
+<mapper namespace="com.jeesuite.passport.dao.mapper.UserEntityMapper" >
+  <resultMap id="BaseResultMap" type="com.jeesuite.passport.dao.entity.UserEntity" >
     
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="username" property="username" jdbcType="VARCHAR" />
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="mobile" property="mobile" jdbcType="CHAR" />
     <result column="password" property="password" jdbcType="CHAR" />
+    <result column="realname" property="realname" jdbcType="VARCHAR" />
+    <result column="nickname" property="nickname" jdbcType="VARCHAR" />
+    <result column="avatar" property="avatar" jdbcType="VARCHAR" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="gender" property="gender" jdbcType="CHAR" />
+    <result column="birthday" property="birthday" jdbcType="DATE" />
     <result column="type" property="type" jdbcType="VARCHAR" />
     <result column="source_app_id" property="sourceAppId" jdbcType="VARCHAR"/>
     <result column="enabled" property="enabled" jdbcType="BIT" />
