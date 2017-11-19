@@ -45,21 +45,21 @@ public class UserCenterController {
 		return "ucenter/setting";
 	}
 	
-	@RequestMapping(value = "passwordsetting", method = RequestMethod.GET)
+	@RequestMapping(value = "setting/password", method = RequestMethod.GET)
 	public String passwordsetting(Model model){
 		LoginSession session = LoginContext.getRequireLoginSession();
 		model.addAttribute(USER_INFO_ATTR_NAME, session.getUserInfo());
 		return "ucenter/passwordsetting";
 	}
 	
-	@RequestMapping(value = "emailsetting", method = RequestMethod.GET)
+	@RequestMapping(value = "setting/email", method = RequestMethod.GET)
 	public String emailsetting(Model model){
 		LoginSession session = LoginContext.getRequireLoginSession();
 		model.addAttribute(USER_INFO_ATTR_NAME, session.getUserInfo());
 		return "ucenter/emailsetting";
 	}
 	
-	@RequestMapping(value = "mobilesetting", method = RequestMethod.GET)
+	@RequestMapping(value = "setting/mobile", method = RequestMethod.GET)
 	public String mobilesetting(Model model){
 		LoginSession session = LoginContext.getRequireLoginSession();
 		model.addAttribute(USER_INFO_ATTR_NAME, session.getUserInfo());
