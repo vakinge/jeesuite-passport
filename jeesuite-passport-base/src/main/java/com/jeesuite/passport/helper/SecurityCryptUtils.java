@@ -6,48 +6,35 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.jeesuite.common.crypt.Base64;
 import com.jeesuite.common.crypt.DES;
 import com.jeesuite.common.util.DigestUtils;
-import com.jeesuite.common.util.ResourceUtils;
 
 public class SecurityCryptUtils {
 
-	private static String cryptType;
-	private static String cryptKey = "s7bq0w1h";
 	private static String passwordSalt = "q@#tr5~d2&P6#_9G";
-	
-	static{
-		cryptType = ResourceUtils.getProperty("auth.crypt.type", "DES");
-		if(ResourceUtils.containsProperty("auth.crypt.key")){
-			String base = ResourceUtils.getProperty("auth.crypt.key");
-			cryptKey = base.substring(0, 2) + DigestUtils.md5Short(base);
-		}
-	}
 	
 	public static String cryptPassword(String password,String salt) {
 		return DigestUtils.md5(password.concat(passwordSalt).concat(salt));
 	}
 	
 	public static String encrypt(String data) {
+		 String cryptKey = AuthConfigClient.getInstance().getCryptSecret();
 		 String encode = DES.encrypt(cryptKey, data);
 		 byte[] bytes = Base64.encodeToByte(encode.getBytes(StandardCharsets.UTF_8), false);
 		 return new String(bytes, StandardCharsets.UTF_8);
 	}
 	
 	public static String decrypt(String data) {
+		String cryptKey = AuthConfigClient.getInstance().getCryptSecret();
 		 byte[] bytes = Base64.decode(data);
 		 data = new String(bytes, StandardCharsets.UTF_8);
 		 return DES.decrypt(cryptKey, data);
 	}
 	
-	public static String generateSign(String...params) {
-		return DigestUtils.md5(cryptKey + StringUtils.join(params));
-	}
 	
 	public static String generateSign(Map<String, String> sPara) {
+		String cryptKey = AuthConfigClient.getInstance().getCryptSecret();
 		return generateSign(cryptKey, sPara);
 	}
 	

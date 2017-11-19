@@ -140,6 +140,9 @@ public class AccountService {
 			if(accountEntity == null){
 				if(bindParam == null){					
 					accountEntity = new UserEntity();
+					accountEntity.setAvatar(oauthUser.getAvatar());
+					accountEntity.setNickname(oauthUser.getNickname());
+					accountEntity.setGender(oauthUser.getGender());
 				}else{
 					accountEntity = BeanCopyUtils.copy(bindParam, UserEntity.class);
 				}

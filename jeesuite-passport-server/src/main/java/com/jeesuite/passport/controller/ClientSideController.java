@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.common.util.DigestUtils;
+import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.helper.SecurityCryptUtils;
 import com.jeesuite.passport.service.AppService;
@@ -48,7 +49,11 @@ public class ClientSideController {
 			result.put("error", "未找到clientId注册APP信息");
 			return result;
 		}
-		String expectSign = SecurityCryptUtils.generateSign(app.getClientSecret(), clientId);
+		
+		Map<String, String> map = new HashMap<>();
+		map.put("timestamp", request.getParameter("timestamp"));
+		map.put("client_id", clientId);
+		String expectSign = SecurityCryptUtils.generateSign(app.getClientSecret(), map);
 		if(!StringUtils.equals(sign, expectSign)){
 			result.put("error", "签名错误");
 			return result;
@@ -59,7 +64,9 @@ public class ClientSideController {
 		result.put("auth.redis.password", cacheProperties.getPassword());
 		result.put("auth.redis.database", String.valueOf(cacheProperties.getDatabase()));
 		result.put("auth.redis.masterName", cacheProperties.getMasterName());
-		
+		result.put("auth.jwt.secret", ResourceUtils.getProperty("auth.jwt.secret"));
+		result.put("auth.crypt.type", ResourceUtils.getProperty("auth.crypt.type", "DES"));
+		result.put("auth.crypt.key", ResourceUtils.getProperty("auth.crypt.key",DigestUtils.md5("jeesuite")));
 		return result;
 	}
 	

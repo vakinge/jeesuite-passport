@@ -22,19 +22,20 @@ public class AuthSessionHelper {
 	
 	private static final int EXPIRE = 1000*60*3;
 	private static final String NULL = "null";
-	private static String cryptKey = "d5tg8y2q";
 	//是否是会话cookies
 	private static boolean cookieTemporary = Boolean.parseBoolean(ResourceUtils.getProperty("auth.cookie.temporary", "true"));
 	private static String SESSION_COOKIE_NAME = ResourceUtils.getProperty("auth.session.cookie.name", "JEESUITE_SID");
+	
+	
 	public static String generateSessionId(boolean anonymous){
 		String str = DigestUtils.md5Short(TokenGenerator.generate()).concat(String.valueOf(System.currentTimeMillis()));
-		return DES.encrypt(cryptKey, str).toLowerCase();
+		return DES.encrypt(AuthConfigClient.getInstance().getCryptSecret(), str).toLowerCase();
 	}
 	
 	public static void validateSessionId(String sessionId,boolean validateExpire){
 		long timestamp = 0;
 		try {
-			timestamp = Long.parseLong(DES.decrypt(cryptKey,sessionId).substring(6));
+			timestamp = Long.parseLong(DES.decrypt(AuthConfigClient.getInstance().getCryptSecret(),sessionId).substring(6));
 		} catch (Exception e) {
 			throw new JeesuiteBaseException(4005, "sessionId格式不正确");
 		}
