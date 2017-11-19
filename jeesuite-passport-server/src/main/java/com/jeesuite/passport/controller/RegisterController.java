@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.BeanCopyUtils;
-import com.jeesuite.passport.PassportConstants;
-import com.jeesuite.passport.dto.Account;
+import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RegisterParam;
 import com.jeesuite.passport.dto.RequestMetadata;
@@ -44,7 +43,7 @@ public class RegisterController {
 	public @ResponseBody WrapperResponseEntity register(HttpServletRequest request,@RequestBody RegisterParam param){
 		//验证码
 		
-		accountService.createAccount(BeanCopyUtils.copy(param, Account.class),RequestMetadata.build(request));
+		accountService.createUser(BeanCopyUtils.copy(param, UserInfo.class),RequestMetadata.build(request));
 		return new WrapperResponseEntity();
 	}
 	
@@ -53,7 +52,7 @@ public class RegisterController {
 	@ApiOperation(value = "注册账号可用性检查",notes="### 调用范围 \n - 匿名 \n - 可跨域", httpMethod = "POST")
 	public @ResponseBody WrapperResponseEntity registerCheck(@RequestParam("account") String name){
 		
-		Account account = accountService.findAcctountByLoginName(name);
+		UserInfo account = accountService.findAcctountByLoginName(name);
 		if(account != null)throw new JeesuiteBaseException(4001, "已注册");
 		
 		return new WrapperResponseEntity();
@@ -72,7 +71,7 @@ public class RegisterController {
 		
 		param.setAppId(oauthUser.getFromClientId());
 		param.setIpAddr(IpUtils.getIpAddr(request));
-		accountService.createAccountByOauthInfo(oauthUser, param);
+		accountService.createUserByOauthInfo(oauthUser, param);
 		//删除ticket
 		redis.remove();
 		return new WrapperResponseEntity();

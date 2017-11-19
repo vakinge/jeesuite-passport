@@ -5,15 +5,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.oltu.oauth2.common.OAuth;
-import org.apache.oltu.oauth2.common.OAuth.HttpMethod;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.PassportConstants;
-import com.jeesuite.passport.dto.Account;
+import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.springweb.utils.WebUtils;
 
 @Controller  
@@ -21,18 +21,11 @@ import com.jeesuite.springweb.utils.WebUtils;
 public class LoginController extends BaseLoginController{
 
 	
-	
-	@RequestMapping(value = "login")
-	public Object login(Model model, HttpServletRequest request ,HttpServletResponse response){
-		
-		
-		if(StringUtils.equals(request.getMethod(), HttpMethod.GET)){
-			String referer = request.getHeader(HttpHeaders.REFERER);
-			if(StringUtils.isBlank(referer)){
-				model.addAttribute("error", "未知来源");
-				return "error";
-			}
-			
+	@RequestMapping(value = "login",method = RequestMethod.GET)
+	public String toLoginpage(Model model, HttpServletRequest request ,HttpServletResponse response){
+		String referer = request.getHeader(HttpHeaders.REFERER);
+		//从其他站点进入
+		if(StringUtils.isNotBlank(referer) && !referer.startsWith(WebUtils.getBaseUrl(request))){
 			String clientId = request.getParameter(PassportConstants.PARAM_CLIENT_ID);
 			String orignDomain = WebUtils.getDomain(referer);
 			try {				
@@ -41,7 +34,6 @@ public class LoginController extends BaseLoginController{
 				model.addAttribute("error", e.getMessage());
 				return "error";
 			}
-			
 			String returnUrl;
 			//同域
 			if(StringUtils.contains(orignDomain, authCookiesDomain)){
@@ -57,25 +49,25 @@ public class LoginController extends BaseLoginController{
 					returnUrl = WebUtils.getBaseUrl(referer) + returnUrl;
 				}
 			}
-			
 			model.addAttribute(PassportConstants.PARAM_ORIGIN_URL, referer);
-			model.addAttribute(PassportConstants.PARAM_CLIENT_ID, clientId);
 			model.addAttribute(OAuth.OAUTH_REDIRECT_URI, returnUrl);
-			return "login";
+			model.addAttribute(PassportConstants.PARAM_CLIENT_ID, clientId);
 		}
 		
+		
+		return "login";
+	}
+	
+	@RequestMapping(value = "login",method = RequestMethod.POST)
+	public String login(Model model, HttpServletRequest request ,HttpServletResponse response){
 		String redirctUri = request.getParameter(OAuth.OAUTH_REDIRECT_URI);
 		if(StringUtils.isBlank(redirctUri)){
-			model.addAttribute("error", "Parameter ["+OAuth.OAUTH_REDIRECT_URI+"] is required");
-			return "error";
+			redirctUri = WebUtils.getBaseUrl(request) + "/ucenter/index";
 		}
 		
 		String orignUrl = request.getParameter(PassportConstants.PARAM_ORIGIN_URL);
 		//验证用户
-		Account account = validateUser(request,model);
-		if(account == null){
-			return "error";
-		}
+		UserInfo account = validateUser(request,model);
 		//
 		return createSessionAndSetResponse(request, response, account, redirctUri,orignUrl);
 	}

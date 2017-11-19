@@ -8,10 +8,8 @@ CREATE TABLE `account` (
   `email` varchar(32) DEFAULT NULL,
   `mobile` char(11) DEFAULT NULL,
   `password` char(32) DEFAULT NULL,
-  `nickname` varchar(32) DEFAULT NULL,
   `source_app_id` VARCHAR(32) DEFAULT NULL COMMENT '用户来源（业务系统）',
   `type` varchar(32) DEFAULT NULL COMMENT '用户类型',
-  `avatar` varchar(200) DEFAULT NULL,
   `deleted` bit(1) DEFAULT b'0',
   `enabled` bit(1) DEFAULT b'1',
   `reg_ip` varchar(15) DEFAULT NULL COMMENT '注册ip',
@@ -24,6 +22,21 @@ CREATE TABLE `account` (
    UNIQUE INDEX `email_uq_index` (`email`),
    UNIQUE INDEX `mobile_uq_index` (`mobile`) 
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='用户账号';
+
+
+DROP TABLE IF EXISTS `user_details`;
+CREATE TABLE `user_details` (
+  `user_id` int(10)  NOT NULL, 
+  `realname` varchar(32) DEFAULT NULL,
+  `nickname` varchar(32) DEFAULT NULL,
+  `avatar` varchar(200) DEFAULT NULL,
+  `age` int(3)  DEFAULT 0,
+  `gender` ENUM('male', 'female') DEFAULT NULL,
+  `birthday` date DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` bigint(13) DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户信息表';
 
 
 DROP TABLE IF EXISTS `sns_account_binding`;

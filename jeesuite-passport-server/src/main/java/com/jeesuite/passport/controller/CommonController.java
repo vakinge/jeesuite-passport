@@ -35,7 +35,10 @@ public class CommonController{
 	@RequestMapping(value = "logout")
 	public String logout(HttpServletRequest request ,HttpServletResponse response){
 		String redirctUrl = request.getHeader(HttpHeaders.REFERER);
-		
+		String baseUrl = WebUtils.getBaseUrl(request);
+		if(redirctUrl.startsWith(baseUrl)){
+			redirctUrl = baseUrl + "/login";
+		}
 		AuthSessionHelper.destroySessionAndCookies(request, response);
 		return "redirect:" + redirctUrl;
 	}

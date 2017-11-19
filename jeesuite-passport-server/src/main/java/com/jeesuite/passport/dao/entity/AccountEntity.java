@@ -14,20 +14,16 @@ public class AccountEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "username",updatable=false)
     private String username;
     
-    private String nickname;
-
     private String email;
 
     private String mobile;
 
     private String password;
-
     
-    private String avatar;
-    
-    @Column(name = "source_app_id")
+    @Column(name = "source_app_id",updatable=false)
     private String sourceAppId;
 
     private Boolean enabled;
@@ -166,22 +162,6 @@ public class AccountEntity extends BaseEntity {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-	public String getNickname() {
-		return nickname;
-	}
-
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	}
-
-	public String getAvatar() {
-		return avatar;
-	}
-
-	public void setAvatar(String avatar) {
-		this.avatar = avatar;
-	}
 
 	public String getRegIp() {
 		return regIp;

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.PassportConstants;
-import com.jeesuite.passport.dto.Account;
+import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
@@ -43,7 +43,7 @@ public class JsonpLoginController extends BaseLoginController {
 		}
 		
 		// 验证用户
-		Account account = validateUser(request, model);
+		UserInfo account = validateUser(request, model);
 		if (account == null) {
 			WrapperResponseEntity entity = new WrapperResponseEntity(4001, "账号或密码错误");
 			WebUtils.responseOutJsonp(response, PassportConstants.JSONP_LOGIN_CALLBACK_FUN_NAME, entity);

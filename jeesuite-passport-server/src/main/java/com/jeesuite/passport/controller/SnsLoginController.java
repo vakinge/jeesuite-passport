@@ -24,7 +24,7 @@ import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.PassportConstants;
-import com.jeesuite.passport.dto.Account;
+import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.snslogin.OauthConnector;
@@ -54,7 +54,7 @@ public class SnsLoginController extends BaseLoginController implements Environme
 	public String redirect(HttpServletRequest request,@PathVariable("type") String type
 			,@RequestParam(value="client_id",required=false) String clientId
 			,@RequestParam(value="reg_uri",required=false) String regPageUri
-			,@RequestParam("redirect_uri") String redirectUri
+			,@RequestParam(value="redirect_uri",required=false) String redirectUri
 			,@RequestParam(value="origin_url",required=false) String orignUrl){
 		
 		boolean isWxGzh = WeixinGzhConnector.SNS_TYPE.equals(type);
@@ -65,9 +65,15 @@ public class SnsLoginController extends BaseLoginController implements Environme
 			if(connector == null)throw new JeesuiteBaseException(1001,"不支持授权类型:"+type);
 		}
 		
-		String orignDomain = WebUtils.getDomain(redirectUri);
+		String orignDomain;
+		if(StringUtils.isBlank(redirectUri)){
+			redirectUri = WebUtils.getBaseUrl(request) + "/ucenter/index";
+			orignDomain = WebUtils.getDomain(redirectUri);
+		}else{
+			orignDomain = WebUtils.getDomain(redirectUri);
+			validateOrignDomain(clientId,orignDomain);
+		}
 		//
-		validateOrignDomain(clientId,orignDomain);
 		
 		SnsLoginState loginState = new SnsLoginState(clientId,orignDomain, type, regPageUri, redirectUri,orignUrl);
 		new RedisObject(loginState.getState()).set(loginState, CacheExpires.IN_1MIN);
@@ -111,7 +117,7 @@ public class SnsLoginController extends BaseLoginController implements Environme
 		oauthUser.setSnsType(loginState.getSnsType());
 		oauthUser.setFromClientId(loginState.getAppId());
 		//根据openid 找用户
-		Account account = accountService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
+		UserInfo account = accountService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
 		
 		if(account != null){
 			return createSessionAndSetResponse(request, response, account, loginState.getSuccessDirectUri(),loginState.getOrignUrl());
@@ -132,7 +138,7 @@ public class SnsLoginController extends BaseLoginController implements Environme
 				AccountBindParam bindParam = new AccountBindParam();
 				bindParam.setAppId(loginState.getAppId());
 				bindParam.setIpAddr(IpUtils.getIpAddr(request));
-				account = accountService.createAccountByOauthInfo(oauthUser,bindParam);
+				account = accountService.createUserByOauthInfo(oauthUser,bindParam);
 				//
 				return createSessionAndSetResponse(request, response, account, loginState.getSuccessDirectUri(),loginState.getOrignUrl());
 			}

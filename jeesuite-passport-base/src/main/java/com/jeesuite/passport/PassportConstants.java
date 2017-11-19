@@ -2,7 +2,6 @@ package com.jeesuite.passport;
 
 public class PassportConstants {
 	
-	public static final String DEFAULT_SESSION_NAME = "SSO_SESSIONID";
 	public static final String ACCESSTOKEN = "accessToken";
 	
 	//auth cache keys

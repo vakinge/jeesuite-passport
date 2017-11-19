@@ -14,10 +14,11 @@ import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
-import com.jeesuite.passport.dto.Account;
+import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
+import com.jeesuite.passport.model.LoginUserInfo;
 import com.jeesuite.passport.service.AccountService;
 import com.jeesuite.passport.service.AppService;
 import com.jeesuite.springweb.utils.WebUtils;
@@ -46,24 +47,32 @@ public abstract class BaseLoginController {
 				|| !appEntity.getAllowDomains().contains(domain))throw new JeesuiteBaseException(4001,"未授权域名["+domain + "]");
 	}
 	
-	protected Account validateUser( HttpServletRequest request ,Model model) {
+	protected UserInfo validateUser( HttpServletRequest request ,Model model) {
 		String username = request.getParameter(OAuth.OAUTH_USERNAME);
 		String password = request.getParameter(OAuth.OAUTH_PASSWORD);
 		if ( StringUtils.isAnyBlank(username,password)) {
-			model.addAttribute(Constants.ERROR, "登录失败:用户名或密码不能为空");
-			return null;
+			if(model != null){
+				model.addAttribute(Constants.ERROR, "登录失败:用户名或密码不能为空");
+				return null;
+			}else{
+				throw new JeesuiteBaseException(4001, "用户名或密码不能为空");
+			}
 		}
 		
-		Account account = accountService.checkAndGetAccount(username,password);
+		UserInfo account = accountService.checkAndGetAccount(username.trim(),password.trim());
 		if(account == null){
-			model.addAttribute(Constants.ERROR, "登录失败:用户名或密码错误");
-			return null;
+			if(model != null){
+				model.addAttribute(Constants.ERROR, "登录失败:用户名或密码错误");
+				return null;
+			}else{
+				throw new JeesuiteBaseException(4001, "用户名或密码错误");
+			}
 		}
 		
 	   return account;
 	}
 	
-	protected LoginSession createLoginSesion(HttpServletRequest request,Account account){
+	protected LoginSession createLoginSesion(HttpServletRequest request,UserInfo account){
 		String sessionId = null;
 		LoginSession session = AuthSessionHelper.getLoginSessionByUserId(account.getId());
 		if(session == null && StringUtils.isNotBlank(sessionId = AuthSessionHelper.getSessionId(request))){
@@ -74,15 +83,24 @@ public abstract class BaseLoginController {
 		session.setUserId(account.getId());
 		session.setUserName(account.getUsername());
 		//
+		LoginUserInfo userInfo = new LoginUserInfo();
+		userInfo.setId(account.getId());
+		userInfo.setAvatar(account.getAvatar());
+		userInfo.setMobile(account.getMobile());
+		userInfo.setNickname(account.getNickname());
+		userInfo.setUsername(account.getUsername());
+		session.setUserInfo(userInfo);
+		//
 		AuthSessionHelper.storgeLoginSession(session);
 		
 		return session;
 	}
 	
 	
-	protected String createSessionAndSetResponse(HttpServletRequest request,HttpServletResponse response,Account account,String redirectUri,String orignUrl){
+	protected String createSessionAndSetResponse(HttpServletRequest request,HttpServletResponse response,UserInfo account,String redirectUri,String orignUrl){
 		
 		String orignDomain = WebUtils.getDomain(redirectUri);
+		orignUrl = StringUtils.trimToEmpty(orignUrl);
 		
 		LoginSession session = null;
 		//同域
@@ -94,7 +112,6 @@ public abstract class BaseLoginController {
 			redirectUri = String.format("%s?origin_url=%s", redirectUri,orignUrl);
 		}else{
 			session = createLoginSesion(request,account);
-			orignUrl = StringUtils.trimToEmpty(orignUrl);
 			StringBuilder urlBuiler = new StringBuilder(redirectUri);
 			urlBuiler.append("?session_id=").append(session.getSessionId());
 			urlBuiler.append("&expires_in=").append(session.getExpiresIn());

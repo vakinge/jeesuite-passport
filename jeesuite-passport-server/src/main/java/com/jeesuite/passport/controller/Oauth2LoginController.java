@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
-import com.jeesuite.passport.dto.Account;
+import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.passport.service.AppService;
@@ -170,7 +170,7 @@ public class Oauth2LoginController extends BaseLoginController{
 	            }
 
 	            //生成Access Token
-	            Account account = oAuthService.findAccountByAuthCode(authCode);
+	            UserInfo account = oAuthService.findAccountByAuthCode(authCode);
 	            
 	            LoginSession loginSession = createLoginSesion(request,account);
 

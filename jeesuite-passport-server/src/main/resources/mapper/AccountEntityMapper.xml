@@ -8,8 +8,6 @@
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="mobile" property="mobile" jdbcType="CHAR" />
     <result column="password" property="password" jdbcType="CHAR" />
-    <result column="nickname" property="nickname" jdbcType="VARCHAR" />
-    <result column="avatar" property="avatar" jdbcType="VARCHAR" />
     <result column="type" property="type" jdbcType="VARCHAR" />
     <result column="source_app_id" property="sourceAppId" jdbcType="VARCHAR"/>
     <result column="enabled" property="enabled" jdbcType="BIT" />

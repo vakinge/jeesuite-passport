@@ -10,7 +10,7 @@ import com.jeesuite.cache.CacheExpires;
 import com.jeesuite.cache.command.RedisString;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.PassportConstants;
-import com.jeesuite.passport.dto.Account;
+import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 
 /**
@@ -29,7 +29,7 @@ public class OAuthService {
 		new  RedisString(String.format(PassportConstants.AUTHCODE_CACHE_KEY, authCode)).set(username, CacheExpires.IN_5MINS);
 	}
 
-	public Account findAccountByAuthCode(String authCode) {
+	public UserInfo findAccountByAuthCode(String authCode) {
 		String loginName = new RedisString(String.format(PassportConstants.AUTHCODE_CACHE_KEY, authCode)).get();
 		return accountService.findAcctountByLoginName(loginName);
 	}

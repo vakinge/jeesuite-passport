@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class LoginUserInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -48,7 +48,7 @@ public class OauthUser implements Serializable {
 	}
 
 	public String getGender() {
-		return gender;
+		return "unkown".equals(gender) ? null : gender;
 	}
 
 	public void setGender(String gender) {

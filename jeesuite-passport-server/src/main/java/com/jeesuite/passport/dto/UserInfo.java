@@ -1,35 +1,43 @@
 package com.jeesuite.passport.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.jeesuite.common.util.DigestUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import io.swagger.annotations.ApiModelProperty;
-
-public class AccountParam extends RequestMetadata implements Serializable {
+public class UserInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@ApiModelProperty(value = "id,mobile必填一个")
 	private Integer id;
-	@ApiModelProperty(value = "登录用户名")
+
     private String username;
-    @ApiModelProperty(value = "昵称")
+    
     private String nickname;
 
     private String email;
-    @ApiModelProperty(value = "id,mobile必填一个")
+
     private String mobile;
 
+    @JsonIgnore
     private String password;
 
-    @ApiModelProperty(value = "用户头像")
     private String avatar;
     
+    private String realname;
+
+    private Integer age;
+
+    private String gender;
+
+    private Date birthday;
+    
+    
+    
 	public Integer getId() {
-		return id == null ? 0 : id;
+		return id;
 	}
 
 	public void setId(Integer id) {
@@ -84,8 +92,37 @@ public class AccountParam extends RequestMetadata implements Serializable {
 		this.avatar = avatar;
 	}
 
-	public static boolean validatePassword(String orignPassword,String cryptPassword){
-		String orignToCrypt = DigestUtils.md5(orignPassword);
-		return StringUtils.equalsIgnoreCase(orignToCrypt, cryptPassword);
+	public String getRealname() {
+		return realname;
 	}
+
+	public void setRealname(String realname) {
+		this.realname = realname;
+	}
+
+	public Integer getAge() {
+		return age;
+	}
+
+	public void setAge(Integer age) {
+		this.age = age;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+
 }

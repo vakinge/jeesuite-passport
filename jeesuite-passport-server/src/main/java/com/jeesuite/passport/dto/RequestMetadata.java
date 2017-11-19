@@ -15,7 +15,7 @@ public class RequestMetadata {
 	@JsonIgnore
 	private String appId;
 	@JsonIgnore
-	private Date time;
+	private Date time = new Date();
 	
 	public RequestMetadata() {}
 	

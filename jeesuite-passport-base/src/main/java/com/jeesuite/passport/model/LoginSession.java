@@ -4,15 +4,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.jeesuite.common.json.JsonUtils;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.helper.SecurityCryptUtils;
-import com.jeesuite.passport.helper.TokenGenerator;
 
+@JsonInclude(Include.NON_NULL)
 public class LoginSession {
 
-	public static final int SESSION_EXPIRE_SECONDS = ResourceUtils.getInt("auth.session.expire.seconds", 86400);
-	public static final int ANON_SESSION_EXPIRE_SECONDS = ResourceUtils.getInt("auth.session.expire.seconds", 3600);
+	public static final int SESSION_EXPIRE_SECONDS = ResourceUtils.getInt("auth.session.expire.seconds", 7200);
 	private static final String CLIENT_ID = ResourceUtils.getProperty("auth.client.id");
 	private static final String CONTACT_CHAR = "#";
 	
@@ -22,7 +24,7 @@ public class LoginSession {
 	private String clientId;
 	private String sessionId;
 	private Integer expiresIn;
-	private long expiresAt;
+	private Long expiresAt;
 	
 	private LoginUserInfo userInfo;
 	
@@ -32,7 +34,7 @@ public class LoginSession {
 		LoginSession session = new LoginSession();
 		session.clientId = CLIENT_ID;
 		session.sessionId = AuthSessionHelper.generateSessionId(anonymous);
-		session.expiresIn = anonymous ? ANON_SESSION_EXPIRE_SECONDS : SESSION_EXPIRE_SECONDS;
+		session.expiresIn = SESSION_EXPIRE_SECONDS;
 		session.expiresAt = System.currentTimeMillis()/1000 + session.expiresIn;
 		return session;
 	}
@@ -82,11 +84,11 @@ public class LoginSession {
 	}
 
 	
-	public long getExpiresAt() {
+	public Long getExpiresAt() {
 		return expiresAt;
 	}
 
-	public void setExpiresAt(long expiresAt) {
+	public void setExpiresAt(Long expiresAt) {
 		this.expiresAt = expiresAt;
 	}
 	
@@ -114,6 +116,9 @@ public class LoginSession {
 		return SecurityCryptUtils.encrypt(builder.toString());
 	}
 	
+	public String toJsonString(){
+		return JsonUtils.toJson(this);
+	}
 
 	public static LoginSession decode(String encodeString){
 		if(StringUtils.isBlank(encodeString))return null;
