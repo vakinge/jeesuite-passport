@@ -50,26 +50,28 @@ public abstract class BaseLoginController {
 	protected UserInfo validateUser( HttpServletRequest request ,Model model) {
 		String username = request.getParameter(OAuth.OAUTH_USERNAME);
 		String password = request.getParameter(OAuth.OAUTH_PASSWORD);
+		
+		UserInfo user = null;
+		String error = null;
 		if ( StringUtils.isAnyBlank(username,password)) {
+			error = "用户名或密码不能为空";
+		}else{
+			user = userService.checkAndGetAccount(username.trim(),password.trim());
+		}
+		
+		if(user == null){
+			error = "用户名或密码错误";
+		}
+		if(error != null){
 			if(model != null){
-				model.addAttribute(Constants.ERROR, "登录失败:用户名或密码不能为空");
+				model.addAttribute(Constants.ERROR, error);
 				return null;
 			}else{
-				throw new JeesuiteBaseException(4001, "用户名或密码不能为空");
+				throw new JeesuiteBaseException(4001, error);
 			}
 		}
 		
-		UserInfo account = userService.checkAndGetAccount(username.trim(),password.trim());
-		if(account == null){
-			if(model != null){
-				model.addAttribute(Constants.ERROR, "登录失败:用户名或密码错误");
-				return null;
-			}else{
-				throw new JeesuiteBaseException(4001, "用户名或密码错误");
-			}
-		}
-		
-	   return account;
+	   return user;
 	}
 	
 	protected LoginSession createLoginSesion(HttpServletRequest request,UserInfo account){

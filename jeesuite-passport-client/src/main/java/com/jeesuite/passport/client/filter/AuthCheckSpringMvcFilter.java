@@ -36,9 +36,10 @@ public class AuthCheckSpringMvcFilter extends OncePerRequestFilter{
 			if(WebUtils.isAjax(request)){
 				WebUtils.responseOutJson(response, JsonUtils.toJson(new WrapperResponseEntity(e.getCode(), e.getMessage())));
 			}else{
-				String redirectUri = request.getRequestURL().toString();
+				String returnUrl = request.getRequestURL().toString();
 				
-				String loginUrl = ClientConfig.authServerBasePath() + "/login?redirect_uri=" + redirectUri;
+				String loginUrl = String.format(ClientConfig.authServerBasePath() + "/login?client_id=%s&return_url=%s", 
+		                  ClientConfig.clientId(),returnUrl);
 				response.sendRedirect(loginUrl);
 			}
 		}

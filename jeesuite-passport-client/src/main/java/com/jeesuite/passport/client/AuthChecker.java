@@ -3,6 +3,8 @@
  */
 package com.jeesuite.passport.client;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.LoginContext;
 import com.jeesuite.passport.exception.UnauthorizedException;
 import com.jeesuite.passport.helper.AuthSessionHelper;
@@ -27,18 +30,32 @@ public class AuthChecker {
 	
 	private static Logger log = LoggerFactory.getLogger(AuthChecker.class);
 	
-	private Pattern anonUriPattern;
+	private List<String> protectedUris = new ArrayList<>();
+	private List<String> protectedUriPrefixs = new ArrayList<>();
+	private List<Pattern> protectedUriPatterns = new ArrayList<>();
 
 	public AuthChecker(String ignoreCheckUris) {
-		String regex = "/oauth2/.*";
 		if(StringUtils.isNotBlank(ignoreCheckUris)){
-			regex = regex + "|" + ignoreCheckUris.replaceAll(";", "|").replaceAll("\\*+", ".*");
+			String[] segs = ignoreCheckUris.split(";|,");
+			String contextPath = ResourceUtils.getProperty("context-path", "");
+			for (String seg : segs) {
+				seg = contextPath + seg;
+				if(seg.contains("*")){
+					if(seg.endsWith("*")){
+						protectedUriPrefixs.add(seg.replaceAll("\\*+", ""));
+					}else{
+						protectedUriPatterns.add(Pattern.compile(seg));
+					}
+				}else{
+					protectedUris.add(seg);
+				}
+			}
+			log.info("protectedUris:{} \nprotectedUriPrefixs:{} \n protectedUriPatterns:{}",protectedUris,protectedUriPrefixs,protectedUriPatterns);
 		}
-		anonUriPattern = Pattern.compile(regex);
 	}
 	
 	public AuthChecker() {
-		this(StringUtils.trimToEmpty(ClientConfig.get(ClientConstants.AUTH_IGNORE_URIS)));
+		this(StringUtils.trimToEmpty(ClientConfig.get(ClientConstants.AUTH_PROTECTED_URIS)));
 	}
 	
 	
@@ -46,7 +63,22 @@ public class AuthChecker {
 	public LoginSession process(HttpServletRequest request,HttpServletResponse response) {
 		
 		// 是否需要鉴权
-		boolean requered = !anonUriPattern.matcher(request.getRequestURI()).matches();
+		boolean requered = protectedUris.contains(request.getRequestURI());
+		if(!requered){
+			for (String prefix : protectedUriPrefixs) {
+				if(requered = request.getRequestURI().startsWith(prefix)){
+					break;
+				}
+			}
+		}
+		
+		if(!requered){
+			for (Pattern pattern : protectedUriPatterns) {
+				if(requered = pattern.matcher(request.getRequestURI()).matches()){
+					break;
+				}
+			}
+		}
 
 		String sessionId = AuthSessionHelper.getSessionId(request);
 		LoginSession session = AuthSessionHelper.validateSessionIfNotCreateAnonymous(sessionId);

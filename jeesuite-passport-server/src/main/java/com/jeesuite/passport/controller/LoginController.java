@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.jeesuite.common.JeesuiteBaseException;
+import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.springweb.utils.WebUtils;
@@ -68,6 +69,7 @@ public class LoginController extends BaseLoginController{
 		String orignUrl = request.getParameter(PassportConstants.PARAM_ORIGIN_URL);
 		//验证用户
 		UserInfo account = validateUser(request,model);
+		if(account == null)return Constants.ERROR;
 		//
 		return createSessionAndSetResponse(request, response, account, redirctUri,orignUrl);
 	}

@@ -44,9 +44,12 @@ public class AuthConfigClient {
 			log.info("fetchFromServer -> begin");
 			String clientId = ResourceUtils.getProperty("auth.client.id");
 			String clientSecret = ResourceUtils.getProperty("auth.client.secret");
-			
+			String baseUrl = ResourceUtils.getAndValidateProperty("auth.server.baseurl");
+			if(baseUrl.endsWith("/")){
+				baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+			}
 			long timestamp = System.currentTimeMillis();
-			String url = ResourceUtils.getAndValidateProperty("auth.server.baseurl") + "/clientside/sync_config?client_id=%s&sign=%s&timestamp=%s";
+			String url = baseUrl + "/clientside/sync_config?client_id=%s&sign=%s&timestamp=%s";
 			Map<String, String> map = new HashMap<>();
 			map.put("timestamp", String.valueOf(timestamp));
 			map.put("client_id", clientId);
@@ -73,6 +76,7 @@ public class AuthConfigClient {
 			}
 			
 			for (Object key : remoteConfigs.keySet()) {
+				if(remoteConfigs.get(key) == null)continue;
 				ResourceUtils.add(key.toString(), remoteConfigs.get(key).toString());
 			}
 			
@@ -110,7 +114,7 @@ public class AuthConfigClient {
 	}
 	
 	public String getAuthRedisMasterName(){
-		return ResourceUtils.getAndValidateProperty("auth.redis.masterName");
+		return ResourceUtils.getProperty("auth.redis.masterName");
 	}
 	
 	public String getJwtSecret(){
