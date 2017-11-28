@@ -12,21 +12,21 @@ import org.springframework.ui.Model;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.ResourceUtils;
+import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.helper.AuthSessionHelper;
-import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.passport.model.LoginUserInfo;
-import com.jeesuite.passport.service.AccountService;
 import com.jeesuite.passport.service.AppService;
+import com.jeesuite.passport.service.UserService;
 import com.jeesuite.springweb.utils.WebUtils;
 
 public abstract class BaseLoginController {
 
 	@Autowired
-	protected AccountService accountService;
+	protected UserService userService;
 	
 	@Autowired
 	protected AppService appService;
@@ -59,7 +59,7 @@ public abstract class BaseLoginController {
 			}
 		}
 		
-		UserInfo account = accountService.checkAndGetAccount(username.trim(),password.trim());
+		UserInfo account = userService.checkAndGetAccount(username.trim(),password.trim());
 		if(account == null){
 			if(model != null){
 				model.addAttribute(Constants.ERROR, "登录失败:用户名或密码错误");

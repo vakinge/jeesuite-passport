@@ -22,11 +22,11 @@ import com.jeesuite.cache.CacheExpires;
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.ResourceUtils;
+import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.UserInfo;
-import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.snslogin.OauthConnector;
 import com.jeesuite.passport.snslogin.OauthUser;
 import com.jeesuite.passport.snslogin.SnsLoginState;
@@ -117,7 +117,7 @@ public class SnsLoginController extends BaseLoginController implements Environme
 		oauthUser.setSnsType(loginState.getSnsType());
 		oauthUser.setFromClientId(loginState.getAppId());
 		//根据openid 找用户
-		UserInfo account = accountService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
+		UserInfo account = userService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
 		
 		if(account != null){
 			return createSessionAndSetResponse(request, response, account, loginState.getSuccessDirectUri(),loginState.getOrignUrl());
@@ -140,7 +140,7 @@ public class SnsLoginController extends BaseLoginController implements Environme
 			AccountBindParam bindParam = new AccountBindParam();
 			bindParam.setAppId(loginState.getAppId());
 			bindParam.setIpAddr(IpUtils.getIpAddr(request));
-			account = accountService.createUserByOauthInfo(oauthUser,bindParam);
+			account = userService.createUserByOauthInfo(oauthUser,bindParam);
 			//
 			return createSessionAndSetResponse(request, response, account, loginState.getSuccessDirectUri(),loginState.getOrignUrl());
 		}

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.jeesuite.passport.LoginContext;
 import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.model.LoginSession;
-import com.jeesuite.passport.service.AccountService;
+import com.jeesuite.passport.service.UserService;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 
 @Controller  
@@ -20,7 +20,7 @@ public class UserCenterController {
 
 	private static final String USER_INFO_ATTR_NAME = "userInfo";
 	@Autowired
-	protected AccountService accountService;
+	protected UserService userService;
 	
 	@RequestMapping(value = "index", method = RequestMethod.GET)
 	public String index(Model model){
@@ -33,7 +33,7 @@ public class UserCenterController {
 	public String information(Model model){
 		LoginSession session = LoginContext.getRequireLoginSession();
 		model.addAttribute(USER_INFO_ATTR_NAME, session.getUserInfo());
-		UserInfo account = accountService.findAcctountById(session.getUserId());
+		UserInfo account = userService.findAcctountById(session.getUserId());
 		model.addAttribute("account", account);
 		return "ucenter/information";
 	}
@@ -70,7 +70,7 @@ public class UserCenterController {
 	public @ResponseBody WrapperResponseEntity updateMyUser(@RequestBody UserInfo account){
 		LoginSession session = LoginContext.getRequireLoginSession();
 		account.setId(session.getUserId());
-		accountService.updateAccount(account);
+		userService.updateAccount(account);
 		return new WrapperResponseEntity();
 	}
 	

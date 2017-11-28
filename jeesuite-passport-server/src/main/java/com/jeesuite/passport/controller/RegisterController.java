@@ -19,7 +19,7 @@ import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RegisterParam;
 import com.jeesuite.passport.dto.RequestMetadata;
 import com.jeesuite.passport.exception.ForbiddenAccessException;
-import com.jeesuite.passport.service.AccountService;
+import com.jeesuite.passport.service.UserService;
 import com.jeesuite.passport.snslogin.OauthUser;
 import com.jeesuite.springweb.annotation.CorsEnabled;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
@@ -32,7 +32,7 @@ import io.swagger.annotations.ApiOperation;
 public class RegisterController {
 
 	@Autowired
-	protected AccountService accountService;
+	protected UserService userService;
 	
 	@RequestMapping(value = "register", method = RequestMethod.GET)
 	public String toRegister(){
@@ -43,7 +43,7 @@ public class RegisterController {
 	public @ResponseBody WrapperResponseEntity register(HttpServletRequest request,@RequestBody RegisterParam param){
 		//验证码
 		
-		accountService.createUser(BeanCopyUtils.copy(param, UserInfo.class),RequestMetadata.build(request));
+		userService.createUser(BeanCopyUtils.copy(param, UserInfo.class),RequestMetadata.build(request));
 		return new WrapperResponseEntity();
 	}
 	
@@ -52,7 +52,7 @@ public class RegisterController {
 	@ApiOperation(value = "注册账号可用性检查",notes="### 调用范围 \n - 匿名 \n - 可跨域", httpMethod = "POST")
 	public @ResponseBody WrapperResponseEntity registerCheck(@RequestParam("account") String name){
 		
-		UserInfo account = accountService.findAcctountByLoginName(name);
+		UserInfo account = userService.findAcctountByLoginName(name);
 		if(account != null)throw new JeesuiteBaseException(4001, "已注册");
 		
 		return new WrapperResponseEntity();
@@ -71,7 +71,7 @@ public class RegisterController {
 		
 		param.setAppId(oauthUser.getFromClientId());
 		param.setIpAddr(IpUtils.getIpAddr(request));
-		accountService.createUserByOauthInfo(oauthUser, param);
+		userService.createUserByOauthInfo(oauthUser, param);
 		//删除ticket
 		redis.remove();
 		return new WrapperResponseEntity();

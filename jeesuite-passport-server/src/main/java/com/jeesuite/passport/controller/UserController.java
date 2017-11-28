@@ -12,7 +12,7 @@ import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.exception.UnauthorizedException;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.model.LoginSession;
-import com.jeesuite.passport.service.AccountService;
+import com.jeesuite.passport.service.UserService;
 import com.jeesuite.springweb.annotation.CorsEnabled;
 import com.jeesuite.springweb.model.WrapperResponse;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
@@ -26,14 +26,14 @@ import io.swagger.annotations.ApiResponses;
 public class UserController {
 
 	@Autowired
-	protected AccountService accountService;
+	protected UserService userService;
 	
 	@CorsEnabled
 	@RequestMapping(value = "profile", method = RequestMethod.GET)
 	@ApiOperation(value = "获取我的登录信息", notes = "### 调用范围 \n - 登录用户", httpMethod = "GET")
 	public @ResponseBody WrapperResponse<UserInfo> getMyInfo(){
 		LoginSession session = LoginContext.getRequireLoginSession();
-		UserInfo account = accountService.findAcctountById(session.getUserId());
+		UserInfo account = userService.findAcctountById(session.getUserId());
 		return new WrapperResponse<>(account);
 	}
 	
@@ -43,7 +43,7 @@ public class UserController {
 	public @ResponseBody WrapperResponse<UserInfo> getMyInfoByAccesstoken(@PathVariable("accesstoken") String accessToken){
 		LoginSession session = AuthSessionHelper.getLoginSession(accessToken);
 		if(session == null)throw new UnauthorizedException();
-		UserInfo account = accountService.findAcctountById(session.getUserId());
+		UserInfo account = userService.findAcctountById(session.getUserId());
 		return new WrapperResponse<>(account);
 	}
 	

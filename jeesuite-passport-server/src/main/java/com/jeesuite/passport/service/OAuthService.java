@@ -22,7 +22,7 @@ import com.jeesuite.passport.helper.AuthSessionHelper;
 public class OAuthService {
 
 	@Autowired
-	private AccountService accountService;
+	private UserService userService;
 
 	
 	public void storeAuthCode(String authCode, String username) {
@@ -31,7 +31,7 @@ public class OAuthService {
 
 	public UserInfo findAccountByAuthCode(String authCode) {
 		String loginName = new RedisString(String.format(PassportConstants.AUTHCODE_CACHE_KEY, authCode)).get();
-		return accountService.findAcctountByLoginName(loginName);
+		return userService.findAcctountByLoginName(loginName);
 	}
 
 	public boolean checkAuthCode(String authCode) {

@@ -14,6 +14,7 @@ import com.jeesuite.common.crypt.DES;
 import com.jeesuite.common.json.JsonUtils;
 import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.common.util.ResourceUtils;
+import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.springweb.utils.WebUtils;
@@ -28,21 +29,9 @@ public class AuthSessionHelper {
 	
 	
 	public static String generateSessionId(boolean anonymous){
-		String str = DigestUtils.md5Short(TokenGenerator.generate()).concat(String.valueOf(System.currentTimeMillis()));
-		return DES.encrypt(AuthConfigClient.getInstance().getCryptSecret(), str).toLowerCase();
+		return TokenGenerator.generateWithSign();
 	}
-	
-	public static void validateSessionId(String sessionId,boolean validateExpire){
-		long timestamp = 0;
-		try {
-			timestamp = Long.parseLong(DES.decrypt(AuthConfigClient.getInstance().getCryptSecret(),sessionId).substring(6));
-		} catch (Exception e) {
-			throw new JeesuiteBaseException(4005, "sessionId格式不正确");
-		}
-		if(validateExpire && System.currentTimeMillis() - timestamp > EXPIRE){
-			throw new JeesuiteBaseException(4005, "sessionId过期");
-		}
-	}
+
 	
 	public static LoginSession getLoginSession(String sessionId){
 		if(StringUtils.isBlank(sessionId))return null;

@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jeesuite.common.JeesuiteBaseException;
+import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.helper.AuthSessionHelper;
-import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.springweb.utils.WebUtils;
 

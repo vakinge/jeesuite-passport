@@ -11,9 +11,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeesuite.common.JeesuiteBaseException;
+import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.dto.UserInfo;
-import com.jeesuite.passport.helper.TokenGenerator;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.WebUtils;
