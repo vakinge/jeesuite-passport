@@ -17,10 +17,6 @@ import com.jeesuite.springweb.annotation.CorsEnabled;
 import com.jeesuite.springweb.model.WrapperResponse;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-
 @Controller  
 @RequestMapping(value = "/user")
 public class UserController {
@@ -30,7 +26,6 @@ public class UserController {
 	
 	@CorsEnabled
 	@RequestMapping(value = "profile", method = RequestMethod.GET)
-	@ApiOperation(value = "获取我的登录信息", notes = "### 调用范围 \n - 登录用户", httpMethod = "GET")
 	public @ResponseBody WrapperResponse<UserInfo> getMyInfo(){
 		LoginSession session = LoginContext.getRequireLoginSession();
 		UserInfo account = userService.findAcctountById(session.getUserId());
@@ -39,7 +34,6 @@ public class UserController {
 	
 	@CorsEnabled
 	@RequestMapping(value = "profile/{accesstoken}", method = RequestMethod.GET)
-	@ApiOperation(value = "获取我的登录信息(带token)", notes = "", httpMethod = "GET")
 	public @ResponseBody WrapperResponse<UserInfo> getMyInfoByAccesstoken(@PathVariable("accesstoken") String accessToken){
 		LoginSession session = AuthSessionHelper.getLoginSession(accessToken);
 		if(session == null)throw new UnauthorizedException();
@@ -49,10 +43,6 @@ public class UserController {
 	
 	@CorsEnabled
 	@RequestMapping(value = "login_status", method = RequestMethod.GET)
-	@ApiOperation(value = "检查登录状态", httpMethod = "GET")
-	@ApiResponses({
-		@ApiResponse(code = 401, message = "未登录")  
-	})
 	public @ResponseBody WrapperResponseEntity loginStatus(){
 		LoginSession session = LoginContext.getRequireLoginSession();
 		return new WrapperResponseEntity(session.getSessionId());
@@ -60,10 +50,6 @@ public class UserController {
 	
 	@CorsEnabled
 	@RequestMapping(value = "login_status/{accesstoken}", method = RequestMethod.GET)
-	@ApiOperation(value = "检查登录状态(带token)", notes = "", httpMethod = "GET")
-	@ApiResponses({
-		@ApiResponse(code = 401, message = "未登录")  
-	})
 	public @ResponseBody WrapperResponseEntity loginStatusWithToken(@PathVariable("accesstoken") String accessToken){
 		LoginSession session = AuthSessionHelper.getLoginSession(accessToken);
 		if(session == null)throw new UnauthorizedException();

@@ -1,14 +1,9 @@
 package com.jeesuite.passport.dto;
 
-import io.swagger.annotations.ApiModelProperty;
-
 public class LoginParam {
 
-	@ApiModelProperty(value = "登录名(userName,mobile，email)",required = true)
 	private String loginName;
-	@ApiModelProperty(value = "密码",required = true)
 	private String password;
-	@ApiModelProperty(value = "验证码")
 	private String code;
 	
 	public String getLoginName() {

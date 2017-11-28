@@ -19,5 +19,6 @@ public interface SnsAccounyBindingEntityMapper extends CustomBaseMapper<SnsAccou
 	@Cache
 	List<SnsAccounyBindingEntity> findByUnionId(@Param("unionId") String unionId);
 	
+	@Cache
 	String findWxUnionId(@Param("userId") int userId);
 }

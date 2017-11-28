@@ -14,18 +14,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.BeanCopyUtils;
-import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RegisterParam;
 import com.jeesuite.passport.dto.RequestMetadata;
+import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.exception.ForbiddenAccessException;
 import com.jeesuite.passport.service.UserService;
 import com.jeesuite.passport.snslogin.OauthUser;
 import com.jeesuite.springweb.annotation.CorsEnabled;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.IpUtils;
-
-import io.swagger.annotations.ApiOperation;
 
 @Controller  
 @RequestMapping(value = "/")
@@ -49,7 +47,6 @@ public class RegisterController {
 	
 	@CorsEnabled
 	@RequestMapping(value = "register_check", method = RequestMethod.POST)
-	@ApiOperation(value = "注册账号可用性检查",notes="### 调用范围 \n - 匿名 \n - 可跨域", httpMethod = "POST")
 	public @ResponseBody WrapperResponseEntity registerCheck(@RequestParam("account") String name){
 		
 		UserInfo account = userService.findAcctountByLoginName(name);
@@ -60,7 +57,6 @@ public class RegisterController {
 	
 	@CorsEnabled
 	@RequestMapping(value = "register/bind", method = RequestMethod.POST)
-	@ApiOperation(value = "第三方账号绑定创建账号", notes = "### 调用范围 \n - 匿名 \n - 可跨域", httpMethod = "POST")
 	public @ResponseBody WrapperResponseEntity createUserThreepartBind(HttpServletRequest request,@RequestBody AccountBindParam param){
 		if(StringUtils.isBlank(param.getAuthTicket()))throw new ForbiddenAccessException();
 		RedisObject redis = new RedisObject(param.getAuthTicket());

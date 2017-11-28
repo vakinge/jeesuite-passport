@@ -11,7 +11,7 @@ import tk.mybatis.mapper.common.BaseMapper;
 
 public interface UserEntityMapper extends BaseMapper<UserEntity> {
 	
-	//@Cache
+	@Cache
 	@Select("select * from users where username = #{name} or email = #{email} or mobile = #{mobile} limit 1")
 	@ResultMap("BaseResultMap")
 	UserEntity findByLoginName(String name);

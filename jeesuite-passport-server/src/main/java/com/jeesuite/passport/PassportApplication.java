@@ -3,7 +3,6 @@ package com.jeesuite.passport;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Controller;
@@ -21,7 +20,6 @@ import com.jeesuite.springboot.starter.mybatis.EnableJeesuiteMybatis;
 @EnableJeesuiteCache
 @EnableJeesuiteMybatis
 @ComponentScan(value = {"com.jeesuite.passport","com.jeesuite.springweb"})
-@EnableDiscoveryClient
 @EnableTransactionManagement
 //@EnableCircuitBreaker
 public class PassportApplication {
