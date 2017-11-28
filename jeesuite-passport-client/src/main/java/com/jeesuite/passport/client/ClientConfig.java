@@ -36,14 +36,14 @@ public class ClientConfig {
 
 	public static String clientId(){
 		if(clientId == null){
-			clientId = ResourceUtils.getProperty("auth.client.id");
+			clientId = ResourceUtils.getAndValidateProperty("auth.client.id");
 		}
 		return clientId;
 	}
 	
 	public static String clientSecret(){
 		if(clientSecret == null){
-			clientSecret = ResourceUtils.getProperty("auth.client.secret");
+			clientSecret = ResourceUtils.getAndValidateProperty("auth.client.secret");
 		}
 		return clientSecret;
 	}
@@ -57,17 +57,17 @@ public class ClientConfig {
 	
 	public static String authServerBasePath(){
 		if(authServerBasePath == null){
-			authServerBasePath = ResourceUtils.getProperty("auth.server.baseurl");
+			authServerBasePath = ResourceUtils.getAndValidateProperty("auth.server.baseurl");
 			if(authServerBasePath.endsWith("/"))authServerBasePath = authServerBasePath.substring(0, authServerBasePath.length() - 1);
 		}
 		return authServerBasePath;
 	}
 
 	public static String defaultLoginSuccessRedirctUri() {
-		return ResourceUtils.getProperty("auth.login-success.default.redirect.uri","");
+		return ResourceUtils.getProperty("auth.login-success.default.redirect.uri");
 	}
 	
 	public static String snsLoginRegUri() {
-		return ResourceUtils.getProperty("auth.sns.register.uri","");
+		return ResourceUtils.getProperty("auth.sns.register.uri");
 	}
 }

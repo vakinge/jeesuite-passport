@@ -40,7 +40,6 @@
 		<module>jeesuite-passport-client</module>
 		<module>jeesuite-passport-server</module>
 		<module>jeesuite-passport-base</module>
-		<module>jeesuite-passport-testapp</module>
 	</modules>
 
 	<properties>

@@ -9,10 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jeesuite.cache.CacheExpires;
-import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.common.crypt.DES;
 import com.jeesuite.common.json.JsonUtils;
-import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.PassportConstants;
@@ -21,7 +18,6 @@ import com.jeesuite.springweb.utils.WebUtils;
 
 public class AuthSessionHelper {
 	
-	private static final int EXPIRE = 1000*60*3;
 	private static final String NULL = "null";
 	//是否是会话cookies
 	private static boolean cookieTemporary = Boolean.parseBoolean(ResourceUtils.getProperty("auth.cookie.temporary", "true"));

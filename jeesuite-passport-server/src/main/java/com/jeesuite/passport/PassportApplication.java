@@ -24,7 +24,7 @@ import com.jeesuite.springboot.starter.mybatis.EnableJeesuiteMybatis;
 @EnableDiscoveryClient
 @EnableTransactionManagement
 //@EnableCircuitBreaker
-public class Application {
+public class PassportApplication {
 	
 	@Bean 
 	public AuthCheckFilter authSessionFilter(){
@@ -39,7 +39,7 @@ public class Application {
     public static void main(String[] args) {
     	
     	long starTime = System.currentTimeMillis();
-    	new SpringApplicationBuilder(Application.class).web(true).run(args);
+    	new SpringApplicationBuilder(PassportApplication.class).web(true).run(args);
     	//
         long endTime = System.currentTimeMillis();
         long time = endTime - starTime;

@@ -12,9 +12,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jeesuite.passport.LoginContext;
 import com.jeesuite.passport.exception.UnauthorizedException;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.model.LoginSession;
+import com.jeesuite.springweb.utils.WebUtils;
 
 /**
  * @description <br>
@@ -47,20 +49,20 @@ public class AuthChecker {
 		boolean requered = !anonUriPattern.matcher(request.getRequestURI()).matches();
 
 		String sessionId = AuthSessionHelper.getSessionId(request);
-		LoginSession sesion = AuthSessionHelper.validateSessionIfNotCreateAnonymous(sessionId);
+		LoginSession session = AuthSessionHelper.validateSessionIfNotCreateAnonymous(sessionId);
 		
 		//如果是首次生成session
-		if(StringUtils.isBlank(sessionId) && sesion.isAnonymous()){
-			String domain = request.getServerName();
-			AuthSessionHelper.createSessionCookies(sesion.getSessionId(), domain, sesion.getExpiresIn());
-			log.debug("createSessionCookie:{}",sesion.getSessionId());
+		if(StringUtils.isBlank(sessionId) && session.isAnonymous()){
+			String domain = WebUtils.getRootDomain(request);
+			AuthSessionHelper.createSessionCookies(session.getSessionId(), domain, session.getExpiresIn());
 		}
 				
-		if (requered && sesion.isAnonymous()) {
+		if (requered && session.isAnonymous()) {
 			throw new UnauthorizedException();
 		}
 
-		return sesion;
+		LoginContext.setLoginSession(session);
+		return session;
 	}
 
 }

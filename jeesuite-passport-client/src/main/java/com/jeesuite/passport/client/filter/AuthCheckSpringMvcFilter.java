@@ -1,7 +1,6 @@
 package com.jeesuite.passport.client.filter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -15,6 +14,7 @@ import com.jeesuite.common.json.JsonUtils;
 import com.jeesuite.passport.client.AuthChecker;
 import com.jeesuite.passport.client.ClientConfig;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
+import com.jeesuite.springweb.utils.WebUtils;
 
 public class AuthCheckSpringMvcFilter extends OncePerRequestFilter{
 	
@@ -33,38 +33,15 @@ public class AuthCheckSpringMvcFilter extends OncePerRequestFilter{
 			
 			filterChain.doFilter(request, response);
 		} catch (JeesuiteBaseException e) {
-			if(isAjax(request)){
-				responseOutWithJson(response, JsonUtils.toJson(new WrapperResponseEntity(e.getCode(), e.getMessage())));
+			if(WebUtils.isAjax(request)){
+				WebUtils.responseOutJson(response, JsonUtils.toJson(new WrapperResponseEntity(e.getCode(), e.getMessage())));
 			}else{
 				String redirectUri = request.getRequestURL().toString();
 				
-				String loginUrl = ClientConfig.authServerBasePath() + "/auth/login?redirect_uri=" + redirectUri;
+				String loginUrl = ClientConfig.authServerBasePath() + "/login?redirect_uri=" + redirectUri;
 				response.sendRedirect(loginUrl);
 			}
 		}
 	}
 	
-	
-	private boolean isAjax(HttpServletRequest request){
-	    return  (request.getHeader("X-Requested-With") != null  
-	    && "XMLHttpRequest".equals(request.getHeader("X-Requested-With").toString())) ;
-	}
-	
-	private void responseOutWithJson(HttpServletResponse response,String json) {  
-	    //将实体对象转换为JSON Object转换  
-	    response.setCharacterEncoding("UTF-8");  
-	    response.setContentType("application/json; charset=utf-8");  
-	    PrintWriter out = null;  
-	    try {  
-	        out = response.getWriter();  
-	        out.append(json);  
-	    } catch (IOException e) {  
-	        e.printStackTrace();  
-	    } finally {  
-	        if (out != null) {  
-	            out.close();  
-	        }  
-	    }  
-	}  
-
 }
