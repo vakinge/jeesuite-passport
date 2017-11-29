@@ -102,22 +102,20 @@ public abstract class BaseLoginController {
 	protected String createSessionAndSetResponse(HttpServletRequest request,HttpServletResponse response,UserInfo account,String redirectUri,String orignUrl){
 		
 		String orignDomain = WebUtils.getDomain(redirectUri);
-		orignUrl = StringUtils.trimToEmpty(orignUrl);
 		
-		LoginSession session = null;
+		LoginSession session = createLoginSesion(request,account);
+		
+		StringBuilder urlBuiler = new StringBuilder(redirectUri);
+		if(StringUtils.isNotBlank(orignUrl)){
+			urlBuiler.append("&origin_url=").append(orignUrl);
+		}
 		//同域
 		if(StringUtils.contains(orignDomain, authCookiesDomain)){
-			session = createLoginSesion(request,account);
-			//
 			Cookie cookie = AuthSessionHelper.createSessionCookies(session.getSessionId(), authCookiesDomain, session.getExpiresIn());
 			response.addCookie(cookie);
-			redirectUri = String.format("%s?origin_url=%s", redirectUri,orignUrl);
 		}else{
-			session = createLoginSesion(request,account);
-			StringBuilder urlBuiler = new StringBuilder(redirectUri);
 			urlBuiler.append("?session_id=").append(session.getSessionId());
 			urlBuiler.append("&expires_in=").append(session.getExpiresIn());
-			urlBuiler.append("&origin_url=").append(orignUrl);
 			urlBuiler.append("&ticket=").append(TokenGenerator.generateWithSign());
 			redirectUri = urlBuiler.toString();
 		}
