@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.BeanCopyUtils;
+import com.jeesuite.common.util.DateUtils;
 import com.jeesuite.common.util.FormatValidateUtils;
 import com.jeesuite.passport.dao.entity.SnsAccounyBindingEntity;
 import com.jeesuite.passport.dao.entity.SnsAccounyBindingEntity.SnsType;
@@ -219,7 +220,7 @@ public class UserService {
 
 
 	private static String cryptPassword(String password,Date regAt){
-		String salt = String.valueOf(regAt.getTime() / 1000);
+		String salt = DateUtils.format2ddMMMyy(regAt);
 		return SecurityCryptUtils.cryptPassword(password, salt);
 	}
 }
