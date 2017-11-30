@@ -53,15 +53,15 @@
 		<druid.version>1.0.16</druid.version>
 		<shiro.version>1.2.3</shiro.version>
 		<junit.version>4.12</junit.version>
-		<jeesuite.cache.version>1.1.7-SNAPSHOT</jeesuite.cache.version>
-		<jeesuite.mybatis.version>1.1.7-SNAPSHOT</jeesuite.mybatis.version>
-		<jeesuite.spring.version>1.1.7-SNAPSHOT</jeesuite.spring.version>
-		<jeesuite.springweb.version>1.1.7-SNAPSHOT</jeesuite.springweb.version>
-		<jeesuite.common.version>1.1.7-SNAPSHOT</jeesuite.common.version>
+		<jeesuite.cache.version>1.1.7</jeesuite.cache.version>
+		<jeesuite.mybatis.version>1.1.7</jeesuite.mybatis.version>
+		<jeesuite.spring.version>1.1.7</jeesuite.spring.version>
+		<jeesuite.springweb.version>1.1.7</jeesuite.springweb.version>
+		<jeesuite.common.version>1.1.7</jeesuite.common.version>
 		<zkclient.version>0.10</zkclient.version>
 		<zookeeper.version>3.4.9</zookeeper.version>
 		<springboot.version>1.5.2.RELEASE</springboot.version>
-		<jeesuite.starter.version>1.1.7-SNAPSHOT</jeesuite.starter.version>
+		<jeesuite.starter.version>1.1.7</jeesuite.starter.version>
 	</properties>
 
 	<dependencyManagement>
