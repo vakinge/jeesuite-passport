@@ -41,7 +41,7 @@
          <div class="verification"> 
           <label for="code"><i class="am-icon-code-fork"></i></label> 
           <input type="tel" name="verifyCode" id="verifyCode" placeholder="请输入验证码" /> 
-          <a class="btn" href="javascript:void(0);" onclick="sendMobileCode();" id="sendMobileCode"> <span id="dyMobileButton">获取</span></a> 
+            <a class="btn" href="javascript:void(0);" id="sendMobileCode"> <span id="dyMobileButton">获取</span></a> 
          </div>
          <div class="user-pass"> 
           <label for="password"><i class="am-icon-lock"></i></label> 
@@ -63,6 +63,7 @@
    </div> 
    <#include "./inc/footer.html"/>
    <script>
+      var timer,timeout = 180;
 	  $(function() {
 		 $('#doc-my-tabs').tabs();
 		 $('.J_register').on('click',function(){
@@ -102,6 +103,37 @@
 						alert('注册错误');
 					}
 				});
+		 });
+		 
+		 $('#dyMobileButton').on('click',function(){
+			    var $btn = $(this);
+			    if(timeout > 0 && timeout < 180)return;
+			    var mobileNo = $("#mobile").val();
+			    if(mobileNo == ''){
+			       alert("手机号码不能为空");	
+			       return;
+			    }
+			    $.ajax({
+				 url : '/common/send_code?to='+mobileNo,
+				 type: 'POST',
+				 contentType: 'application/json',
+				 success : function(json) {
+				  if(json.code == 200){
+					timer = setInterval(function() {
+						timeout--;
+						if (timeout == 0) {
+							clearInterval(timer);
+							$btn.html('获取');
+							btn.disabled = false;
+						} else {
+							$btn.html(timeout+'秒');
+						}
+					}, 1000, "");
+				  }else{
+					  alert( json.msg);	
+				   }
+				 }
+			  });
 		 });
 	  });
   </script>  

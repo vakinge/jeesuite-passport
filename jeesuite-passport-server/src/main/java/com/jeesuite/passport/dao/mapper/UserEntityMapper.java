@@ -4,12 +4,11 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 
-import com.jeesuite.passport.dao.entity.UserEntity;
 import com.jeesuite.mybatis.plugin.cache.annotation.Cache;
+import com.jeesuite.passport.dao.CustomBaseMapper;
+import com.jeesuite.passport.dao.entity.UserEntity;
 
-import tk.mybatis.mapper.common.BaseMapper;
-
-public interface UserEntityMapper extends BaseMapper<UserEntity> {
+public interface UserEntityMapper extends CustomBaseMapper<UserEntity> {
 	
 	@Cache
 	@Select("select * from users where username = #{name} or email = #{email} or mobile = #{mobile} limit 1")

@@ -23,6 +23,13 @@ import com.jeesuite.passport.service.AppService;
 import com.jeesuite.passport.service.UserService;
 import com.jeesuite.springweb.utils.WebUtils;
 
+
+/**
+ * 
+ * @description <br>
+ * @author <a href="mailto:vakinge@gmail.com">vakin</a>
+ * @date 2017年7月29日
+ */
 public abstract class BaseLoginController {
 
 	@Autowired

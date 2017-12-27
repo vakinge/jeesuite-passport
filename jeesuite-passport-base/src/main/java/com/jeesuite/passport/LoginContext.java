@@ -6,6 +6,12 @@ import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.passport.model.LoginUserInfo;
 import com.jeesuite.springweb.RequestContextHelper;
 
+/**
+ * 
+ * @description <br>
+ * @author <a href="mailto:vakinge@gmail.com">vakin</a>
+ * @date 2017年4月16日
+ */
 public class LoginContext {
 	
 	private final static ThreadLocal<LoginSession> holder = new ThreadLocal<>();
