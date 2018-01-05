@@ -18,17 +18,17 @@
 
 #### 关联项目
  - 基础库
-  - [http://git.oschina.net/vakinge/jeesuite-config](http://git.oschina.net/vakinge/jeesuite-libs)
-  - [https://github.com/vakinge/jeesuite-config](https://github.com/vakinge/jeesuite-libs)
- - 模板项目
-  - [http://git.oschina.net/vakinge/jeesuite-bestpl](http://git.oschina.net/vakinge/jeesuite-bestpl)
-  - [https://github.com/vakinge/jeesuite-bestpl](https://github.com/vakinge/jeesuite-bestpl)
- - 统一认证中心
-  - [http://git.oschina.net/vakinge/jeesuite-passport](http://git.oschina.net/vakinge/jeesuite-passport)
-  - [https://github.com/vakinge/jeesuite-passport](https://github.com/vakinge/jeesuite-passport)
+  - [http://git.oschina.net/vakinge/jeesuite-libs](http://git.oschina.net/vakinge/jeesuite-libs)
+  - [https://github.com/vakinge/jeesuite-libs](https://github.com/vakinge/jeesuite-libs)
+ - 配置中心
+  - [http://git.oschina.net/vakinge/jeesuite-config](http://git.oschina.net/vakinge/jeesuite-config)
+  - [https://github.com/vakinge/jeesuite-config](https://github.com/vakinge/jeesuite-config)
  - api网关
   - [http://git.oschina.net/vakinge/jeesuite-apigateway](http://git.oschina.net/vakinge/jeesuite-apigateway)
   - [https://github.com/vakinge/jeesuite-apigateway](https://github.com/vakinge/jeesuite-apigateway)
+ - 模板项目
+  - [http://git.oschina.net/vakinge/jeesuite-bestpl](http://git.oschina.net/vakinge/jeesuite-bestpl)
+  - [https://github.com/vakinge/jeesuite-bestpl](https://github.com/vakinge/jeesuite-bestpl)
  - 应用监控平台
   - [http://git.oschina.net/vakinge/jeesuite-admin](http://git.oschina.net/vakinge/jeesuite-admin)
   - [https://github.com/vakinge/jeesuite-admin](https://github.com/vakinge/jeesuite-admin)
