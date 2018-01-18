@@ -84,13 +84,14 @@ CREATE TABLE `resources` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) DEFAULT NULL COMMENT '父ID，顶级为0',
   `app_id` int(10) DEFAULT NULL,
-  `name` varchar(50) DEFAULT NULL COMMENT '菜单名称',
-  `url` varchar(200) DEFAULT NULL COMMENT '菜单URL',
-  `type` smallint(1) DEFAULT NULL COMMENT '类型   0：目录   1：菜单   2：按钮',
-  `icon` varchar(50) DEFAULT NULL COMMENT '菜单图标',
+  `name` varchar(50) DEFAULT NULL COMMENT '资源名称',
+  `code` varchar(200) DEFAULT NULL COMMENT '资源编码(url,事件编码等)',
+  `is_leaf` tinyint(1) DEFAULT 1,
+  `is_menu` tinyint(1) DEFAULT 0,
+  `icon` varchar(50) DEFAULT NULL COMMENT '资源图标',
   `order_id` int(10) DEFAULT NULL COMMENT '排序',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜单管理';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='资源';
 
 -- ----------------------------
 --  Table structure for `role`
@@ -99,6 +100,7 @@ DROP TABLE IF EXISTS `role`;
 CREATE TABLE `role` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `app_id` int(10) DEFAULT NULL,
+  `group` varchar(32) DEFAULT NULL COMMENT '角色分组',
   `name` varchar(32) DEFAULT NULL COMMENT '角色名称',
   `remark` varchar(100) DEFAULT NULL COMMENT '备注',
   `create_at` datetime DEFAULT NULL COMMENT '创建时间',
@@ -112,8 +114,8 @@ DROP TABLE IF EXISTS `role_r_resources`;
 CREATE TABLE `role_r_resources` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `role_id` int(10) DEFAULT NULL COMMENT '角色ID',
-  `resource_id` int(10) DEFAULT NULL COMMENT '菜单ID',
+  `resource_id` int(10) DEFAULT NULL COMMENT '资源ID',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='角色与菜单对应关系';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='角色与资源对应关系';
 
 SET FOREIGN_KEY_CHECKS = 1;

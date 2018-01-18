@@ -9,8 +9,9 @@
     <result column="parent_id" property="parentId" jdbcType="INTEGER" />
     <result column="app_id" property="appId" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
-    <result column="url" property="url" jdbcType="VARCHAR" />
-    <result column="type" property="type" jdbcType="SMALLINT" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="is_menu" property="isMenu" jdbcType="BIT" />
+    <result column="is_leaf" property="isLeaf" jdbcType="BIT" />
     <result column="icon" property="icon" jdbcType="VARCHAR" />
     <result column="order_id" property="orderId" jdbcType="INTEGER" />
   </resultMap>

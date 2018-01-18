@@ -23,15 +23,20 @@ public class ResourceEntity extends BaseEntity {
      */
     private String name;
 
-    /**
-     * 菜单URL
-     */
-    private String url;
+
+    private String code;
 
     /**
-     * 类型   0：目录   1：菜单   2：按钮
+     * 是否菜单
      */
-    private Short type;
+    @Column(name = "is_menu")
+    private Boolean isMenu;
+
+    /**
+     * 是否叶节点
+     */
+    @Column(name = "is_leaf")
+    private Boolean isLeaf;
 
     /**
      * 菜单图标
@@ -106,43 +111,7 @@ public class ResourceEntity extends BaseEntity {
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * 获取菜单URL
-     *
-     * @return url - 菜单URL
-     */
-    public String getUrl() {
-        return url;
-    }
-
-    /**
-     * 设置菜单URL
-     *
-     * @param url 菜单URL
-     */
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    /**
-     * 获取类型   0：目录   1：菜单   2：按钮
-     *
-     * @return type - 类型   0：目录   1：菜单   2：按钮
-     */
-    public Short getType() {
-        return type;
-    }
-
-    /**
-     * 设置类型   0：目录   1：菜单   2：按钮
-     *
-     * @param type 类型   0：目录   1：菜单   2：按钮
-     */
-    public void setType(Short type) {
-        this.type = type;
-    }
+    }    
 
     /**
      * 获取菜单图标
@@ -179,4 +148,29 @@ public class ResourceEntity extends BaseEntity {
     public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public Boolean getIsMenu() {
+		return isMenu;
+	}
+
+	public void setIsMenu(Boolean isMenu) {
+		this.isMenu = isMenu;
+	}
+
+	public Boolean getIsLeaf() {
+		return isLeaf;
+	}
+
+	public void setIsLeaf(Boolean isLeaf) {
+		this.isLeaf = isLeaf;
+	}
+    
 }

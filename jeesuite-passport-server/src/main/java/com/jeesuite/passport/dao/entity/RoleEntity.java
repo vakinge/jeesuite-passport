@@ -17,6 +17,8 @@ public class RoleEntity extends BaseEntity {
      * 角色名称
      */
     private String name;
+    
+    private String group;
 
     /**
      * 备注
@@ -74,8 +76,17 @@ public class RoleEntity extends BaseEntity {
     public void setName(String name) {
         this.name = name;
     }
+    
 
-    /**
+    public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	/**
      * 获取备注
      *
      * @return remark - 备注
