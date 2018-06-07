@@ -41,7 +41,7 @@ public class LoginUserInfo implements Serializable {
 	}
 
 	public String getNickname() {
-		return nickname;
+		return StringUtils.isBlank(nickname) ? getUsername() : nickname;
 	}
 
 	public void setNickname(String nickname) {
@@ -65,7 +65,7 @@ public class LoginUserInfo implements Serializable {
 	}
 
 	public String getAvatar() {
-		return avatar;
+		return StringUtils.isBlank(avatar) ? "/static/images/defaultAvatar.jpg" : avatar;
 	}
 
 	public void setAvatar(String avatar) {
