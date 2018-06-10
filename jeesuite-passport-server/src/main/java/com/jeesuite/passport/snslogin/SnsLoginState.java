@@ -1,29 +1,36 @@
 package com.jeesuite.passport.snslogin;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 import javax.persistence.Transient;
+
+import com.jeesuite.common.util.TokenGenerator;
 
 public class SnsLoginState implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
 	private String appId;
-	private String domain;
 	private String snsType;
 	@Transient
 	private String state;
 	private String regPageUri;
 	private String successDirectUri;
 	private String orignUrl;
+	private Integer lognUserId;
 	
 	public SnsLoginState() {}
-
-	public SnsLoginState(String appId,String domain, String snsType, String regPageUri, String successDirectUri,String orignUrl) {
-		this.state = UUID.randomUUID().toString().replaceAll("-", "");
+	
+	public SnsLoginState(String appId, String snsType, Integer lognUserId) {
+		super();
 		this.appId = appId;
-		this.domain = domain;
+		this.snsType = snsType;
+		this.lognUserId = lognUserId;
+	}
+
+	public SnsLoginState(String appId,String snsType, String regPageUri, String successDirectUri,String orignUrl) {
+		this.state = TokenGenerator.generate();
+		this.appId = appId;
 		this.snsType = snsType;
 		this.regPageUri = regPageUri;
 		this.successDirectUri = successDirectUri;
@@ -36,14 +43,6 @@ public class SnsLoginState implements Serializable{
 
 	public void setAppId(String appId) {
 		this.appId = appId;
-	}
-	
-	public String getDomain() {
-		return domain;
-	}
-
-	public void setDomain(String domain) {
-		this.domain = domain;
 	}
 
 	public String getSnsType() {
@@ -86,5 +85,16 @@ public class SnsLoginState implements Serializable{
 	public void setOrignUrl(String orignUrl) {
 		this.orignUrl = orignUrl;
 	}
+
+	public Integer getLognUserId() {
+		return lognUserId;
+	}
+
+	public void setLognUserId(Integer lognUserId) {
+		this.lognUserId = lognUserId;
+	}
 	
+	public boolean loginAction(){
+		return lognUserId == null || lognUserId == 0;
+	}
 }

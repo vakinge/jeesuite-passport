@@ -13,17 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.BeanCopyUtils;
-import com.jeesuite.common.util.DateUtils;
 import com.jeesuite.common.util.FormatValidateUtils;
-import com.jeesuite.passport.dao.entity.SnsAccounyBindingEntity;
-import com.jeesuite.passport.dao.entity.SnsAccounyBindingEntity.SnsType;
+import com.jeesuite.passport.dao.entity.SnsAccountBindingEntity;
+import com.jeesuite.passport.dao.entity.SnsAccountBindingEntity.SnsType;
 import com.jeesuite.passport.dao.entity.UserEntity;
-import com.jeesuite.passport.dao.mapper.SnsAccounyBindingEntityMapper;
+import com.jeesuite.passport.dao.mapper.SnsAccountBindingEntityMapper;
 import com.jeesuite.passport.dao.mapper.UserEntityMapper;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RequestMetadata;
 import com.jeesuite.passport.dto.UserInfo;
-import com.jeesuite.passport.helper.SecurityCryptUtils;
 import com.jeesuite.passport.snslogin.OauthUser;
 import com.jeesuite.passport.snslogin.connector.WeixinGzhConnector;
 
@@ -39,10 +37,10 @@ public class UserService {
 	@Autowired
 	private UserEntityMapper userMapper;
 	@Autowired
-	private SnsAccounyBindingEntityMapper snsAccounyBindingMapper;
+	private SnsAccountBindingEntityMapper snsAccounyBindingMapper;
 
 
-	public UserInfo findAcctountById(int id) {
+	public UserInfo findAcctountById(Integer id) {
 		UserEntity entity = userMapper.selectByPrimaryKey(id);
 		return buildUserInfo(entity);
 	}
@@ -64,7 +62,7 @@ public class UserService {
 	
 	public UserInfo findAcctountBySnsOpenId(String type,String openId) {
 		type = WeixinGzhConnector.SNS_TYPE.equals(type) ? SnsType.weixin.name() : type;
-		SnsAccounyBindingEntity bindingEntity = snsAccounyBindingMapper.findBySnsOpenId(type, openId);
+		SnsAccountBindingEntity bindingEntity = snsAccounyBindingMapper.findBySnsOpenId(type, openId);
 		if(bindingEntity != null){
 			UserEntity accountEntity = userMapper.selectByPrimaryKey(bindingEntity.getUserId());
 			return buildUserInfo(accountEntity);
@@ -74,7 +72,7 @@ public class UserService {
 	
 	public UserInfo checkAndGetAccount(String loginName,String password){
 		UserEntity entity = userMapper.findByLoginName(loginName);
-		if(entity == null || !entity.getPassword().equals(cryptPassword(password, entity.getRegAt()))){
+		if(entity == null || !entity.getPassword().equals(UserEntity.encryptPassword(password))){
 		   return null;
 		}
 		return buildUserInfo(entity);
@@ -111,7 +109,7 @@ public class UserService {
 		accountEntity.setRegIp(metadata.getIpAddr());
 		accountEntity.setSourceAppId(metadata.getAppId());
 		if(StringUtils.isNotBlank(accountEntity.getPassword())){
-			accountEntity.setPassword(cryptPassword(accountEntity.getPassword(), accountEntity.getRegAt()));
+			accountEntity.setPassword(UserEntity.encryptPassword(accountEntity.getPassword()));
 		}
 		userMapper.insertSelective(accountEntity);
 		
@@ -122,14 +120,19 @@ public class UserService {
 	@Transactional
 	public UserInfo createUserByOauthInfo(OauthUser oauthUser,AccountBindParam bindParam){
 		
-		String snsType = WeixinGzhConnector.SNS_TYPE.equals(oauthUser.getSnsType()) ? SnsType.weixin.name() : oauthUser.getSnsType();
+		String snsType = oauthUser.getSnsType();
+		String subSnsType = null;
+		if(WeixinGzhConnector.SNS_TYPE.equals(oauthUser.getSnsType())){
+			snsType = SnsType.weixin.name();
+			subSnsType = oauthUser.getSnsType();
+		}
 		UserInfo account = findAcctountBySnsOpenId(snsType, oauthUser.getOpenId());
 		if(account == null){
 			
 			UserEntity accountEntity = null;
 			//先按unionId查找是否有已存在的用户
 			if(StringUtils.isNotBlank(oauthUser.getUnionId())){
-				List<SnsAccounyBindingEntity> sameAccounyBinds = snsAccounyBindingMapper.findByUnionId(oauthUser.getUnionId());
+				List<SnsAccountBindingEntity> sameAccounyBinds = snsAccounyBindingMapper.findByUnionId(oauthUser.getUnionId());
 				if(sameAccounyBinds != null && sameAccounyBinds.size() > 0){
 					accountEntity = userMapper.selectByPrimaryKey(sameAccounyBinds.get(0).getUserId());
 					if(accountEntity == null){
@@ -151,14 +154,15 @@ public class UserService {
 				accountEntity.setRegIp(bindParam.getIpAddr());
 				accountEntity.setRegAt(bindParam.getTime());
 				if(StringUtils.isNotBlank(accountEntity.getPassword())){
-					accountEntity.setPassword(cryptPassword(accountEntity.getPassword(), accountEntity.getRegAt()));
+					accountEntity.setPassword(UserEntity.encryptPassword(accountEntity.getPassword()));
 				}
 				userMapper.insertSelective(accountEntity);
 			}
 			//
-			SnsAccounyBindingEntity bindingEntity = new SnsAccounyBindingEntity();
+			SnsAccountBindingEntity bindingEntity = new SnsAccountBindingEntity();
 			bindingEntity.setUserId(accountEntity.getId().intValue());
 			bindingEntity.setSnsType(snsType);
+			bindingEntity.setSubSnsType(subSnsType);
 			bindingEntity.setOpenId(oauthUser.getOpenId());
 			bindingEntity.setUnionId(oauthUser.getUnionId());
 			bindingEntity.setEnabled(true);
@@ -193,7 +197,7 @@ public class UserService {
 			accountEntity.setEmail(userInfo.getEmail());
 		}
 		if(StringUtils.isNotBlank(userInfo.getPassword())){
-			accountEntity.setPassword(cryptPassword(userInfo.getPassword(), accountEntity.getRegAt()));
+			accountEntity.setPassword(UserEntity.encryptPassword(userInfo.getPassword()));
 		}
 		if(StringUtils.isNotBlank(userInfo.getAvatar())){
 			accountEntity.setAvatar(userInfo.getAvatar());
@@ -218,9 +222,32 @@ public class UserService {
 		userMapper.updateByPrimaryKeySelective(accountEntity);
 	}
 
-
-	private static String cryptPassword(String password,Date regAt){
-		String salt = DateUtils.format2ddMMMyy(regAt);
-		return SecurityCryptUtils.cryptPassword(password, salt);
+	public void addSnsAccountBind(int userId,OauthUser oauthUser){
+		SnsAccountBindingEntity bindingEntity = snsAccounyBindingMapper.findBySnsOpenId(oauthUser.getSnsType(), oauthUser.getOpenId());
+		if(bindingEntity != null){
+			if(bindingEntity.getUserId().intValue() == userId){
+				if(!bindingEntity.getEnabled()){
+					bindingEntity.setEnabled(true);
+					bindingEntity.setUpdatedAt(new Date());
+					snsAccounyBindingMapper.updateByPrimaryKeySelective(bindingEntity);
+				}
+				return;
+			}
+			throw new JeesuiteBaseException(4005, "该账号已经绑定其他账号");
+		}
+		
+		bindingEntity = new SnsAccountBindingEntity();
+		bindingEntity.setUserId(userId);
+		bindingEntity.setSnsType(oauthUser.getSnsType());
+		bindingEntity.setOpenId(oauthUser.getOpenId());
+		bindingEntity.setUnionId(oauthUser.getUnionId());
+		bindingEntity.setEnabled(true);
+		bindingEntity.setCreatedAt(new Date());
+		snsAccounyBindingMapper.insertSelective(bindingEntity);
+		
+	}
+	
+    public void cancelSnsAccountBind(int userId,String snsType){
+    	snsAccounyBindingMapper.unbindSnsAccount(userId, snsType);
 	}
 }

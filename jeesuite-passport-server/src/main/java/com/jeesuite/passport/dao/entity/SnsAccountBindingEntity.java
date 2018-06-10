@@ -1,14 +1,20 @@
 package com.jeesuite.passport.dao.entity;
 
-import com.jeesuite.mybatis.core.BaseEntity;
 import java.util.Date;
-import javax.persistence.*;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.jeesuite.mybatis.core.BaseEntity;
 
 @Table(name = "sns_account_binding")
-public class SnsAccounyBindingEntity extends BaseEntity {
+public class SnsAccountBindingEntity extends BaseEntity {
 	
 	public static enum SnsType{
-		weixin,weibo,qq
+		weixin,weibo,qq,taobao
 	}
 	
     @Id
@@ -20,6 +26,9 @@ public class SnsAccounyBindingEntity extends BaseEntity {
 
     @Column(name = "sns_type",updatable = false)
     private String snsType;
+    
+    @Column(name = "sub_sns_type",updatable = false)
+    private String subSnsType;
 
     @Column(name = "union_id")
     private String unionId;
@@ -36,7 +45,7 @@ public class SnsAccounyBindingEntity extends BaseEntity {
     private Date createdAt;
 
     @Column(name = "updated_at")
-    private Long updatedAt;
+    private Date updatedAt;
 
     /**
      * @return id
@@ -79,8 +88,17 @@ public class SnsAccounyBindingEntity extends BaseEntity {
     public void setSnsType(String snsType) {
         this.snsType = snsType;
     }
+    
+   
+    public String getSubSnsType() {
+		return subSnsType;
+	}
 
-    /**
+	public void setSubSnsType(String subSnsType) {
+		this.subSnsType = subSnsType;
+	}
+
+	/**
      * @return union_id
      */
     public String getUnionId() {
@@ -139,14 +157,14 @@ public class SnsAccounyBindingEntity extends BaseEntity {
     /**
      * @return updated_at
      */
-    public Long getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
     /**
      * @param updatedAt
      */
-    public void setUpdatedAt(Long updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 

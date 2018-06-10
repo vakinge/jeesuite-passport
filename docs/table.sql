@@ -22,7 +22,7 @@ CREATE TABLE `users` (
   `reg_at` datetime DEFAULT NULL,
   `last_login_ip` varchar(15) DEFAULT NULL COMMENT '最后登录ip',
   `last_login_at` datetime DEFAULT NULL,
-  `update_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
    UNIQUE INDEX `username_uq_index` (`username`),
    UNIQUE INDEX `email_uq_index` (`email`),
@@ -34,13 +34,14 @@ DROP TABLE IF EXISTS `sns_account_binding`;
 CREATE TABLE `sns_account_binding` (
   `id` int(10)  NOT NULL AUTO_INCREMENT,
   `user_id` int(10)  NOT NULL, 
-  `sns_type` ENUM('weixin', 'weibo','qq') DEFAULT NULL,
+  `sns_type` ENUM('weixin', 'weibo','qq','taobao') DEFAULT NULL,
+  `sub_sns_type` varchar(32) DEFAULT NULL,
   `union_id` varchar(32) DEFAULT NULL,
   `open_id` varchar(32) DEFAULT NULL,
   `source_app_id` VARCHAR(32) DEFAULT NULL COMMENT '用户来源（业务系统）',
   `enabled` bit(1) DEFAULT b'1',
   `created_at` datetime DEFAULT NULL,
-  `updated_at` bigint(13) DEFAULT NULL,
+  `updated_at` TIMESTAMP DEFAULT NULL,
   PRIMARY KEY (`id`),
    UNIQUE INDEX `ao_uq_index` (`user_id`,`open_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='第三方账号绑定';

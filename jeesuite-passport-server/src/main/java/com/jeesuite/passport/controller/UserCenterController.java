@@ -25,17 +25,16 @@ public class UserCenterController {
 	@RequestMapping(value = "index", method = RequestMethod.GET)
 	public String index(Model model){
 		LoginSession session = LoginContext.getRequireLoginSession();
-		model.addAttribute(USER_INFO_ATTR_NAME, session.getUserInfo());
+		UserInfo userInfo = userService.findAcctountById(session.getUserId());
+		model.addAttribute(USER_INFO_ATTR_NAME, userInfo);
 		return "ucenter/index";
 	}
-	
-	@RequestMapping(value = "information", method = RequestMethod.GET)
-	public String information(Model model){
+
+	@RequestMapping(value = "snsbinding", method = RequestMethod.GET)
+	public String snsbinding(Model model){
 		LoginSession session = LoginContext.getRequireLoginSession();
 		model.addAttribute(USER_INFO_ATTR_NAME, session.getUserInfo());
-		UserInfo account = userService.findAcctountById(session.getUserId());
-		model.addAttribute("account", account);
-		return "ucenter/information";
+		return "ucenter/snsbinding";
 	}
 	
 	@RequestMapping(value = "setting", method = RequestMethod.GET)

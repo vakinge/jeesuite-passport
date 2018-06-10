@@ -26,27 +26,31 @@ public class WeixinGzhConnector  {
 	private Map<String, AppConfig> appConfigs = new HashMap<>();
 	
 	public WeixinGzhConnector() {}
+	
+	public boolean contains(String appName){
+		return appConfigs.containsKey(appName);
+	}
 
-	public void addConfig(String groupName, String appkey, String appSecret){
-		appConfigs.put(groupName, new AppConfig(appkey, appSecret));
+	public void addConfig(String appName, String appkey, String appSecret){
+		appConfigs.put(appName, new AppConfig(appkey, appSecret));
 	}
 	
 
-	public String getClientId(String groupName) {
-		AppConfig appConfig = appConfigs.get(groupName);
-		if(appConfig == null)throw new JeesuiteBaseException(1001, "no wxgzh config for["+groupName+"]");
+	public String getClientId(String appName) {
+		AppConfig appConfig = appConfigs.get(appName);
+		if(appConfig == null)throw new JeesuiteBaseException(1001, "no wxgzh config for["+appName+"]");
 		return appConfig.getAppkey();
 	}
 
-	public String getClientSecret(String groupName) {
-		AppConfig appConfig = appConfigs.get(groupName);
+	public String getClientSecret(String appName) {
+		AppConfig appConfig = appConfigs.get(appName);
 		return appConfig.getAppSecret();
 	}
 
-	public String getAuthorizeUrl(String groupName, String scope,String redirectUrl,String state) {
+	public String getAuthorizeUrl(String appName, String scope,String redirectUrl,String state) {
 
 		StringBuilder urlBuilder = new StringBuilder("https://open.weixin.qq.com/connect/oauth2/authorize?");
-		urlBuilder.append("appid=").append(getClientId(groupName))
+		urlBuilder.append("appid=").append(getClientId(appName))
                 .append("&redirect_uri=").append(redirectUrl)
                 .append("&response_type=code&scope=").append(scope)
                 .append("&state=")
@@ -56,11 +60,11 @@ public class WeixinGzhConnector  {
 		return urlBuilder.toString();
 	}
 
-	protected JSONObject getAccessToken(String groupName,String code) {
+	protected JSONObject getAccessToken(String appName,String code) {
 
 		StringBuilder urlBuilder = new StringBuilder("https://api.weixin.qq.com/sns/oauth2/access_token?grant_type=authorization_code");
-		urlBuilder.append("&appid=" + getClientId(groupName));
-		urlBuilder.append("&secret=" + getClientSecret(groupName));
+		urlBuilder.append("&appid=" + getClientId(appName));
+		urlBuilder.append("&secret=" + getClientSecret(appName));
 		urlBuilder.append("&code=" + code);
 
 		String url = urlBuilder.toString();
@@ -71,9 +75,9 @@ public class WeixinGzhConnector  {
 		return JSONObject.parseObject(httpString);
 	}
 
-	public OauthUser getUser(String groupName,String code) {
+	public OauthUser getUser(String appName,String code) {
 
-		JSONObject tokenJson = getAccessToken(groupName,code);
+		JSONObject tokenJson = getAccessToken(appName,code);
 		String accessToken = tokenJson.getString("access_token");
 		String openId = tokenJson.getString("openid");
 		

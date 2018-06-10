@@ -24,9 +24,11 @@ import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.Constants;
+import com.jeesuite.passport.LoginContext;
 import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.UserInfo;
+import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.passport.snslogin.OauthConnector;
 import com.jeesuite.passport.snslogin.OauthUser;
 import com.jeesuite.passport.snslogin.SnsLoginState;
@@ -41,8 +43,8 @@ import com.jeesuite.springweb.utils.WebUtils;
 
 
 @Controller
-@RequestMapping("/snslogin")
-public class SnsLoginController extends BaseLoginController implements EnvironmentAware{
+@RequestMapping("/sns")
+public class SnsConnectController extends BaseLoginController implements EnvironmentAware{
 	
 	@Value("${sns.login.next.bind:false}")
 	private boolean snsLoginBind;
@@ -50,9 +52,9 @@ public class SnsLoginController extends BaseLoginController implements Environme
 	private WeixinGzhConnector weixinGzhConnector = new WeixinGzhConnector();
 	private Map<String, String> callbackUris = new HashMap<>();
 	
-	@RequestMapping(value = "{type}", method = RequestMethod.GET)
-	public String redirect(HttpServletRequest request,@PathVariable("type") String type
-			,@RequestParam(value="client_id",required=false) String clientId
+	@RequestMapping(value = "login/{type}", method = RequestMethod.GET)
+	public String loginRedirect(HttpServletRequest request,@PathVariable("type") String type
+			,@RequestParam(value="app_id",required=false) String appId
 			,@RequestParam(value="reg_uri",required=false) String regPageUri
 			,@RequestParam(value="redirect_uri",required=false) String redirectUri
 			,@RequestParam(value="origin_url",required=false) String orignUrl){
@@ -71,12 +73,12 @@ public class SnsLoginController extends BaseLoginController implements Environme
 			orignDomain = WebUtils.getDomain(redirectUri);
 		}else{
 			orignDomain = WebUtils.getDomain(redirectUri);
-			validateOrignDomain(clientId,orignDomain);
+			validateOrignDomain(appId,orignDomain);
 		}
 		//
 		
-		SnsLoginState loginState = new SnsLoginState(clientId,orignDomain, type, regPageUri, redirectUri,orignUrl);
-		new RedisObject(loginState.getState()).set(loginState, CacheExpires.IN_1MIN);
+		SnsLoginState snsState = new SnsLoginState(appId, type, regPageUri, redirectUri,orignUrl);
+		new RedisObject(snsState.getState()).set(snsState, CacheExpires.IN_1MIN);
 		
 		String callBackUri = getCallbackUri(request,type);
 		
@@ -84,15 +86,29 @@ public class SnsLoginController extends BaseLoginController implements Environme
 		if(isWxGzh){
 			String scope = request.getParameter("scope");
 			scope = WeixinGzhConnector.SNSAPI_USERINFO.equalsIgnoreCase(scope) ? WeixinGzhConnector.SNSAPI_USERINFO : WeixinGzhConnector.SNSAPI_BASE;
-			url = weixinGzhConnector.getAuthorizeUrl(orignDomain, scope, callBackUri, loginState.getState());
+			url = weixinGzhConnector.getAuthorizeUrl(orignDomain, scope, callBackUri, snsState.getState());
 		}else{
-			url = connector.getAuthorizeUrl(loginState.getState(), callBackUri);			
+			url = connector.getAuthorizeUrl(snsState.getState(), callBackUri);			
 		}
 
 		return redirectTo(url); 
 	}
 	
 
+	@RequestMapping(value = "bind/{type}", method = RequestMethod.GET)
+	public String bindRedirect(HttpServletRequest request,@PathVariable("type") String type){
+		LoginSession session = LoginContext.getRequireLoginSession();
+		SnsLoginState snsState = new SnsLoginState(null, type, session.getUserId());
+		new RedisObject(snsState.getState()).set(snsState, CacheExpires.IN_1MIN);
+		String callBackUri = getCallbackUri(request,type);
+		
+		OauthConnector connector = oauthConnectors.get(type);
+		if(connector == null)throw new JeesuiteBaseException(1001,"不支持授权类型:"+type);
+		String authorizeUrl = connector.getAuthorizeUrl(snsState.getState(), callBackUri);	
+		
+		return redirectTo(authorizeUrl); 
+	}
+	
 	@RequestMapping(value = "callback", method = {RequestMethod.GET,RequestMethod.POST})
 	public String callback(HttpServletRequest request,HttpServletResponse response,Model model) {
 		String code = request.getParameter(PassportConstants.PARAM_CODE);
@@ -106,7 +122,7 @@ public class SnsLoginController extends BaseLoginController implements Environme
 
 		OauthUser oauthUser;
 		if(WeixinGzhConnector.SNS_TYPE.equals(loginState.getSnsType())){
-			oauthUser = weixinGzhConnector.getUser(loginState.getDomain(), code);
+			oauthUser = weixinGzhConnector.getUser(loginState.getAppId(), code);
 		}else{
 			oauthUser = oauthConnectors.get(loginState.getSnsType()).getUser(code);
 		}
@@ -116,9 +132,14 @@ public class SnsLoginController extends BaseLoginController implements Environme
 		}
 		oauthUser.setSnsType(loginState.getSnsType());
 		oauthUser.setFromClientId(loginState.getAppId());
+		//绑定
+		if(!loginState.loginAction()){
+			LoginSession session = LoginContext.getRequireLoginSession();
+			userService.addSnsAccountBind(session.getUserId(), oauthUser);
+			return redirectTo(WebUtils.getBaseUrl(request) + "/ucenter/snsbinding");
+		}
 		//根据openid 找用户
 		UserInfo account = userService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
-		
 		if(account != null){
 			return createSessionAndSetResponse(request, response, account, loginState.getSuccessDirectUri(),loginState.getOrignUrl());
 		}
@@ -168,8 +189,10 @@ public class SnsLoginController extends BaseLoginController implements Environme
 			}else if(OSChinaConnector.SNS_TYPE.equals(type)){				
 				oauthConnectors.put(type, new OSChinaConnector(appKey, appSecret));
 			}else if(type.startsWith(WeixinGzhConnector.SNS_TYPE)){
-				String domain = type.split("\\[|\\]")[1];
-				weixinGzhConnector.addConfig(domain, appKey, appSecret);
+				String appName = type.split("\\[|\\]")[1];
+				if(!weixinGzhConnector.contains(appName)){					
+					weixinGzhConnector.addConfig(appName, appKey, appSecret);
+				}
 			}
 			
 		}

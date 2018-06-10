@@ -65,7 +65,7 @@ public class LoginUserInfo implements Serializable {
 	}
 
 	public String getAvatar() {
-		return StringUtils.isBlank(avatar) ? "/static/images/defaultAvatar.jpg" : avatar;
+		return avatar;
 	}
 
 	public void setAvatar(String avatar) {

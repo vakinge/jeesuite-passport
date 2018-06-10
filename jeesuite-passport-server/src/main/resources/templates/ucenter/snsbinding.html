@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=0">
+    <title>第三方账号绑定</title>
+    <link href="${rc.contextPath}/AmazeUI-2.4.2/assets/css/admin.css" rel="stylesheet" type="text/css">
+    <link href="${rc.contextPath}/AmazeUI-2.4.2/assets/css/amazeui.min.css" rel="stylesheet" type="text/css">
+    <link href="${rc.contextPath}/css/personal.css" rel="stylesheet" type="text/css">
+    <link href="${rc.contextPath}/css/infstyle.css" rel="stylesheet" type="text/css"></head> 
+  <body>
+    <!--头 -->
+    <#include "../inc/header.html"/>
+    <b class="line"></b>
+    <div class="center">
+      <div class="col-main">
+        <div class="main-wrap">
+          <!--标题 -->
+          <div class="user-safety">
+            <div class="am-cf am-padding">
+              <div class="am-fl am-cf">
+                <strong class="am-text-danger am-text-lg">第三方账号绑定</strong>/
+                <small>3rd&nbsp;Account&nbsp;Bind</small></div>
+            </div>
+            <hr/>
+            <div class="arial uc-body clearfix">
+              <h3 class="title-h3">账号绑定设置</h3>
+              <ul class="openid_list">
+                <!--账号列表 开始-->
+                <li class="clearfix">
+                  <img src="/images/openid-taobao.png" alt="淘宝" class="op_l">
+                  <p class="op_r">
+                    <span class="op_text">绑定淘宝账号，使用淘宝账号便捷登录</span>
+                    <a href="/sns/bind/taobao" class="am-btn am-btn-success">
+                      <i>立即绑定</i>
+                    </a>
+                  </p>
+                </li>
+                <li class="clearfix" data-id="745761" data-name="QQ" data-nickname="vakinge">
+                  <img src="/images/openid-qq.png" alt="QQ" class="op_l">
+                  <p class="op_r">
+                    <span class="op_text">已绑定QQ账号：@姜维不混三国</span>
+                    <a href="javascript:void(0);" class="btn btn-white btn-rect btn-s J-btn-openid-unbind">
+                      <i class="am-btn am-btn-default">解除绑定</i>
+                    </a>
+                  </p>
+                </li>
+                <li class="clearfix">
+                  <img src="/images/openid-sina.png" alt="新浪微博" class="op_l">
+                  <p class="op_r">
+                    <span class="op_text">绑定新浪微博账号，使用新浪微博账号便捷登录</span>
+                    <a href="/sns/bind/weibo" class="am-btn am-btn-success">
+                      <i>立即绑定</i>
+                    </a>
+                  </p>
+                </li>
+                <li class="clearfix">
+                  <img src="/images/openid-wechat.png" alt="" class="op_l">
+                  <p class="op_r">
+                    <span class="op_text">绑定账号，使用账号便捷登录</span>
+                    <a href="/sns/bind/weixin" class="am-btn am-btn-success">
+                      <i>立即绑定</i>
+                    </a>
+                  </p>
+                </li>
+                <!--账号列表 结束--></ul>
+            </div>
+          </div>
+        </div>
+        <!--底部-->
+        <#include "../inc/footer.html"/></div>
+      <#include "../inc/left.html"/></div>
+  </body>
+
+</html>

@@ -5,12 +5,18 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.mybatis.core.BaseEntity;
 
 @Table(name = "users")
 public class UserEntity extends BaseEntity {
+	
+	private static final String salts = DigestUtils.md5(UserEntity.class.getName());
+	
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -253,5 +259,12 @@ public class UserEntity extends BaseEntity {
 		this.birthday = birthday;
 	}
     
-    
+	public static String encryptPassword(String password) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < password.length(); i++) {
+			sb.append(password.charAt(i)).append(salts.substring(i*2, (i+1)*2));
+		}
+		return DigestUtils.md5(sb.toString());
+
+	}
 }
