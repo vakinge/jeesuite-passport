@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.common.util.BeanCopyUtils;
+import com.jeesuite.common.util.BeanUtils;
 import com.jeesuite.common.util.FormatValidateUtils;
 import com.jeesuite.passport.dao.entity.SnsAccountBindingEntity;
 import com.jeesuite.passport.dao.entity.SnsAccountBindingEntity.SnsType;
@@ -56,7 +56,7 @@ public class UserService {
 	}
 
 	private UserInfo buildUserInfo(UserEntity entity) {
-		UserInfo userInfo = BeanCopyUtils.copy(entity, UserInfo.class);
+		UserInfo userInfo = BeanUtils.copy(entity, UserInfo.class);
 		return userInfo;
 	}
 	
@@ -104,7 +104,7 @@ public class UserService {
 			}
 		}
 		
-		accountEntity = BeanCopyUtils.copy(userInfo, UserEntity.class);
+		accountEntity = BeanUtils.copy(userInfo, UserEntity.class);
 		accountEntity.setRegAt(metadata.getTime());
 		accountEntity.setRegIp(metadata.getIpAddr());
 		accountEntity.setSourceAppId(metadata.getAppId());
@@ -148,7 +148,7 @@ public class UserService {
 					accountEntity.setNickname(oauthUser.getNickname());
 					accountEntity.setGender(oauthUser.getGender());
 				}else{
-					accountEntity = BeanCopyUtils.copy(bindParam, UserEntity.class);
+					accountEntity = BeanUtils.copy(bindParam, UserEntity.class);
 				}
 				accountEntity.setSourceAppId(bindParam.getAppId());
 				accountEntity.setRegIp(bindParam.getIpAddr());

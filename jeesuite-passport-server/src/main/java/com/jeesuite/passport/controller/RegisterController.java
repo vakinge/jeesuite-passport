@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.common.util.BeanCopyUtils;
+import com.jeesuite.common.util.BeanUtils;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RegisterParam;
 import com.jeesuite.passport.dto.RequestMetadata;
@@ -41,7 +41,7 @@ public class RegisterController {
 	public @ResponseBody WrapperResponseEntity register(HttpServletRequest request,@RequestBody RegisterParam param){
 		//验证码
 		
-		userService.createUser(BeanCopyUtils.copy(param, UserInfo.class),RequestMetadata.build(request));
+		userService.createUser(BeanUtils.copy(param, UserInfo.class),RequestMetadata.build(request));
 		return new WrapperResponseEntity();
 	}
 	

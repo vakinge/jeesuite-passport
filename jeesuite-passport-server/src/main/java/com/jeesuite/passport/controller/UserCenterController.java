@@ -3,6 +3,7 @@ package com.jeesuite.passport.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,7 +13,7 @@ import com.jeesuite.passport.LoginContext;
 import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.passport.service.UserService;
-import com.jeesuite.springweb.model.WrapperResponseEntity;
+import com.jeesuite.springweb.model.WrapperResponse;
 
 @Controller  
 @RequestMapping(value = "/ucenter")
@@ -65,12 +66,19 @@ public class UserCenterController {
 		return "ucenter/mobilesetting";
 	}
 	
-	@RequestMapping(value = "update", method = RequestMethod.POST)
-	public @ResponseBody WrapperResponseEntity updateMyUser(@RequestBody UserInfo account){
+	@RequestMapping(value = "user/update", method = RequestMethod.POST)
+	public @ResponseBody WrapperResponse<String> updateMyUser(@RequestBody UserInfo account){
 		LoginSession session = LoginContext.getRequireLoginSession();
 		account.setId(session.getUserId());
 		userService.updateAccount(account);
-		return new WrapperResponseEntity();
+		return new WrapperResponse<>();
+	}
+	
+	@RequestMapping(value = "/unbind/{snsType}", method = RequestMethod.POST)
+	public @ResponseBody WrapperResponse<String> unbindSnsAccount(@PathVariable("snsType") String snsType){
+		LoginSession session = LoginContext.getRequireLoginSession();
+		userService.cancelSnsAccountBind(session.getUserId(), snsType);
+		return new WrapperResponse<>();
 	}
 	
 }

@@ -2,15 +2,14 @@ package com.jeesuite.passport.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,13 +43,12 @@ import com.jeesuite.springweb.utils.WebUtils;
 
 @Controller
 @RequestMapping("/sns")
-public class SnsConnectController extends BaseLoginController implements EnvironmentAware{
+public class SnsConnectController extends BaseLoginController implements InitializingBean{
 	
 	@Value("${sns.login.next.bind:false}")
 	private boolean snsLoginBind;
 	private Map<String, OauthConnector> oauthConnectors = new HashMap<>();
 	private WeixinGzhConnector weixinGzhConnector = new WeixinGzhConnector();
-	private Map<String, String> callbackUris = new HashMap<>();
 	
 	@RequestMapping(value = "login/{type}", method = RequestMethod.GET)
 	public String loginRedirect(HttpServletRequest request,@PathVariable("type") String type
@@ -80,18 +78,17 @@ public class SnsConnectController extends BaseLoginController implements Environ
 		SnsLoginState snsState = new SnsLoginState(appId, type, regPageUri, redirectUri,orignUrl);
 		new RedisObject(snsState.getState()).set(snsState, CacheExpires.IN_1MIN);
 		
-		String callBackUri = getCallbackUri(request,type);
-		
-		String url;
+		String callBackUri = request.getRequestURL().toString().split("/" + type)[0] + "/callback";
+		String redirectUrl;
 		if(isWxGzh){
 			String scope = request.getParameter("scope");
 			scope = WeixinGzhConnector.SNSAPI_USERINFO.equalsIgnoreCase(scope) ? WeixinGzhConnector.SNSAPI_USERINFO : WeixinGzhConnector.SNSAPI_BASE;
-			url = weixinGzhConnector.getAuthorizeUrl(orignDomain, scope, callBackUri, snsState.getState());
+			redirectUrl = weixinGzhConnector.getAuthorizeUrl(orignDomain, scope, callBackUri, snsState.getState());
 		}else{
-			url = connector.getAuthorizeUrl(snsState.getState(), callBackUri);			
+			redirectUrl = connector.getAuthorizeUrl(snsState.getState(), callBackUri);			
 		}
 
-		return redirectTo(url); 
+		return redirectTo(redirectUrl); 
 	}
 	
 
@@ -100,10 +97,10 @@ public class SnsConnectController extends BaseLoginController implements Environ
 		LoginSession session = LoginContext.getRequireLoginSession();
 		SnsLoginState snsState = new SnsLoginState(null, type, session.getUserId());
 		new RedisObject(snsState.getState()).set(snsState, CacheExpires.IN_1MIN);
-		String callBackUri = getCallbackUri(request,type);
 		
 		OauthConnector connector = oauthConnectors.get(type);
 		if(connector == null)throw new JeesuiteBaseException(1001,"不支持授权类型:"+type);
+		String callBackUri = request.getRequestURL().toString().split("/" + type)[0] + "/callback";
 		String authorizeUrl = connector.getAuthorizeUrl(snsState.getState(), callBackUri);	
 		
 		return redirectTo(authorizeUrl); 
@@ -169,16 +166,15 @@ public class SnsConnectController extends BaseLoginController implements Environ
 	}
 
 	@Override
-	public void setEnvironment(Environment environment) {
-		RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(environment, "threepart.oauth.");
-		Map<String, Object> subProperties = resolver.getSubProperties("");
+	public void afterPropertiesSet() throws Exception {
+		Properties properties = ResourceUtils.getAllProperties("threepart.oauth.");
 		String type;String appKey;String appSecret;
-		for (String key : subProperties.keySet()) {
-			type = key.substring(0, key.lastIndexOf("."));
+		for (Object key : properties.keySet()) {
+			type = StringUtils.splitByWholeSeparator(key.toString(), ".")[2];
 			
 			if(oauthConnectors.containsKey(type))continue;
-			appKey = environment.getProperty("threepart.oauth."+type+".appId");
-			appSecret = environment.getProperty("threepart.oauth."+type+".appSecret");
+			appKey = properties.getProperty("threepart.oauth."+type+".appId");
+			appSecret = properties.getProperty("threepart.oauth."+type+".appSecret");
 			
 			if(QQConnector.SNS_TYPE.equals(type)){				
 				oauthConnectors.put(type, new QQConnector(appKey, appSecret));
@@ -196,31 +192,5 @@ public class SnsConnectController extends BaseLoginController implements Environ
 			}
 			
 		}
-		
 	}
-	
-	private String getCallbackUri(HttpServletRequest request, String type) {
-		String callbackUri = callbackUris.get(type);
-		if(callbackUri != null)return callbackUri;
-		synchronized (callbackUris) {			
-			String routeBaseUri = ResourceUtils.getProperty("route.base.url");
-			if(routeBaseUri != null){
-				routeBaseUri = routeBaseUri.endsWith("/") ? routeBaseUri : routeBaseUri.concat("/");
-				callbackUri = routeBaseUri + "snslogin/callback";
-			}else{
-				String authServerBasePath = ResourceUtils.getProperty("auth.server.baseurl");
-				if(StringUtils.isNotBlank(authServerBasePath)){					
-					if(authServerBasePath.endsWith("/"))authServerBasePath = authServerBasePath.substring(0, authServerBasePath.length() - 1);
-					callbackUri = authServerBasePath + "/snslogin/callback";
-				}else{					
-					callbackUri = request.getRequestURL().toString().split("/" + type)[0] + "/callback";
-				}
-				
-			}
-			callbackUris.put(type, callbackUri);
-		}
-		
-		return callbackUri;
-	}
-
 }

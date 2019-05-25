@@ -4,13 +4,15 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=0">
 		<title>个人资料</title>
-		<link href="${rc.contextPath}/AmazeUI-2.4.2/assets/css/admin.css" rel="stylesheet" type="text/css">
 		<link href="${rc.contextPath}/AmazeUI-2.4.2/assets/css/amazeui.min.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="${rc.contextPath}/AmazeUI-2.4.2/assets/css//amazeui.datetimepicker.css"/>
 
+        <link href="${rc.contextPath}/css/admin.css" rel="stylesheet" type="text/css">
 		<link href="${rc.contextPath}/css/personal.css" rel="stylesheet" type="text/css">
 		<link href="${rc.contextPath}/css/infstyle.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="${rc.contextPath}/js/jquery.js"></script>
-		<script src="${rc.contextPath}/AmazeUI-2.4.2/assets/js/amazeui.min.js"></script>		
+		<script src="${rc.contextPath}/AmazeUI-2.4.2/assets/js/amazeui.min.js"></script>	
+		<script src="${rc.contextPath}/AmazeUI-2.4.2/assets/js/amazeui.datetimepicker.min.js"></script>	
 	</head>
 
 	<body>
@@ -46,7 +48,7 @@
 									<label for="user-name2" class="am-form-label">昵称</label>
 									<div class="am-form-content">
 										<input type="text" id="user-name2" placeholder="nickname">
-                                          <small>昵称长度不能超过40个汉字</small>
+                                          <small>昵称长度不能超过16个汉字</small>
 									</div>
 								</div>
 
@@ -75,26 +77,8 @@
 
 								<div class="am-form-group">
 									<label for="user-birth" class="am-form-label">生日</label>
-									<div class="am-form-content birth">
-										<div class="birth-select">
-											<select data-am-selected>
-												<option value="a">2015</option>
-												<option value="b">1987</option>
-											</select>
-											<em>年</em>
-										</div>
-										<div class="birth-select2">
-											<select data-am-selected>
-												<option value="a">12</option>
-												<option value="b">8</option>
-											</select>
-											<em>月</em></div>
-										<div class="birth-select2">
-											<select data-am-selected>
-												<option value="a">21</option>
-												<option value="b">23</option>
-											</select>
-											<em>日</em></div>
+									<div class="am-form-content">
+										<input type="text" id="datetimepicker" class="am-form-field date-picker">
 									</div>
 							
 								</div>
