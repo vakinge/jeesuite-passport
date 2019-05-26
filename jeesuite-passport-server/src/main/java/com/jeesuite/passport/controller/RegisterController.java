@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.BeanUtils;
+import com.jeesuite.passport.component.snslogin.OauthUser;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RegisterParam;
 import com.jeesuite.passport.dto.RequestMetadata;
 import com.jeesuite.passport.dto.UserInfo;
-import com.jeesuite.passport.exception.ForbiddenAccessException;
 import com.jeesuite.passport.service.UserService;
-import com.jeesuite.passport.snslogin.OauthUser;
 import com.jeesuite.springweb.annotation.CorsEnabled;
+import com.jeesuite.springweb.exception.ForbiddenAccessException;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.IpUtils;
 

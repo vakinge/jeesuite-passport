@@ -3,18 +3,11 @@ package com.jeesuite.passport.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jeesuite.security.model.BaseUserInfo;
 
-public class UserInfo implements Serializable {
+public class UserInfo extends BaseUserInfo {
 
-	private static final long serialVersionUID = 1L;
-
-	private Integer id;
-
-    private String username;
-    
     private String nickname;
 
     private String email;
@@ -34,24 +27,6 @@ public class UserInfo implements Serializable {
 
     private Date birthday;
     
-    
-    
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getUsername() {
-		return StringUtils.isBlank(username) ? mobile : username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	public String getNickname() {
 		return nickname;
 	}
@@ -124,5 +99,10 @@ public class UserInfo implements Serializable {
 		this.birthday = birthday;
 	}
 
+	@Override
+	public Integer getId() {
+		return (Integer)super.getId();
+	}
 
+    
 }

@@ -1,11 +1,11 @@
-package com.jeesuite.passport.snslogin.connector;
+package com.jeesuite.passport.component.snslogin.connector;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.jeesuite.passport.snslogin.OauthConnector;
-import com.jeesuite.passport.snslogin.OauthUser;
+import com.jeesuite.passport.component.snslogin.OauthConnector;
+import com.jeesuite.passport.component.snslogin.OauthUser;
 
 public class QQConnector extends OauthConnector {
 

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 
-import com.jeesuite.passport.PassportConstants;
+import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.springweb.utils.WebUtils;
 
 /**
@@ -36,7 +36,7 @@ public class ThreepartOauth2LoginEntrypoint extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {	
 		
 		String snsType = req.getPathInfo().substring(1);
-		String orignUrl = req.getParameter(PassportConstants.PARAM_RETURN_URL);
+		String orignUrl = req.getParameter(SecurityConstants.PARAM_RETURN_URL);
 		if(StringUtils.isBlank(orignUrl)){
 			orignUrl = req.getHeader(HttpHeaders.REFERER);
 		}		

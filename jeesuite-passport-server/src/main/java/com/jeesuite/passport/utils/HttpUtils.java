@@ -1,4 +1,4 @@
-package com.jeesuite.passport.helper;
+package com.jeesuite.passport.utils;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

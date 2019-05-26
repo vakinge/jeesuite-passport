@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.BeanUtils;
 import com.jeesuite.common.util.FormatValidateUtils;
+import com.jeesuite.passport.component.snslogin.OauthUser;
+import com.jeesuite.passport.component.snslogin.connector.WeixinGzhConnector;
 import com.jeesuite.passport.dao.entity.SnsAccountBindingEntity;
 import com.jeesuite.passport.dao.entity.SnsAccountBindingEntity.SnsType;
 import com.jeesuite.passport.dao.entity.UserEntity;
@@ -22,8 +24,6 @@ import com.jeesuite.passport.dao.mapper.UserEntityMapper;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RequestMetadata;
 import com.jeesuite.passport.dto.UserInfo;
-import com.jeesuite.passport.snslogin.OauthUser;
-import com.jeesuite.passport.snslogin.connector.WeixinGzhConnector;
 
 /**
  * @description <br>
@@ -97,8 +97,8 @@ public class UserService {
 			}
 		}
 		
-		if(StringUtils.isNotBlank(userInfo.getUsername())){
-			accountEntity = userMapper.findByLoginName(userInfo.getUsername());
+		if(StringUtils.isNotBlank(userInfo.getUserName())){
+			accountEntity = userMapper.findByLoginName(userInfo.getUserName());
 			if(accountEntity != null){
 				throw new JeesuiteBaseException(4003, "该用户名已注册");
 			}

@@ -3,13 +3,14 @@ package com.jeesuite.passport;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeesuite.passport.filter.AuthCheckFilter;
+import com.jeesuite.security.SecurityDelegatingFilter;
 import com.jeesuite.springboot.starter.cache.EnableJeesuiteCache;
 import com.jeesuite.springboot.starter.mybatis.EnableJeesuiteMybatis;
 
@@ -24,15 +25,6 @@ import com.jeesuite.springboot.starter.mybatis.EnableJeesuiteMybatis;
 //@EnableCircuitBreaker
 public class PassportApplication {
 	
-	@Bean 
-	public AuthCheckFilter authSessionFilter(){
-		return new AuthCheckFilter();
-	}
-	
-	@RequestMapping("/")
-    String home() {
-        return "redirect:/ucenter/index";
-    }
 	
     public static void main(String[] args) {
     	
@@ -47,4 +39,19 @@ public class PassportApplication {
         System.out.println("...............................................................");
        
     }
+    
+    @RequestMapping("/")
+    String home() {
+        return "redirect:/ucenter/index";
+    }
+    
+    @Bean
+	public FilterRegistrationBean<SecurityDelegatingFilter> someFilterRegistration() {
+	    FilterRegistrationBean<SecurityDelegatingFilter> registration = new FilterRegistrationBean<>();
+	    registration.setFilter(new SecurityDelegatingFilter());
+	    registration.addUrlPatterns("/*");
+	    registration.setName("authFilter");
+	    registration.setOrder(0);
+	    return registration;
+	} 
 }

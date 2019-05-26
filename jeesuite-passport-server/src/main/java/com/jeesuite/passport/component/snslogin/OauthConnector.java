@@ -1,8 +1,8 @@
-package com.jeesuite.passport.snslogin;
+package com.jeesuite.passport.component.snslogin;
 
 import java.util.Map;
 
-import com.jeesuite.passport.helper.HttpUtils;
+import com.jeesuite.passport.utils.HttpUtils;
 
 
 public abstract class OauthConnector {

@@ -5,7 +5,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jeesuite.passport.PassportConstants;
+import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.springweb.utils.IpUtils;
 
 public class RequestMetadata {
@@ -22,7 +22,7 @@ public class RequestMetadata {
 	public static RequestMetadata build(HttpServletRequest request){
 		RequestMetadata metadata = new RequestMetadata();
 		metadata.setIpAddr(IpUtils.getIpAddr(request));
-		metadata.setAppId(request.getParameter(request.getParameter(PassportConstants.PARAM_CLIENT_ID)));
+		metadata.setAppId(request.getParameter(request.getParameter(SecurityConstants.PARAM_CLIENT_ID)));
 		return metadata;
 	}
 	public String getIpAddr() {

@@ -1,4 +1,4 @@
-package com.jeesuite.passport.snslogin.connector;
+package com.jeesuite.passport.component.snslogin.connector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.passport.helper.HttpUtils;
-import com.jeesuite.passport.snslogin.AppConfig;
-import com.jeesuite.passport.snslogin.OauthUser;
+import com.jeesuite.passport.component.snslogin.AppConfig;
+import com.jeesuite.passport.component.snslogin.OauthUser;
+import com.jeesuite.passport.utils.HttpUtils;
 
 public class WeixinGzhConnector  {
 	

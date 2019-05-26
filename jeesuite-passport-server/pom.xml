@@ -23,11 +23,6 @@
 
 
 	<dependencies>
-		<dependency>
-			<groupId>com.jeesuite</groupId>
-			<artifactId>jeesuite-passport-base</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -124,10 +119,6 @@
 			<artifactId>jeesuite-springweb</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>com.jeesuite</groupId>
-			<artifactId>jeesuite-security</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -208,6 +199,13 @@
 			<artifactId>aspectjweaver</artifactId>
 			<version>1.8.5</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>3.14.2</version>
+		</dependency>
+
 
 	</dependencies>
 

@@ -39,7 +39,6 @@
 	<modules>
 		<module>jeesuite-passport-client</module>
 		<module>jeesuite-passport-server</module>
-		<module>jeesuite-passport-base</module>
 	</modules>
 
 	<properties>
@@ -154,6 +153,10 @@
 		<dependency>
 			<groupId>com.jeesuite</groupId>
 			<artifactId>jeesuite-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.jeesuite</groupId>
+			<artifactId>jeesuite-security</artifactId>
 		</dependency>
 	</dependencies>
 

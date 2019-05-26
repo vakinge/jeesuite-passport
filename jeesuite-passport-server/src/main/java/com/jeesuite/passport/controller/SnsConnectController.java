@@ -23,19 +23,19 @@ import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.Constants;
-import com.jeesuite.passport.LoginContext;
-import com.jeesuite.passport.PassportConstants;
+import com.jeesuite.passport.component.snslogin.OauthConnector;
+import com.jeesuite.passport.component.snslogin.OauthUser;
+import com.jeesuite.passport.component.snslogin.SnsLoginState;
+import com.jeesuite.passport.component.snslogin.connector.OSChinaConnector;
+import com.jeesuite.passport.component.snslogin.connector.QQConnector;
+import com.jeesuite.passport.component.snslogin.connector.WeiboConnector;
+import com.jeesuite.passport.component.snslogin.connector.WeixinGzhConnector;
+import com.jeesuite.passport.component.snslogin.connector.WinxinConnector;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.UserInfo;
-import com.jeesuite.passport.model.LoginSession;
-import com.jeesuite.passport.snslogin.OauthConnector;
-import com.jeesuite.passport.snslogin.OauthUser;
-import com.jeesuite.passport.snslogin.SnsLoginState;
-import com.jeesuite.passport.snslogin.connector.OSChinaConnector;
-import com.jeesuite.passport.snslogin.connector.QQConnector;
-import com.jeesuite.passport.snslogin.connector.WeiboConnector;
-import com.jeesuite.passport.snslogin.connector.WeixinGzhConnector;
-import com.jeesuite.passport.snslogin.connector.WinxinConnector;
+import com.jeesuite.security.SecurityConstants;
+import com.jeesuite.security.SecurityDelegating;
+import com.jeesuite.security.model.UserSession;
 import com.jeesuite.springweb.utils.IpUtils;
 import com.jeesuite.springweb.utils.WebUtils;
 
@@ -94,8 +94,8 @@ public class SnsConnectController extends BaseLoginController implements Initial
 
 	@RequestMapping(value = "bind/{type}", method = RequestMethod.GET)
 	public String bindRedirect(HttpServletRequest request,@PathVariable("type") String type){
-		LoginSession session = LoginContext.getRequireLoginSession();
-		SnsLoginState snsState = new SnsLoginState(null, type, session.getUserId());
+		UserSession session = SecurityDelegating.getRequireLoginSession();
+		SnsLoginState snsState = new SnsLoginState(null, type, Integer.parseInt(session.getUserId().toString()));
 		new RedisObject(snsState.getState()).set(snsState, CacheExpires.IN_1MIN);
 		
 		OauthConnector connector = oauthConnectors.get(type);
@@ -108,7 +108,7 @@ public class SnsConnectController extends BaseLoginController implements Initial
 	
 	@RequestMapping(value = "callback", method = {RequestMethod.GET,RequestMethod.POST})
 	public String callback(HttpServletRequest request,HttpServletResponse response,Model model) {
-		String code = request.getParameter(PassportConstants.PARAM_CODE);
+		String code = request.getParameter(SecurityConstants.PARAM_CODE);
 		String state = request.getParameter("state");
 		
 		SnsLoginState loginState = null;
@@ -131,14 +131,15 @@ public class SnsConnectController extends BaseLoginController implements Initial
 		oauthUser.setFromClientId(loginState.getAppId());
 		//绑定
 		if(!loginState.loginAction()){
-			LoginSession session = LoginContext.getRequireLoginSession();
-			userService.addSnsAccountBind(session.getUserId(), oauthUser);
+			UserSession session = SecurityDelegating.getRequireLoginSession();
+			userService.addSnsAccountBind(Integer.parseInt(session.getUserId().toString()), oauthUser);
 			return redirectTo(WebUtils.getBaseUrl(request) + "/ucenter/snsbinding");
 		}
 		//根据openid 找用户
-		UserInfo account = userService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
-		if(account != null){
-			return createSessionAndSetResponse(request, response, account, loginState.getSuccessDirectUri(),loginState.getOrignUrl());
+		UserInfo userInfo = userService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
+		if(userInfo != null){
+			SecurityDelegating.updateSession(userInfo);
+			return redirectTo(loginState.getSuccessDirectUri());
 		}
 		
 		//跳转去绑定页面
@@ -158,9 +159,9 @@ public class SnsConnectController extends BaseLoginController implements Initial
 			AccountBindParam bindParam = new AccountBindParam();
 			bindParam.setAppId(loginState.getAppId());
 			bindParam.setIpAddr(IpUtils.getIpAddr(request));
-			account = userService.createUserByOauthInfo(oauthUser,bindParam);
+			userInfo = userService.createUserByOauthInfo(oauthUser,bindParam);
 			//
-			return createSessionAndSetResponse(request, response, account, loginState.getSuccessDirectUri(),loginState.getOrignUrl());
+			return redirectTo(loginState.getSuccessDirectUri());
 		}
 		 
 	}

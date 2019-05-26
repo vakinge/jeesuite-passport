@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
-import com.jeesuite.passport.helper.SecurityCryptUtils;
 import com.jeesuite.passport.service.AppService;
 import com.jeesuite.springboot.starter.cache.CacheProperties;
+import com.jeesuite.springweb.utils.ParameterUtils;
 
 /**
  * @description <br>
@@ -50,10 +50,12 @@ public class ClientSideController {
 			return result;
 		}
 		
-		Map<String, String> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("timestamp", request.getParameter("timestamp"));
 		map.put("client_id", clientId);
-		String expectSign = SecurityCryptUtils.generateSign(app.getClientSecret(), map);
+		
+		String content = ParameterUtils.mapToSignContent(map) + app.getClientSecret();
+		String expectSign = DigestUtils.md5(content);
 		if(!StringUtils.equals(sign, expectSign)){
 			result.put("error", "签名错误");
 			return result;

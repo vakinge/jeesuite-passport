@@ -18,10 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.json.JsonUtils;
 import com.jeesuite.common.util.TokenGenerator;
-import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.helper.AuthSessionHelper;
-import com.jeesuite.passport.model.AccessToken;
 import com.jeesuite.passport.model.LoginSession;
+import com.jeesuite.security.SecurityConstants;
+import com.jeesuite.security.model.AccessToken;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.WebUtils;
 
@@ -55,11 +55,11 @@ public class LoginSuccessCallback extends HttpServlet {
 		
 		boolean setCookies = false;
 		int expiresIn = LoginSession.SESSION_EXPIRE_SECONDS;
-		String sessionId = req.getParameter(PassportConstants.PARAM_SESSION_ID);
-		String code = req.getParameter(PassportConstants.PARAM_CODE);
-		String redirectUri = req.getParameter(PassportConstants.PARAM_ORIGIN_URL);
-		String loginType = req.getParameter(PassportConstants.PARAM_LOGIN_TYPE);
-		String ticket = req.getParameter(PassportConstants.PARAM_TICKET);
+		String sessionId = req.getParameter(SecurityConstants.PARAM_SESSION_ID);
+		String code = req.getParameter(SecurityConstants.PARAM_CODE);
+		String redirectUri = req.getParameter(SecurityConstants.PARAM_ORIGIN_URL);
+		String loginType = req.getParameter(SecurityConstants.PARAM_LOGIN_TYPE);
+		String ticket = req.getParameter(SecurityConstants.PARAM_TICKET);
 		
 		if(StringUtils.isNotBlank(sessionId)){
 			//验证session合法性
@@ -70,14 +70,14 @@ public class LoginSuccessCallback extends HttpServlet {
 				return;
 			}
 			setCookies = true;
-			expiresIn = Integer.parseInt(req.getParameter(PassportConstants.PARAM_EXPIRE_IN));
+			expiresIn = Integer.parseInt(req.getParameter(SecurityConstants.PARAM_EXPIRE_IN));
 			if("jsonp".equals(loginType)){
 				String domain = WebUtils.getDomain(req.getRequestURL().toString());
 				Cookie loginCookie = AuthSessionHelper.createSessionCookies(sessionId, domain, expiresIn);
 				resp.addCookie(loginCookie);
 				
 				WrapperResponseEntity responseEntity = new WrapperResponseEntity();
-				WebUtils.responseOutJsonp(resp, PassportConstants.JSONP_LOGIN_CALLBACK_FUN_NAME, responseEntity);
+				WebUtils.responseOutJsonp(resp, SecurityConstants.JSONP_LOGIN_CALLBACK_FUN_NAME, responseEntity);
 				return;
 			}else{				
 				if(StringUtils.isBlank(redirectUri)){

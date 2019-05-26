@@ -20,7 +20,6 @@ import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.apache.oltu.oauth2.common.message.types.ResponseType;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -33,16 +32,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.UserInfo;
-import com.jeesuite.passport.model.LoginSession;
 import com.jeesuite.passport.service.AppService;
-import com.jeesuite.passport.service.OAuthService;
+import com.jeesuite.passport.service.UserService;
+import com.jeesuite.security.SecurityDelegating;
+import com.jeesuite.security.model.AccessToken;
 
 
 /**
+ * oauth2登录
  * @description <br>
  * @author <a href="mailto:vakinge@gmail.com">vakin</a>
  * @date 2017年3月18日
@@ -52,10 +52,9 @@ import com.jeesuite.passport.service.OAuthService;
 public class Oauth2LoginController extends BaseLoginController{ 
 	
 	@Autowired
-    private OAuthService oAuthService;
-	
-	@Autowired
     private AppService appService;
+	@Autowired
+	protected UserService userService;
 
 	@RequestMapping(value = "authorize")
 	public Object authorize( Model model, HttpServletRequest request ) throws URISyntaxException, OAuthSystemException {
@@ -75,23 +74,16 @@ public class Oauth2LoginController extends BaseLoginController{
             }
 			
 			//如果用户没有登录，跳转到登陆页面
+            String authCode = null;
 			if (org.apache.commons.lang3.StringUtils.equals(request.getMethod(), HttpMethod.GET) 
-					|| validateUser(request,model) == null ) {
+					|| (authCode = validateUser(request)) == null) {
+				
 				//登录失败时跳转到登陆页面
 				model.addAttribute(OAuth.OAUTH_CLIENT_ID, oauthRequest.getClientId());
 				model.addAttribute(OAuth.OAUTH_RESPONSE_TYPE, oauthRequest.getResponseType());
 				model.addAttribute(OAuth.OAUTH_REDIRECT_URI, oauthRequest.getRedirectURI());
 				model.addAttribute(OAuth.OAUTH_STATE, oauthRequest.getState());
 				return "login";
-			}
-
-			//生成授权码
-			String authCode = null;
-			if ( oauthRequest.getResponseType().equals(ResponseType.CODE.toString()) ) {
-				String username = request.getParameter(OAuth.OAUTH_USERNAME); //获取用户名
-				authCode = TokenGenerator.generate();
-				oAuthService.storeAuthCode(authCode, username);
-				
 			}
 
 			//进行OAuth响应构建
@@ -158,8 +150,10 @@ public class Oauth2LoginController extends BaseLoginController{
 
 	            String authCode = oauthRequest.getParam(OAuth.OAUTH_CODE);
 	            // 检查验证类型，此处只检查AUTHORIZATION_CODE类型，其他的还有PASSWORD或REFRESH_TOKEN
+	            String userId = null;
 	            if (oauthRequest.getParam(OAuth.OAUTH_GRANT_TYPE).equals(GrantType.AUTHORIZATION_CODE.toString())) {
-	                if (!oAuthService.checkAuthCode(authCode)) {
+	            	userId = SecurityDelegating.oauth2AuthCode2UserId(authCode);
+	                if (userId == null) {
 	                    OAuthResponse response = OAuthASResponse
 	                            .errorResponse(HttpServletResponse.SC_BAD_REQUEST)
 	                            .setError(OAuthError.TokenResponse.INVALID_GRANT)
@@ -169,16 +163,14 @@ public class Oauth2LoginController extends BaseLoginController{
 	                }
 	            }
 
-	            //生成Access Token
-	            UserInfo account = oAuthService.findAccountByAuthCode(authCode);
-	            
-	            LoginSession loginSession = createLoginSesion(request,account);
-
+	            UserInfo userInfo = userService.findAcctountById(Integer.parseInt(userId));
+	            AccessToken accessToken = SecurityDelegating.createOauth2AccessToken(userInfo);
 	            //生成OAuth响应
 	            OAuthResponse response = OAuthASResponse
 	                    .tokenResponse(HttpServletResponse.SC_OK)
-	                    .setAccessToken(loginSession.getSessionId())
-	                    .setExpiresIn(String.valueOf(oAuthService.createExpireIn()))
+	                    .setAccessToken(accessToken.getAccess_token())
+	                    .setRefreshToken(accessToken.getRefresh_token())
+	                    .setExpiresIn(String.valueOf(accessToken.getExpires_in()))
 	                    .buildJSONMessage();
 
 	            //根据OAuthResponse生成ResponseEntity
@@ -199,8 +191,19 @@ public class Oauth2LoginController extends BaseLoginController{
 	     * @return
 	     */
 	    @RequestMapping(value = "/token_check", method = RequestMethod.POST)
-	    public ResponseEntity<Object> checkAccessToken(@RequestParam("actoken") String accessToken) {
-	        boolean b = oAuthService.checkAccessToken(accessToken);
+	    public ResponseEntity<Object> checkAccessToken(@RequestParam("access_token") String accessToken) {
+	        boolean b = SecurityDelegating.validateSessionId(accessToken);
 	        return b ? new ResponseEntity<Object>(HttpStatus.valueOf(HttpServletResponse.SC_OK)) : new ResponseEntity<Object>(HttpStatus.valueOf(HttpServletResponse.SC_UNAUTHORIZED));
+	    }
+	    
+	    private String validateUser(HttpServletRequest request){
+	    	String username = request.getParameter(OAuth.OAUTH_USERNAME);
+			String password = request.getParameter(OAuth.OAUTH_PASSWORD);
+			if (StringUtils.isAnyBlank(username,password)) return null;
+			try {
+				return SecurityDelegating.doAuthenticationForOauth2(username, password);
+			} catch (Exception e) {
+				return null;
+			}
 	    }
 } 

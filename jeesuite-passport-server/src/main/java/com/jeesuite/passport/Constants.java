@@ -1,6 +1,7 @@
 package com.jeesuite.passport;
 
 public class Constants {
+	public static final String SUPER_ADMIN_NAME = "sa";
     public static final String RESOURCE_SERVER_NAME = "oauth-server";
     public static final String INVALID_CLIENT_ID = "客户端验证失败，如错误的client_id/client_secret。";
     public static final String INVALID_ACCESS_TOKEN = "accessToken无效或已过期。";

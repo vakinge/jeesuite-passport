@@ -16,9 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.TokenGenerator;
-import com.jeesuite.passport.PassportConstants;
 import com.jeesuite.passport.helper.AuthSessionHelper;
 import com.jeesuite.passport.model.LoginSession;
+import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.springweb.utils.WebUtils;
 
 /**
@@ -41,9 +41,9 @@ public class SSOSyncLoginEntrypoint extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		
 		String redirectUri = WebUtils.getBaseUrl(req) + ClientConfig.defaultLoginSuccessRedirctUri();
-		String sessionId = req.getParameter(PassportConstants.PARAM_SESSION_ID);
-		String ticket = req.getParameter(PassportConstants.PARAM_TICKET);
-		String act = req.getParameter(PassportConstants.PARAM_ACT);
+		String sessionId = req.getParameter(SecurityConstants.PARAM_SESSION_ID);
+		String ticket = req.getParameter(SecurityConstants.PARAM_TICKET);
+		String act = req.getParameter(SecurityConstants.PARAM_ACT);
 		if(StringUtils.isAnyBlank(sessionId,ticket,act)){
 			WebUtils.responseOutHtml(resp, "非法请求[参数session_id,ticket,act必填]");
 			return;

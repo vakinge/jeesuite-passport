@@ -9,11 +9,6 @@
 	<artifactId>jeesuite-passport-client</artifactId>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.jeesuite</groupId>
-			<artifactId>jeesuite-passport-base</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
 		
 		<dependency>
 			<groupId>com.jeesuite</groupId>

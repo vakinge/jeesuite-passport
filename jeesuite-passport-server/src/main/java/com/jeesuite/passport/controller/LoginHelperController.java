@@ -19,9 +19,9 @@ import com.jeesuite.cache.CacheExpires;
 import com.jeesuite.cache.command.RedisString;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.common.util.TokenGenerator;
-import com.jeesuite.passport.PassportConstants;
-import com.jeesuite.passport.helper.AuthSessionHelper;
-import com.jeesuite.passport.model.LoginSession;
+import com.jeesuite.security.SecurityConstants;
+import com.jeesuite.security.SecurityDelegating;
+import com.jeesuite.security.model.UserSession;
 import com.jeesuite.springweb.annotation.CorsEnabled;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.WebUtils;
@@ -39,7 +39,7 @@ public class LoginHelperController{
 		if(redirctUrl.startsWith(baseUrl)){
 			redirctUrl = baseUrl + "/login";
 		}
-		AuthSessionHelper.destroySessionAndCookies(request, response);
+		SecurityDelegating.doLogout();
 		return "redirect:" + redirctUrl;
 	}
 	
@@ -48,15 +48,15 @@ public class LoginHelperController{
 		String url = new RedisString(ticket).get();
 		if(StringUtils.isBlank(url)){
 			WrapperResponseEntity entity = new WrapperResponseEntity(403, "未授权访问01");
-			WebUtils.responseOutJsonp(response, PassportConstants.JSONP_LOGIN_CALLBACK_FUN_NAME, entity);
+			WebUtils.responseOutJsonp(response, SecurityConstants.JSONP_LOGIN_CALLBACK_FUN_NAME, entity);
 			return null;
 		}
 		
-		LoginSession session = AuthSessionHelper.getLoginSession(sessionId);
+		UserSession session = SecurityDelegating.getCurrentSession();
 		
 		if(session == null){
 			WrapperResponseEntity entity = new WrapperResponseEntity(403, "未授权访问02");
-			WebUtils.responseOutJsonp(response, PassportConstants.JSONP_LOGIN_CALLBACK_FUN_NAME, entity);
+			WebUtils.responseOutJsonp(response, SecurityConstants.JSONP_LOGIN_CALLBACK_FUN_NAME, entity);
 			return null;
 		}
 		
