@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.dto.LoginParam;
 import com.jeesuite.security.SecurityConstants;
+import com.jeesuite.security.SecurityDelegating;
+import com.jeesuite.security.model.UserSession;
 import com.jeesuite.springweb.utils.WebUtils;
 
 /**
@@ -43,7 +45,7 @@ public class LoginController extends BaseLoginController{
 			}
 			String returnUrl;
 			//同域
-			if(StringUtils.contains(orignDomain, authCookiesDomain)){
+			if(StringUtils.contains(orignDomain, getCookiesDomain(request))){
 				returnUrl = referer;
 			}else{
 				returnUrl = request.getParameter(SecurityConstants.PARAM_RETURN_URL);
@@ -71,7 +73,14 @@ public class LoginController extends BaseLoginController{
 		if(StringUtils.isBlank(redirctUri)){
 			redirctUri = WebUtils.getBaseUrl(request) + "/ucenter/index";
 		}
-		return doLogin(param.getLoginName(), param.getPassword(), redirctUri);
+		
+		if (StringUtils.isAnyBlank(param.getLoginName(), param.getPassword())) {
+			throw new JeesuiteBaseException(4001, "用户名或密码不能为空");
+		}
+		
+		UserSession session = SecurityDelegating.doAuthentication(param.getLoginName(), param.getPassword());
+		
+		return loginSuccessRedirect(session, redirctUri);
 	}
 
 }

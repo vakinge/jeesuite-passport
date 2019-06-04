@@ -120,6 +120,12 @@
 
 		<dependency>
 			<groupId>com.jeesuite</groupId>
+			<artifactId>jeesuite-common</artifactId>
+			<version>${jeesuite.libs.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jeesuite</groupId>
 			<artifactId>jeesuite-cache</artifactId>
 			<version>${jeesuite.libs.version}</version>
 		</dependency>
@@ -179,20 +185,20 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.oltu.oauth2</groupId>
-			<artifactId>org.apache.oltu.oauth2.resourceserver</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.oltu.oauth2</groupId>
 			<artifactId>org.apache.oltu.oauth2.common</artifactId>
 			<version>1.0.1</version>
 		</dependency>
 		<!-- oauth2 end -->
 
 		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-jwt</artifactId>
-			<version>1.0.10.RELEASE</version>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>3.4.0</version>
 		</dependency>
 
 		<dependency>

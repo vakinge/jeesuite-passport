@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +23,6 @@ import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.UserSession;
-import com.jeesuite.springweb.annotation.CorsEnabled;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.WebUtils;
 
@@ -69,7 +69,7 @@ public class LoginHelperController{
 	}
 	
 	
-	@CorsEnabled
+	@CrossOrigin(origins = "*", maxAge = 3600) 
 	@RequestMapping(value = "sso/get_setcookie_list", method = RequestMethod.GET)
 	public @ResponseBody List<String> getSsoSetCookieTickets(HttpServletRequest request){
 		

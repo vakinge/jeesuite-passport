@@ -40,10 +40,16 @@ import com.jeesuite.springweb.utils.IpUtils;
 import com.jeesuite.springweb.utils.WebUtils;
 
 
-
+/**
+ * 第三方开放平台登录
+ * @description <br>
+ * @author <a href="mailto:vakinge@gmail.com">vakin</a>
+ * @website <a href="http://www.jeesuite.com">vakin</a>
+ * @date 2016年5月23日
+ */
 @Controller
-@RequestMapping("/sns")
-public class SnsConnectController extends BaseLoginController implements InitializingBean{
+@RequestMapping("/open")
+public class OpenOAuthConnectController extends BaseLoginController implements InitializingBean{
 	
 	@Value("${sns.login.next.bind:false}")
 	private boolean snsLoginBind;
@@ -131,15 +137,14 @@ public class SnsConnectController extends BaseLoginController implements Initial
 		oauthUser.setFromClientId(loginState.getAppId());
 		//绑定
 		if(!loginState.loginAction()){
-			UserSession session = SecurityDelegating.getRequireLoginSession();
-			userService.addSnsAccountBind(Integer.parseInt(session.getUserId().toString()), oauthUser);
+			userService.addSnsAccountBind(loginState.getLognUserId(), oauthUser);
 			return redirectTo(WebUtils.getBaseUrl(request) + "/ucenter/snsbinding");
 		}
 		//根据openid 找用户
 		UserInfo userInfo = userService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
 		if(userInfo != null){
-			SecurityDelegating.updateSession(userInfo);
-			return redirectTo(loginState.getSuccessDirectUri());
+			UserSession session = SecurityDelegating.updateSession(userInfo);
+			return loginSuccessRedirect(session,loginState.getSuccessDirectUri());
 		}
 		
 		//跳转去绑定页面
@@ -161,7 +166,9 @@ public class SnsConnectController extends BaseLoginController implements Initial
 			bindParam.setIpAddr(IpUtils.getIpAddr(request));
 			userInfo = userService.createUserByOauthInfo(oauthUser,bindParam);
 			//
-			return redirectTo(loginState.getSuccessDirectUri());
+			UserSession session = SecurityDelegating.updateSession(userInfo);
+			
+			return loginSuccessRedirect(session,loginState.getSuccessDirectUri());
 		}
 		 
 	}

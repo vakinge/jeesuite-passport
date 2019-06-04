@@ -5,10 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.cache.command.RedisObject;
@@ -20,7 +20,6 @@ import com.jeesuite.passport.dto.RegisterParam;
 import com.jeesuite.passport.dto.RequestMetadata;
 import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.service.UserService;
-import com.jeesuite.springweb.annotation.CorsEnabled;
 import com.jeesuite.springweb.exception.ForbiddenAccessException;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 import com.jeesuite.springweb.utils.IpUtils;
@@ -45,17 +44,8 @@ public class RegisterController {
 		return new WrapperResponseEntity();
 	}
 	
-	@CorsEnabled
-	@RequestMapping(value = "register_check", method = RequestMethod.POST)
-	public @ResponseBody WrapperResponseEntity registerCheck(@RequestParam("account") String name){
-		
-		UserInfo account = userService.findAcctountByLoginName(name);
-		if(account != null)throw new JeesuiteBaseException(4001, "已注册");
-		
-		return new WrapperResponseEntity();
-	}
 	
-	@CorsEnabled
+	@CrossOrigin(origins = "*", maxAge = 3600) 
 	@RequestMapping(value = "register/bind", method = RequestMethod.POST)
 	public @ResponseBody WrapperResponseEntity createUserThreepartBind(HttpServletRequest request,@RequestBody AccountBindParam param){
 		if(StringUtils.isBlank(param.getAuthTicket()))throw new ForbiddenAccessException();
