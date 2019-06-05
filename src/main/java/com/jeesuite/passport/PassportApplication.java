@@ -1,6 +1,7 @@
 package com.jeesuite.passport;
 
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -29,7 +30,7 @@ public class PassportApplication {
     public static void main(String[] args) {
     	
     	long starTime = System.currentTimeMillis();
-    	new SpringApplicationBuilder(PassportApplication.class).web(true).run(args);
+    	new SpringApplicationBuilder(PassportApplication.class).web(WebApplicationType.SERVLET).run(args);
     	//
         long endTime = System.currentTimeMillis();
         long time = endTime - starTime;

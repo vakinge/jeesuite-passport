@@ -49,8 +49,13 @@ public class PassportSecurityDecisionProvider extends SecurityDecisionProvider {
 	}
 	
 	@Override
-	public String[] anonymousUris() {
-		return new String[]{};
+	public String[] anonymousUrlPatterns() {
+		return null;
+	}
+	
+	@Override
+	public String[] protectedUrlPatterns() {
+		return new String[]{"/ucenter/*"};
 	}
 
 	@Override
@@ -84,4 +89,15 @@ public class PassportSecurityDecisionProvider extends SecurityDecisionProvider {
 		return Constants.SUPER_ADMIN_NAME;
 	}
 
+	@Override
+	public String _401_Error_Page() {
+		return "/login";
+	}
+
+	@Override
+	public String _403_Error_Page() {
+		return null;
+	}
+
+	
 }

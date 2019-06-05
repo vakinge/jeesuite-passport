@@ -56,7 +56,17 @@ public class UserService {
 	}
 
 	private UserInfo buildUserInfo(UserEntity entity) {
-		UserInfo userInfo = BeanUtils.copy(entity, UserInfo.class);
+		UserInfo userInfo = new UserInfo();
+		userInfo.setId(entity.getId());
+		userInfo.setUserName(entity.getUsername());
+		userInfo.setNickname(entity.getNickname());
+		userInfo.setRealname(entity.getRealname());
+		userInfo.setMobile(entity.getMobile());
+		userInfo.setEmail(entity.getEmail());
+		userInfo.setPassword(entity.getPassword());
+		userInfo.setAge(entity.getAge());
+		userInfo.setGender(entity.getGender());
+		userInfo.setAvatar(entity.getAvatar());
 		return userInfo;
 	}
 	

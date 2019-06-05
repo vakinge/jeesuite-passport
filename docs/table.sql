@@ -1,5 +1,4 @@
 SET NAMES utf8;
-SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
@@ -48,19 +47,6 @@ CREATE TABLE `sns_account_binding` (
 
 
 
--- ----------------------------
---  Table structure for `account_r_roles`
--- ----------------------------
-DROP TABLE IF EXISTS `account_r_roles`;
-CREATE TABLE `account_r_roles` (
-  `account_id` int(10) NOT NULL COMMENT '用户ID',
-  `role_id` int(10) NOT NULL COMMENT '角色ID',
-  PRIMARY KEY (`account_id`,`role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户与角色对应关系';
-
--- ----------------------------
---  Table structure for `app`
--- ----------------------------
 DROP TABLE IF EXISTS `client_config`;
 CREATE TABLE `client_config` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
@@ -77,46 +63,4 @@ CREATE TABLE `client_config` (
   UNIQUE INDEX `client_id_uq_index` (`client_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- ----------------------------
---  Table structure for `resources`
--- ----------------------------
-DROP TABLE IF EXISTS `resources`;
-CREATE TABLE `resources` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `parent_id` int(10) DEFAULT NULL COMMENT '父ID，顶级为0',
-  `app_id` int(10) DEFAULT NULL,
-  `name` varchar(50) DEFAULT NULL COMMENT '资源名称',
-  `code` varchar(200) DEFAULT NULL COMMENT '资源编码(url,事件编码等)',
-  `is_leaf` tinyint(1) DEFAULT 1,
-  `is_menu` tinyint(1) DEFAULT 0,
-  `icon` varchar(50) DEFAULT NULL COMMENT '资源图标',
-  `order_id` int(10) DEFAULT NULL COMMENT '排序',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='资源';
 
--- ----------------------------
---  Table structure for `role`
--- ----------------------------
-DROP TABLE IF EXISTS `role`;
-CREATE TABLE `role` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `app_id` int(10) DEFAULT NULL,
-  `group` varchar(32) DEFAULT NULL COMMENT '角色分组',
-  `name` varchar(32) DEFAULT NULL COMMENT '角色名称',
-  `remark` varchar(100) DEFAULT NULL COMMENT '备注',
-  `create_at` datetime DEFAULT NULL COMMENT '创建时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='角色';
-
--- ----------------------------
---  Table structure for `role_r_resources`
--- ----------------------------
-DROP TABLE IF EXISTS `role_r_resources`;
-CREATE TABLE `role_r_resources` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `role_id` int(10) DEFAULT NULL COMMENT '角色ID',
-  `resource_id` int(10) DEFAULT NULL COMMENT '资源ID',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='角色与资源对应关系';
-
-SET FOREIGN_KEY_CHECKS = 1;

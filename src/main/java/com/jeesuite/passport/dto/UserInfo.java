@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jeesuite.common.util.BeanUtils;
+import com.jeesuite.passport.dao.entity.UserEntity;
 import com.jeesuite.security.model.BaseUserInfo;
 
 public class UserInfo extends BaseUserInfo {
@@ -104,5 +106,11 @@ public class UserInfo extends BaseUserInfo {
 		return (Integer)super.getId();
 	}
 
-    
+    public static void main(String[] args) {
+    	UserEntity entity = new UserEntity();
+    	entity.setId(1);
+    	entity.setUsername("jj");
+    	UserInfo userInfo = BeanUtils.copy(entity, UserInfo.class);
+    	System.out.println(userInfo);
+	}
 }

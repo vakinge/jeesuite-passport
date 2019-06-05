@@ -1,18 +1,17 @@
 package com.jeesuite.passport.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.oltu.oauth2.common.OAuth;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.passport.dto.LoginParam;
 import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.UserSession;
@@ -68,19 +67,33 @@ public class LoginController extends BaseLoginController{
 	}
 	
 	@RequestMapping(value = "login",method = RequestMethod.POST)
-	public String login(HttpServletRequest request,@RequestBody LoginParam param){
+	public String login(HttpServletRequest request){
 		String redirctUri = request.getParameter(OAuth.OAUTH_REDIRECT_URI);
 		if(StringUtils.isBlank(redirctUri)){
 			redirctUri = WebUtils.getBaseUrl(request) + "/ucenter/index";
 		}
 		
-		if (StringUtils.isAnyBlank(param.getLoginName(), param.getPassword())) {
+		String username = request.getParameter(OAuth.OAUTH_USERNAME);
+		String password = request.getParameter(OAuth.OAUTH_PASSWORD);
+		
+		if (StringUtils.isAnyBlank(username, password)) {
 			throw new JeesuiteBaseException(4001, "用户名或密码不能为空");
 		}
 		
-		UserSession session = SecurityDelegating.doAuthentication(param.getLoginName(), param.getPassword());
+		UserSession session = SecurityDelegating.doAuthentication(username, password);
 		
 		return loginSuccessRedirect(session, redirctUri);
+	}
+	
+	@RequestMapping(value = "logout")
+	public String logout(HttpServletRequest request ,HttpServletResponse response){
+		String redirctUrl = request.getHeader(HttpHeaders.REFERER);
+		String baseUrl = WebUtils.getBaseUrl(request);
+		if(redirctUrl.startsWith(baseUrl)){
+			redirctUrl = baseUrl + "/login";
+		}
+		SecurityDelegating.doLogout();
+		return "redirect:" + redirctUrl;
 	}
 
 }
