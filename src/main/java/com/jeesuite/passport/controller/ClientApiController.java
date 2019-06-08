@@ -19,6 +19,8 @@ import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.component.jwt.JwtHelper;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
+import com.jeesuite.passport.dto.LoginTicketInfo;
+import com.jeesuite.passport.dto.TicketExchangeResult;
 import com.jeesuite.passport.service.AppService;
 import com.jeesuite.security.SecurityConstants.CacheType;
 import com.jeesuite.security.SecurityDelegating;
@@ -40,8 +42,8 @@ public class ClientApiController {
 	@Autowired
 	private AppService appService;
 	
-	@RequestMapping(value = "get_auth_configs", method = RequestMethod.GET)
-	public @ResponseBody WrapperResponse<Map<String,Map<String,String>>> getAuthConfigs(HttpServletRequest request){
+	@RequestMapping(value = "metadaatas", method = RequestMethod.GET)
+	public @ResponseBody WrapperResponse<Map<String,Map<String,String>>> getMetadaatas(HttpServletRequest request){
 		preCheck(request);
 		
 		Map<String, Map<String,String>> data = new HashMap<>();
@@ -66,15 +68,21 @@ public class ClientApiController {
 		return new WrapperResponse<>(validated);
 	}
 	
-	@RequestMapping(value = "ticket_exchange_jwt", method = RequestMethod.GET)
-	public @ResponseBody WrapperResponse<String> ticketExchangeJWT(HttpServletRequest request,String ticket){
+	@RequestMapping(value = "ticket_exchange", method = RequestMethod.GET)
+	public @ResponseBody WrapperResponse<TicketExchangeResult> ticketExchangeJWT(HttpServletRequest request,String ticket){
 		preCheck(request);
-		String sessionId = SecurityDelegating.ticketToObject(ticket);
-		if(StringUtils.isBlank(sessionId))throw new JeesuiteBaseException(500, "ticket不存在或已过期");
-		UserSession session = SecurityDelegating.genUserSession(sessionId);
-		String jwt = JwtHelper.createToken(session);
+		LoginTicketInfo ticketInfo = SecurityDelegating.ticketToObject(ticket);
+		if(ticketInfo == null)throw new JeesuiteBaseException(500, "ticket不存在或已过期");
+		UserSession session = SecurityDelegating.genUserSession(ticketInfo.getSessionId());
+		String payload = JwtHelper.createToken(session);
 		
-		return new WrapperResponse<>(jwt);
+		TicketExchangeResult result = new TicketExchangeResult();
+		result.setAccessToken(session.getSessionId());
+		result.setExpiresIn(session.getExpiresIn());
+		result.setPayload(payload);
+		result.setReturnUrl(ticketInfo.getReturnUrl());
+		
+		return new WrapperResponse<>(result);
 	}
 	
 	private void preCheck(HttpServletRequest request){

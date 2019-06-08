@@ -14,27 +14,17 @@ public class SnsLoginState implements Serializable{
 	private String snsType;
 	@Transient
 	private String state;
-	private String regPageUri;
-	private String successDirectUri;
-	private String orignUrl;
+	private String returnUrl;
 	private Integer lognUserId;
 	
 	public SnsLoginState() {}
-	
-	public SnsLoginState(String appId, String snsType, Integer lognUserId) {
-		super();
-		this.appId = appId;
-		this.snsType = snsType;
-		this.lognUserId = lognUserId;
-	}
 
-	public SnsLoginState(String appId,String snsType, String regPageUri, String successDirectUri,String orignUrl) {
+	public SnsLoginState(String appId,String snsType, String returnUrl, Integer lognUserId) {
 		this.state = TokenGenerator.generate();
 		this.appId = appId;
 		this.snsType = snsType;
-		this.regPageUri = regPageUri;
-		this.successDirectUri = successDirectUri;
-		this.orignUrl = orignUrl;
+		this.returnUrl = returnUrl;
+		this.lognUserId = lognUserId;
 	}
 
 	public String getAppId() {
@@ -52,15 +42,6 @@ public class SnsLoginState implements Serializable{
 	public void setSnsType(String snsType) {
 		this.snsType = snsType;
 	}
-	
-
-	public String getRegPageUri() {
-		return regPageUri;
-	}
-
-	public void setRegPageUri(String regPageUri) {
-		this.regPageUri = regPageUri;
-	}
 
 	public String getState() {
 		return state;
@@ -70,20 +51,12 @@ public class SnsLoginState implements Serializable{
 		this.state = state;
 	}
 
-	public String getSuccessDirectUri() {
-		return successDirectUri;
+	public String getReturnUrl() {
+		return returnUrl;
 	}
 
-	public void setSuccessDirectUri(String successDirectUri) {
-		this.successDirectUri = successDirectUri;
-	}
-
-	public String getOrignUrl() {
-		return orignUrl;
-	}
-
-	public void setOrignUrl(String orignUrl) {
-		this.orignUrl = orignUrl;
+	public void setReturnUrl(String returnUrl) {
+		this.returnUrl = returnUrl;
 	}
 
 	public Integer getLognUserId() {

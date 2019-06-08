@@ -10,9 +10,8 @@
     <result column="client_id" property="clientId" jdbcType="VARCHAR" />
     <result column="client_secret" property="clientSecret" jdbcType="VARCHAR" />
     <result column="enabled" property="enabled" jdbcType="BIT" />
-    <result column="invoke_limit" property="invokeLimit" jdbcType="INTEGER" />
-    <result column="allow_domains" property="allowDomains" jdbcType="VARCHAR" />
+    <result column="callback_uri" property="callbackUri" jdbcType="VARCHAR" />
     <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
-    <result column="updated_at" property="updatedAt" jdbcType="BIGINT" />
+    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
   </resultMap>
 </mapper>

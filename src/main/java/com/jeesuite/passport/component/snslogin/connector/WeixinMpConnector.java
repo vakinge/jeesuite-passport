@@ -13,11 +13,11 @@ import com.jeesuite.passport.component.snslogin.AppConfig;
 import com.jeesuite.passport.component.snslogin.OauthUser;
 import com.jeesuite.passport.utils.HttpUtils;
 
-public class WeixinGzhConnector  {
+public class WeixinMpConnector  {
 	
-	private static Logger logger = LoggerFactory.getLogger(WeixinGzhConnector.class);
+	private static Logger logger = LoggerFactory.getLogger(WeixinMpConnector.class);
 
-	public static final String SNS_TYPE = "wxgzh";
+	public static final String SNS_TYPE = "weixin:mp";
 	
 	public static final String SNSAPI_BASE = "snsapi_base";
 	
@@ -25,7 +25,7 @@ public class WeixinGzhConnector  {
 	
 	private Map<String, AppConfig> appConfigs = new HashMap<>();
 	
-	public WeixinGzhConnector() {}
+	public WeixinMpConnector() {}
 	
 	public boolean contains(String appName){
 		return appConfigs.containsKey(appName);

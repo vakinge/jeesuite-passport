@@ -21,7 +21,6 @@ import com.jeesuite.cache.CacheExpires;
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.ResourceUtils;
-import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.Constants;
 import com.jeesuite.passport.component.snslogin.OauthConnector;
 import com.jeesuite.passport.component.snslogin.OauthUser;
@@ -29,8 +28,9 @@ import com.jeesuite.passport.component.snslogin.SnsLoginState;
 import com.jeesuite.passport.component.snslogin.connector.OSChinaConnector;
 import com.jeesuite.passport.component.snslogin.connector.QQConnector;
 import com.jeesuite.passport.component.snslogin.connector.WeiboConnector;
-import com.jeesuite.passport.component.snslogin.connector.WeixinGzhConnector;
+import com.jeesuite.passport.component.snslogin.connector.WeixinMpConnector;
 import com.jeesuite.passport.component.snslogin.connector.WinxinConnector;
+import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.security.SecurityConstants;
@@ -54,16 +54,14 @@ public class OpenOAuthConnectController extends BaseLoginController implements I
 	@Value("${sns.login.next.bind:false}")
 	private boolean snsLoginBind;
 	private Map<String, OauthConnector> oauthConnectors = new HashMap<>();
-	private WeixinGzhConnector weixinGzhConnector = new WeixinGzhConnector();
+	private WeixinMpConnector weixinGzhConnector = new WeixinMpConnector();
 	
 	@RequestMapping(value = "login/{type}", method = RequestMethod.GET)
 	public String loginRedirect(HttpServletRequest request,@PathVariable("type") String type
-			,@RequestParam(value="app_id",required=false) String appId
-			,@RequestParam(value="reg_uri",required=false) String regPageUri
-			,@RequestParam(value="redirect_uri",required=false) String redirectUri
-			,@RequestParam(value="origin_url",required=false) String orignUrl){
+			,@RequestParam(value="client_id",required=false,defaultValue = Constants.DEFAULT_CLIENT_ID) String clientId
+			,@RequestParam(value="return_url",required=false) String returnUrl){
 		
-		boolean isWxGzh = WeixinGzhConnector.SNS_TYPE.equals(type);
+		boolean isWxGzh = WeixinMpConnector.SNS_TYPE.equals(type);
 
 		OauthConnector connector = null;
 		if(!isWxGzh){
@@ -71,25 +69,21 @@ public class OpenOAuthConnectController extends BaseLoginController implements I
 			if(connector == null)throw new JeesuiteBaseException(1001,"不支持授权类型:"+type);
 		}
 		
-		String orignDomain;
-		if(StringUtils.isBlank(redirectUri)){
-			redirectUri = WebUtils.getBaseUrl(request) + "/ucenter/index";
-			orignDomain = WebUtils.getDomain(redirectUri);
+		if(Constants.DEFAULT_CLIENT_ID.equals(clientId)){
+			returnUrl = WebUtils.getBaseUrl(request) + "/ucenter/index";
 		}else{
-			orignDomain = WebUtils.getDomain(redirectUri);
-			validateOrignDomain(appId,orignDomain);
+			getClientConfig(clientId);
 		}
 		//
-		
-		SnsLoginState snsState = new SnsLoginState(appId, type, regPageUri, redirectUri,orignUrl);
-		new RedisObject(snsState.getState()).set(snsState, CacheExpires.IN_1MIN);
+		SnsLoginState snsState = new SnsLoginState(clientId, type, returnUrl,null);
+		new RedisObject(snsState.getState()).set(snsState, CacheExpires.IN_3MINS);
 		
 		String callBackUri = request.getRequestURL().toString().split("/" + type)[0] + "/callback";
 		String redirectUrl;
 		if(isWxGzh){
 			String scope = request.getParameter("scope");
-			scope = WeixinGzhConnector.SNSAPI_USERINFO.equalsIgnoreCase(scope) ? WeixinGzhConnector.SNSAPI_USERINFO : WeixinGzhConnector.SNSAPI_BASE;
-			redirectUrl = weixinGzhConnector.getAuthorizeUrl(orignDomain, scope, callBackUri, snsState.getState());
+			scope = WeixinMpConnector.SNSAPI_USERINFO.equalsIgnoreCase(scope) ? WeixinMpConnector.SNSAPI_USERINFO : WeixinMpConnector.SNSAPI_BASE;
+			redirectUrl = weixinGzhConnector.getAuthorizeUrl(clientId, scope, callBackUri, snsState.getState());
 		}else{
 			redirectUrl = connector.getAuthorizeUrl(snsState.getState(), callBackUri);			
 		}
@@ -100,9 +94,9 @@ public class OpenOAuthConnectController extends BaseLoginController implements I
 
 	@RequestMapping(value = "bind/{type}", method = RequestMethod.GET)
 	public String bindRedirect(HttpServletRequest request,@PathVariable("type") String type){
-		UserSession session = SecurityDelegating.getRequireLoginSession();
-		SnsLoginState snsState = new SnsLoginState(null, type, Integer.parseInt(session.getUserId().toString()));
-		new RedisObject(snsState.getState()).set(snsState, CacheExpires.IN_1MIN);
+		UserSession session = SecurityDelegating.getAndValidateCurrentSession();
+		SnsLoginState snsState = new SnsLoginState(null, type, null, Integer.parseInt(session.getUserId().toString()));
+		new RedisObject(snsState.getState()).set(snsState, CacheExpires.IN_3MINS);
 		
 		OauthConnector connector = oauthConnectors.get(type);
 		if(connector == null)throw new JeesuiteBaseException(1001,"不支持授权类型:"+type);
@@ -124,7 +118,7 @@ public class OpenOAuthConnectController extends BaseLoginController implements I
 		}
 
 		OauthUser oauthUser;
-		if(WeixinGzhConnector.SNS_TYPE.equals(loginState.getSnsType())){
+		if(WeixinMpConnector.SNS_TYPE.equals(loginState.getSnsType())){
 			oauthUser = weixinGzhConnector.getUser(loginState.getAppId(), code);
 		}else{
 			oauthUser = oauthConnectors.get(loginState.getSnsType()).getUser(code);
@@ -133,44 +127,40 @@ public class OpenOAuthConnectController extends BaseLoginController implements I
 			model.addAttribute(Constants.ERROR, "callback error");
 			return Constants.ERROR; 
 		}
-		oauthUser.setSnsType(loginState.getSnsType());
+		
+		getClientConfig(loginState.getAppId());
+		oauthUser.setOpenType(loginState.getSnsType());
 		oauthUser.setFromClientId(loginState.getAppId());
 		//绑定
 		if(!loginState.loginAction()){
 			userService.addSnsAccountBind(loginState.getLognUserId(), oauthUser);
 			return redirectTo(WebUtils.getBaseUrl(request) + "/ucenter/snsbinding");
 		}
+		
 		//根据openid 找用户
 		UserInfo userInfo = userService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
-		if(userInfo != null){
-			UserSession session = SecurityDelegating.updateSession(userInfo);
-			return loginSuccessRedirect(session,loginState.getSuccessDirectUri());
+		if(userInfo == null){
+			//跳转去绑定页面
+			if(snsLoginBind){
+				model.addAttribute("oauthUser", oauthUser);
+				model.addAttribute(SecurityConstants.PARAM_RETURN_URL, loginState.getReturnUrl());
+				return "bind";
+			}else{
+				//创建用户
+				AccountBindParam bindParam = new AccountBindParam();
+				bindParam.setAppId(loginState.getAppId());
+				bindParam.setIpAddr(IpUtils.getIpAddr(request));
+				userInfo = userService.createUserByOauthInfo(oauthUser,bindParam);
+			}
 		}
 		
-		//跳转去绑定页面
-		if(snsLoginBind || StringUtils.isNotBlank(loginState.getRegPageUri())){//业务系统自定义绑定页面
-			String ticket = TokenGenerator.generate();
-			new RedisObject(ticket).set(oauthUser, CacheExpires.IN_5MINS);
-			if(snsLoginBind){
-				model.addAttribute("authTicket", ticket);
-				model.addAttribute("oauthUser", oauthUser);
-				model.addAttribute("redirect_uri", loginState.getSuccessDirectUri());
-				return "bind";
-			}else{				
-				return "redirect:" + loginState.getRegPageUri() + "?auth_ticket=" + ticket + "&" + oauthUser.userInfoToUrlQueryString();
-			}
+		UserSession session = SecurityDelegating.updateSession(userInfo);
+		if(Constants.DEFAULT_CLIENT_ID.equals(loginState.getAppId())){
+			return redirectTo(loginState.getReturnUrl());
 		}else{
-			//创建用户并登陆
-			AccountBindParam bindParam = new AccountBindParam();
-			bindParam.setAppId(loginState.getAppId());
-			bindParam.setIpAddr(IpUtils.getIpAddr(request));
-			userInfo = userService.createUserByOauthInfo(oauthUser,bindParam);
-			//
-			UserSession session = SecurityDelegating.updateSession(userInfo);
-			
-			return loginSuccessRedirect(session,loginState.getSuccessDirectUri());
+			ClientConfigEntity clientConfig = getClientConfig(loginState.getAppId());
+			return loginSuccessRedirect(session, clientConfig.getCallbackUri(),loginState.getReturnUrl());
 		}
-		 
 	}
 
 	@Override
@@ -192,7 +182,7 @@ public class OpenOAuthConnectController extends BaseLoginController implements I
 				oauthConnectors.put(type, new WeiboConnector(appKey, appSecret));
 			}else if(OSChinaConnector.SNS_TYPE.equals(type)){				
 				oauthConnectors.put(type, new OSChinaConnector(appKey, appSecret));
-			}else if(type.startsWith(WeixinGzhConnector.SNS_TYPE)){
+			}else if(type.startsWith(WeixinMpConnector.SNS_TYPE)){
 				String appName = type.split("\\[|\\]")[1];
 				if(!weixinGzhConnector.contains(appName)){					
 					weixinGzhConnector.addConfig(appName, appKey, appSecret);

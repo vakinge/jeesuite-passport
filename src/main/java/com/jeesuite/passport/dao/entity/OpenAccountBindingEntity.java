@@ -1,47 +1,39 @@
 package com.jeesuite.passport.dao.entity;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import com.jeesuite.mybatis.core.BaseEntity;
+import java.util.Date;
+import javax.persistence.*;
 
-@Table(name = "sns_account_binding")
-public class SnsAccountBindingEntity extends BaseEntity {
-	
-	public static enum SnsType{
-		weixin,weibo,qq,taobao
-	}
-	
+@Table(name = "open_account_binding")
+public class OpenAccountBindingEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_id",updatable = false)
+    @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "sns_type",updatable = false)
-    private String snsType;
-    
-    @Column(name = "sub_sns_type",updatable = false)
-    private String subSnsType;
+    @Column(name = "open_type")
+    private String openType;
+
+    @Column(name = "app_type")
+    private String appType;
 
     @Column(name = "union_id")
     private String unionId;
 
-    @Column(name = "open_id",updatable = false)
+    @Column(name = "open_id")
     private String openId;
 
-    private Boolean enabled = true;
-    
-    @Column(name = "source_app_id")
-    private String sourceAppId;
+    /**
+     * 用户来源（业务系统）
+     */
+    @Column(name = "source_client_id")
+    private String sourceClientId;
 
-    @Column(name = "created_at",updatable = false)
+    private Boolean enabled;
+
+    @Column(name = "created_at")
     private Date createdAt;
 
     @Column(name = "updated_at")
@@ -76,29 +68,34 @@ public class SnsAccountBindingEntity extends BaseEntity {
     }
 
     /**
-     * @return sns_type
+     * @return open_type
      */
-    public String getSnsType() {
-        return snsType;
+    public String getOpenType() {
+        return openType;
     }
 
     /**
-     * @param snsType
+     * @param openType
      */
-    public void setSnsType(String snsType) {
-        this.snsType = snsType;
+    public void setOpenType(String openType) {
+        this.openType = openType;
     }
-    
-   
-    public String getSubSnsType() {
-		return subSnsType;
-	}
 
-	public void setSubSnsType(String subSnsType) {
-		this.subSnsType = subSnsType;
-	}
+    /**
+     * @return app_type
+     */
+    public String getAppType() {
+        return appType;
+    }
 
-	/**
+    /**
+     * @param appType
+     */
+    public void setAppType(String appType) {
+        this.appType = appType;
+    }
+
+    /**
      * @return union_id
      */
     public String getUnionId() {
@@ -124,6 +121,24 @@ public class SnsAccountBindingEntity extends BaseEntity {
      */
     public void setOpenId(String openId) {
         this.openId = openId;
+    }
+
+    /**
+     * 获取用户来源（业务系统）
+     *
+     * @return source_client_id - 用户来源（业务系统）
+     */
+    public String getSourceClientId() {
+        return sourceClientId;
+    }
+
+    /**
+     * 设置用户来源（业务系统）
+     *
+     * @param sourceClientId 用户来源（业务系统）
+     */
+    public void setSourceClientId(String sourceClientId) {
+        this.sourceClientId = sourceClientId;
     }
 
     /**
@@ -167,14 +182,4 @@ public class SnsAccountBindingEntity extends BaseEntity {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-	public String getSourceAppId() {
-		return sourceAppId;
-	}
-
-	public void setSourceAppId(String sourceAppId) {
-		this.sourceAppId = sourceAppId;
-	}
-    
-    
 }

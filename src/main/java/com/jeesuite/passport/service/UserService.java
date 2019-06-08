@@ -14,12 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.BeanUtils;
 import com.jeesuite.common.util.FormatValidateUtils;
+import com.jeesuite.mybatis.test.entity.SnsAccounyBindingEntity.SnsType;
 import com.jeesuite.passport.component.snslogin.OauthUser;
-import com.jeesuite.passport.component.snslogin.connector.WeixinGzhConnector;
-import com.jeesuite.passport.dao.entity.SnsAccountBindingEntity;
-import com.jeesuite.passport.dao.entity.SnsAccountBindingEntity.SnsType;
+import com.jeesuite.passport.component.snslogin.connector.WeixinMpConnector;
+import com.jeesuite.passport.dao.entity.OpenAccountBindingEntity;
 import com.jeesuite.passport.dao.entity.UserEntity;
-import com.jeesuite.passport.dao.mapper.SnsAccountBindingEntityMapper;
+import com.jeesuite.passport.dao.mapper.OpenAccountBindingEntityMapper;
 import com.jeesuite.passport.dao.mapper.UserEntityMapper;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RequestMetadata;
@@ -37,7 +37,7 @@ public class UserService {
 	@Autowired
 	private UserEntityMapper userMapper;
 	@Autowired
-	private SnsAccountBindingEntityMapper snsAccounyBindingMapper;
+	private OpenAccountBindingEntityMapper openAccounyBindingMapper;
 
 
 	public UserInfo findAcctountById(Integer id) {
@@ -71,8 +71,8 @@ public class UserService {
 	}
 	
 	public UserInfo findAcctountBySnsOpenId(String type,String openId) {
-		type = WeixinGzhConnector.SNS_TYPE.equals(type) ? SnsType.weixin.name() : type;
-		SnsAccountBindingEntity bindingEntity = snsAccounyBindingMapper.findBySnsOpenId(type, openId);
+		type = WeixinMpConnector.SNS_TYPE.equals(type) ? SnsType.weixin.name() : type;
+		OpenAccountBindingEntity bindingEntity = openAccounyBindingMapper.findByOpenId(type, openId);
 		if(bindingEntity != null){
 			UserEntity accountEntity = userMapper.selectByPrimaryKey(bindingEntity.getUserId());
 			return buildUserInfo(accountEntity);
@@ -129,20 +129,21 @@ public class UserService {
 	
 	@Transactional
 	public UserInfo createUserByOauthInfo(OauthUser oauthUser,AccountBindParam bindParam){
-		
-		String snsType = oauthUser.getSnsType();
-		String subSnsType = null;
-		if(WeixinGzhConnector.SNS_TYPE.equals(oauthUser.getSnsType())){
-			snsType = SnsType.weixin.name();
-			subSnsType = oauthUser.getSnsType();
+
+		String openType = null;String appType = null;
+		if(oauthUser.getOpenType().contains(":")){
+			openType = StringUtils.split(oauthUser.getOpenType(), ":")[0];
+			appType = StringUtils.split(oauthUser.getOpenType(), ":")[1];
+		}else{
+			openType = oauthUser.getOpenType();
 		}
-		UserInfo account = findAcctountBySnsOpenId(snsType, oauthUser.getOpenId());
+		UserInfo account = findAcctountBySnsOpenId(openType, oauthUser.getOpenId());
 		if(account == null){
 			
 			UserEntity accountEntity = null;
 			//先按unionId查找是否有已存在的用户
 			if(StringUtils.isNotBlank(oauthUser.getUnionId())){
-				List<SnsAccountBindingEntity> sameAccounyBinds = snsAccounyBindingMapper.findByUnionId(oauthUser.getUnionId());
+				List<OpenAccountBindingEntity> sameAccounyBinds = openAccounyBindingMapper.findByUnionId(openType,oauthUser.getUnionId());
 				if(sameAccounyBinds != null && sameAccounyBinds.size() > 0){
 					accountEntity = userMapper.selectByPrimaryKey(sameAccounyBinds.get(0).getUserId());
 					if(accountEntity == null){
@@ -169,15 +170,15 @@ public class UserService {
 				userMapper.insertSelective(accountEntity);
 			}
 			//
-			SnsAccountBindingEntity bindingEntity = new SnsAccountBindingEntity();
+			OpenAccountBindingEntity bindingEntity = new OpenAccountBindingEntity();
 			bindingEntity.setUserId(accountEntity.getId().intValue());
-			bindingEntity.setSnsType(snsType);
-			bindingEntity.setSubSnsType(subSnsType);
+			bindingEntity.setOpenType(openType);
+			bindingEntity.setAppType(appType);
 			bindingEntity.setOpenId(oauthUser.getOpenId());
 			bindingEntity.setUnionId(oauthUser.getUnionId());
 			bindingEntity.setEnabled(true);
 			bindingEntity.setCreatedAt(bindParam.getTime());
-			snsAccounyBindingMapper.insertSelective(bindingEntity);
+			openAccounyBindingMapper.insertSelective(bindingEntity);
 			
 			account = buildUserInfo(accountEntity);
 			
@@ -233,31 +234,31 @@ public class UserService {
 	}
 
 	public void addSnsAccountBind(int userId,OauthUser oauthUser){
-		SnsAccountBindingEntity bindingEntity = snsAccounyBindingMapper.findBySnsOpenId(oauthUser.getSnsType(), oauthUser.getOpenId());
+		OpenAccountBindingEntity bindingEntity = openAccounyBindingMapper.findByOpenId(oauthUser.getOpenType(), oauthUser.getOpenId());
 		if(bindingEntity != null){
 			if(bindingEntity.getUserId().intValue() == userId){
 				if(!bindingEntity.getEnabled()){
 					bindingEntity.setEnabled(true);
 					bindingEntity.setUpdatedAt(new Date());
-					snsAccounyBindingMapper.updateByPrimaryKeySelective(bindingEntity);
+					openAccounyBindingMapper.updateByPrimaryKeySelective(bindingEntity);
 				}
 				return;
 			}
 			throw new JeesuiteBaseException(4005, "该账号已经绑定其他账号");
 		}
 		
-		bindingEntity = new SnsAccountBindingEntity();
+		bindingEntity = new OpenAccountBindingEntity();
 		bindingEntity.setUserId(userId);
-		bindingEntity.setSnsType(oauthUser.getSnsType());
+		bindingEntity.setOpenType(oauthUser.getOpenType());
 		bindingEntity.setOpenId(oauthUser.getOpenId());
 		bindingEntity.setUnionId(oauthUser.getUnionId());
 		bindingEntity.setEnabled(true);
 		bindingEntity.setCreatedAt(new Date());
-		snsAccounyBindingMapper.insertSelective(bindingEntity);
+		openAccounyBindingMapper.insertSelective(bindingEntity);
 		
 	}
 	
     public void cancelSnsAccountBind(int userId,String snsType){
-    	snsAccounyBindingMapper.unbindSnsAccount(userId, snsType);
+    	openAccounyBindingMapper.unbindSnsAccount(userId, snsType);
 	}
 }

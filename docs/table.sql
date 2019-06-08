@@ -29,18 +29,32 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='用户表';
 
 
-DROP TABLE IF EXISTS `sns_account_binding`;
-CREATE TABLE `sns_account_binding` (
+DROP TABLE IF EXISTS `open_oauth2_config`;
+CREATE TABLE `open_oauth2_config` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `open_type` ENUM('weixin', 'weibo','qq','taobao','alipay') NOT NULL,
+  `app_type` ENUM('mp','miniapp') DEFAULT NULL,
+  `app_id` varchar(32) DEFAULT NULL,
+  `app_secret` varchar(64) DEFAULT NULL,
+  `bind_client_id` varchar(50) DEFAULT NULL,
+  `enabled` TINYINT(1) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `open_account_binding`;
+CREATE TABLE `open_account_binding` (
   `id` int(10)  NOT NULL AUTO_INCREMENT,
   `user_id` int(10)  NOT NULL, 
-  `sns_type` ENUM('weixin', 'weibo','qq','taobao') DEFAULT NULL,
-  `sub_sns_type` varchar(32) DEFAULT NULL,
+  `open_type` ENUM('weixin', 'weibo','qq','taobao','alipay') NOT NULL,
+  `app_type` ENUM('mp','miniapp') DEFAULT NULL,
   `union_id` varchar(32) DEFAULT NULL,
   `open_id` varchar(32) DEFAULT NULL,
-  `source_app_id` VARCHAR(32) DEFAULT NULL COMMENT '用户来源（业务系统）',
+  `source_client_id` VARCHAR(32) DEFAULT NULL COMMENT '用户来源（业务系统）',
   `enabled` bit(1) DEFAULT b'1',
   `created_at` datetime DEFAULT NULL,
-  `updated_at` TIMESTAMP DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
    UNIQUE INDEX `ao_uq_index` (`user_id`,`open_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='第三方账号绑定';
@@ -55,12 +69,13 @@ CREATE TABLE `client_config` (
   `client_secret` varchar(64) DEFAULT NULL,
   `enabled` TINYINT(1) DEFAULT NULL,
   `is_inner_app` TINYINT(1) DEFAULT 0,
-  `invoke_limit` int(10) DEFAULT NULL,
-  `allow_domains` varchar(200) DEFAULT NULL,
+  `callback_uri` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
-  `updated_at` bigint(13) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `client_id_uq_index` (`client_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 

@@ -1,8 +1,14 @@
 package com.jeesuite.passport.dao.entity;
 
-import com.jeesuite.mybatis.core.BaseEntity;
 import java.util.Date;
-import javax.persistence.*;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.jeesuite.mybatis.core.BaseEntity;
 
 @Table(name = "client_config")
 public class ClientConfigEntity extends BaseEntity {
@@ -20,17 +26,14 @@ public class ClientConfigEntity extends BaseEntity {
 
     private Boolean enabled;
 
-    @Column(name = "invoke_limit")
-    private Integer invokeLimit;
-
-    @Column(name = "allow_domains")
-    private String allowDomains;
+    @Column(name = "callback_uri")
+    private String callbackUri;
 
     @Column(name = "created_at")
     private Date createdAt;
 
     @Column(name = "updated_at")
-    private Long updatedAt;
+    private Date updatedAt;
 
     /**
      * @return id
@@ -102,35 +105,15 @@ public class ClientConfigEntity extends BaseEntity {
         this.enabled = enabled;
     }
 
-    /**
-     * @return invoke_limit
-     */
-    public Integer getInvokeLimit() {
-        return invokeLimit;
-    }
+    public String getCallbackUri() {
+		return callbackUri;
+	}
 
-    /**
-     * @param invokeLimit
-     */
-    public void setInvokeLimit(Integer invokeLimit) {
-        this.invokeLimit = invokeLimit;
-    }
+	public void setCallbackUri(String callbackUri) {
+		this.callbackUri = callbackUri;
+	}
 
-    /**
-     * @return allow_domains
-     */
-    public String getAllowDomains() {
-        return allowDomains;
-    }
-
-    /**
-     * @param allowDomains
-     */
-    public void setAllowDomains(String allowDomains) {
-        this.allowDomains = allowDomains;
-    }
-
-    /**
+	/**
      * @return created_at
      */
     public Date getCreatedAt() {
@@ -147,14 +130,14 @@ public class ClientConfigEntity extends BaseEntity {
     /**
      * @return updated_at
      */
-    public Long getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
     /**
      * @param updatedAt
      */
-    public void setUpdatedAt(Long updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

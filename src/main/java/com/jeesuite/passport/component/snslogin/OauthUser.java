@@ -14,8 +14,7 @@ public class OauthUser implements Serializable {
 	private String avatar;
 	private String gender; // male/female/unknow
 	private String unionId;
-	private String snsType;
-	
+	private String openType;
 
 	public String getFromClientId() {
 		return fromClientId;
@@ -65,13 +64,12 @@ public class OauthUser implements Serializable {
 		this.unionId = unionId;
 	}
 	
-
-	public String getSnsType() {
-		return snsType;
+	public String getOpenType() {
+		return openType;
 	}
 
-	public void setSnsType(String snsType) {
-		this.snsType = snsType;
+	public void setOpenType(String openType) {
+		this.openType = openType;
 	}
 
 	public String userInfoToUrlQueryString(){
