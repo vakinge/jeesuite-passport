@@ -1,8 +1,8 @@
-package com.jeesuite.passport.component.snslogin.connector;
+package com.jeesuite.passport.component.openauth.connector;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jeesuite.passport.component.snslogin.OauthConnector;
-import com.jeesuite.passport.component.snslogin.OauthUser;
+import com.jeesuite.passport.component.openauth.OauthConnector;
+import com.jeesuite.passport.component.openauth.OauthUser;
 
 public class WinxinConnector extends OauthConnector {
 

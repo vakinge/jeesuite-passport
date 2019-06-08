@@ -1,4 +1,4 @@
-package com.jeesuite.passport.component.snslogin.connector;
+package com.jeesuite.passport.component.openauth.connector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,8 +6,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jeesuite.passport.component.snslogin.OauthConnector;
-import com.jeesuite.passport.component.snslogin.OauthUser;
+import com.jeesuite.passport.component.openauth.OauthConnector;
+import com.jeesuite.passport.component.openauth.OauthUser;
 
 
 public class WeiboConnector extends OauthConnector {

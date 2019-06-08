@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.util.BeanUtils;
-import com.jeesuite.passport.component.snslogin.OauthUser;
+import com.jeesuite.passport.component.openauth.OauthUser;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RegisterParam;
 import com.jeesuite.passport.dto.RequestMetadata;

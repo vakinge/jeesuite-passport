@@ -1,4 +1,4 @@
-package com.jeesuite.passport.component.snslogin;
+package com.jeesuite.passport.component.openauth;
 
 import java.io.Serializable;
 

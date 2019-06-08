@@ -2,13 +2,11 @@ package com.jeesuite.passport.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,16 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.jeesuite.cache.CacheExpires;
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.Constants;
-import com.jeesuite.passport.component.snslogin.OauthConnector;
-import com.jeesuite.passport.component.snslogin.OauthUser;
-import com.jeesuite.passport.component.snslogin.SnsLoginState;
-import com.jeesuite.passport.component.snslogin.connector.OSChinaConnector;
-import com.jeesuite.passport.component.snslogin.connector.QQConnector;
-import com.jeesuite.passport.component.snslogin.connector.WeiboConnector;
-import com.jeesuite.passport.component.snslogin.connector.WeixinMpConnector;
-import com.jeesuite.passport.component.snslogin.connector.WinxinConnector;
+import com.jeesuite.passport.component.openauth.OauthConnector;
+import com.jeesuite.passport.component.openauth.OauthUser;
+import com.jeesuite.passport.component.openauth.SnsLoginState;
+import com.jeesuite.passport.component.openauth.connector.WeixinMpConnector;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.UserInfo;
@@ -49,7 +42,7 @@ import com.jeesuite.springweb.utils.WebUtils;
  */
 @Controller
 @RequestMapping("/open")
-public class OpenOAuthConnectController extends BaseLoginController implements InitializingBean{
+public class OpenOAuthConnectController extends BaseLoginController {
 	
 	@Value("${sns.login.next.bind:false}")
 	private boolean snsLoginBind;
@@ -163,32 +156,4 @@ public class OpenOAuthConnectController extends BaseLoginController implements I
 		}
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Properties properties = ResourceUtils.getAllProperties("threepart.oauth.");
-		String type;String appKey;String appSecret;
-		for (Object key : properties.keySet()) {
-			type = StringUtils.splitByWholeSeparator(key.toString(), ".")[2];
-			
-			if(oauthConnectors.containsKey(type))continue;
-			appKey = properties.getProperty("threepart.oauth."+type+".appId");
-			appSecret = properties.getProperty("threepart.oauth."+type+".appSecret");
-			
-			if(QQConnector.SNS_TYPE.equals(type)){				
-				oauthConnectors.put(type, new QQConnector(appKey, appSecret));
-			}else if(WinxinConnector.SNS_TYPE.equals(type)){				
-				oauthConnectors.put(type, new WinxinConnector(appKey, appSecret));
-			}else if(WeiboConnector.SNS_TYPE.equals(type)){				
-				oauthConnectors.put(type, new WeiboConnector(appKey, appSecret));
-			}else if(OSChinaConnector.SNS_TYPE.equals(type)){				
-				oauthConnectors.put(type, new OSChinaConnector(appKey, appSecret));
-			}else if(type.startsWith(WeixinMpConnector.SNS_TYPE)){
-				String appName = type.split("\\[|\\]")[1];
-				if(!weixinGzhConnector.contains(appName)){					
-					weixinGzhConnector.addConfig(appName, appKey, appSecret);
-				}
-			}
-			
-		}
-	}
 }
