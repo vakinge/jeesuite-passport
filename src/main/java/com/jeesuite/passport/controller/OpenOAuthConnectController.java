@@ -69,7 +69,7 @@ public class OpenOAuthConnectController extends BaseLoginController implements C
 		OauthConnector connector = null;
 		if(!isWxGzh){
 			connector = oauthConnectors.get(type);
-			if(connector == null)throw new JeesuiteBaseException(1001,"不支持授权类型:"+type);
+			if(connector == null)throw new JeesuiteBaseException(1001,"未找到登录类型["+type+"]配置");
 		}
 		
 		if(AppConstants.DEFAULT_CLIENT_ID.equals(clientId)){

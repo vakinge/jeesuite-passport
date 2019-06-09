@@ -76,10 +76,6 @@ input#code {width: 80%;}
 .am-nav-tabs.am-nav-justify > .am-active> a, .am-nav-tabs.am-nav-justify>.am-active>a:focus, .am-nav-tabs.am-nav-justify>.am-active>a:hover ,.am-nav-tabs>li.am-active>a,.am-nav-tabs>li.am-active>a:focus, .am-nav-tabs>li.am-active>a:hover {
 margin-right: 0px;border-bottom: 1px solid #0e90d2;border-radius: 0px;}
 
- /*底部*/
-.footer {text-align:center;font-size: 12px;padding-top: 5px;}
-.footer-bd{ display:none;}
-
 @media screen and (min-width:640px){
 form,.am-cf,.partner{max-width:640px;margin:20px auto ;}
 .footer-bd{ display:block;}	
@@ -88,7 +84,7 @@ form,.am-cf,.partner{max-width:640px;margin:20px auto ;}
 .am-btn-group span{display:inline-block;}
 .am-cf input{width: 100%;font-size: 16px;}
  /*底部*/
-.footer {text-align:left; display:block;position: relative;margin: 0px auto; padding: 7px 0px 9px; margin-top:20px;max-width: 1200px;}
+.footer {text-align:center; display:block;margin: 0px auto; padding: 7px 0px 9px; margin-top:20px;max-width: 1200px;}
 .footer .footer-bd p, .footer .footer-hd p {margin-bottom: 8px;line-height: 27px;text-align:left;border-bottom:1px solid #ddd ;}
 .footer .footer-hd a { margin: 0px 4px;white-space: nowrap;color: #6C6C6C;}
 .footer .footer-hd b { margin: 0px 3px;font-weight: 400;color: #DDD;}

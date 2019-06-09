@@ -37,18 +37,11 @@ public class LoginController extends BaseLoginController{
 		String clientId = request.getParameter(SecurityConstants.PARAM_CLIENT_ID);
 		String returnUrl = request.getParameter(SecurityConstants.PARAM_RETURN_URL);
 		if(StringUtils.isBlank(returnUrl))returnUrl = request.getHeader(HttpHeaders.REFERER);
-		
 		if(StringUtils.isBlank(returnUrl)){
-			model.addAttribute("error", "Parameter [return_url] is required");
-			return "error";
-		}
-		
-		if(!returnUrl.startsWith("http")){
-			returnUrl = WebUtils.getBaseUrl(request) + returnUrl;
-		}
-		//本站
-		if(returnUrl.startsWith(WebUtils.getBaseUrl(request))){
 			clientId = AppConstants.DEFAULT_CLIENT_ID;
+			returnUrl = WebUtils.getBaseUrl(request) + "/ucenter/index";
+		}else if(!returnUrl.startsWith("http")){
+			returnUrl = WebUtils.getBaseUrl(request) + returnUrl;
 		}
 		
 		if(StringUtils.isBlank(clientId)){
