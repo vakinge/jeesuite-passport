@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.passport.Constants;
+import com.jeesuite.passport.AppConstants;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.security.SecurityDelegating;
@@ -48,7 +48,7 @@ public class LoginController extends BaseLoginController{
 		}
 		//本站
 		if(returnUrl.startsWith(WebUtils.getBaseUrl(request))){
-			clientId = Constants.DEFAULT_CLIENT_ID;
+			clientId = AppConstants.DEFAULT_CLIENT_ID;
 		}
 		
 		if(StringUtils.isBlank(clientId)){
@@ -76,7 +76,7 @@ public class LoginController extends BaseLoginController{
 		
 		UserSession session = SecurityDelegating.doAuthentication(username, password);
 		
-		if(Constants.DEFAULT_CLIENT_ID.equals(clientId)){
+		if(AppConstants.DEFAULT_CLIENT_ID.equals(clientId)){
 			return redirectTo(returnUrl);
 		}else{
 			ClientConfigEntity clientConfig = getClientConfig(clientId);

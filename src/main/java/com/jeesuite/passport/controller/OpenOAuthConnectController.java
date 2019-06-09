@@ -1,13 +1,16 @@
 package com.jeesuite.passport.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,12 +21,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.jeesuite.cache.CacheExpires;
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.passport.Constants;
+import com.jeesuite.passport.AppConstants;
 import com.jeesuite.passport.component.openauth.OauthConnector;
 import com.jeesuite.passport.component.openauth.OauthUser;
 import com.jeesuite.passport.component.openauth.SnsLoginState;
+import com.jeesuite.passport.component.openauth.connector.QQConnector;
+import com.jeesuite.passport.component.openauth.connector.WeiboConnector;
 import com.jeesuite.passport.component.openauth.connector.WeixinMpConnector;
+import com.jeesuite.passport.component.openauth.connector.WinxinConnector;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
+import com.jeesuite.passport.dao.entity.OpenOauth2ConfigEntity;
+import com.jeesuite.passport.dao.mapper.OpenOauth2ConfigEntityMapper;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.security.SecurityConstants;
@@ -42,16 +50,18 @@ import com.jeesuite.springweb.utils.WebUtils;
  */
 @Controller
 @RequestMapping("/open")
-public class OpenOAuthConnectController extends BaseLoginController {
+public class OpenOAuthConnectController extends BaseLoginController implements CommandLineRunner{
 	
 	@Value("${sns.login.next.bind:false}")
 	private boolean snsLoginBind;
+	@Autowired
+	private OpenOauth2ConfigEntityMapper openOauth2ConfigMapper;
 	private Map<String, OauthConnector> oauthConnectors = new HashMap<>();
 	private WeixinMpConnector weixinGzhConnector = new WeixinMpConnector();
 	
 	@RequestMapping(value = "login/{type}", method = RequestMethod.GET)
 	public String loginRedirect(HttpServletRequest request,@PathVariable("type") String type
-			,@RequestParam(value="client_id",required=false,defaultValue = Constants.DEFAULT_CLIENT_ID) String clientId
+			,@RequestParam(value="client_id",required=false,defaultValue = AppConstants.DEFAULT_CLIENT_ID) String clientId
 			,@RequestParam(value="return_url",required=false) String returnUrl){
 		
 		boolean isWxGzh = WeixinMpConnector.SNS_TYPE.equals(type);
@@ -62,7 +72,7 @@ public class OpenOAuthConnectController extends BaseLoginController {
 			if(connector == null)throw new JeesuiteBaseException(1001,"不支持授权类型:"+type);
 		}
 		
-		if(Constants.DEFAULT_CLIENT_ID.equals(clientId)){
+		if(AppConstants.DEFAULT_CLIENT_ID.equals(clientId)){
 			returnUrl = WebUtils.getBaseUrl(request) + "/ucenter/index";
 		}else{
 			getClientConfig(clientId);
@@ -106,8 +116,8 @@ public class OpenOAuthConnectController extends BaseLoginController {
 		
 		SnsLoginState loginState = null;
 		if(StringUtils.isBlank(state) || (loginState = new RedisObject(state).get()) == null){
-			model.addAttribute(Constants.ERROR, "访问失效，state expire");
-			return Constants.ERROR; 
+			model.addAttribute(AppConstants.ERROR, "访问失效，state expire");
+			return AppConstants.ERROR; 
 		}
 
 		OauthUser oauthUser;
@@ -117,8 +127,8 @@ public class OpenOAuthConnectController extends BaseLoginController {
 			oauthUser = oauthConnectors.get(loginState.getSnsType()).getUser(code);
 		}
 		if(StringUtils.isBlank(oauthUser.getOpenId())){
-			model.addAttribute(Constants.ERROR, "callback error");
-			return Constants.ERROR; 
+			model.addAttribute(AppConstants.ERROR, "callback error");
+			return AppConstants.ERROR; 
 		}
 		
 		getClientConfig(loginState.getAppId());
@@ -148,7 +158,7 @@ public class OpenOAuthConnectController extends BaseLoginController {
 		}
 		
 		UserSession session = SecurityDelegating.updateSession(userInfo);
-		if(Constants.DEFAULT_CLIENT_ID.equals(loginState.getAppId())){
+		if(AppConstants.DEFAULT_CLIENT_ID.equals(loginState.getAppId())){
 			return redirectTo(loginState.getReturnUrl());
 		}else{
 			ClientConfigEntity clientConfig = getClientConfig(loginState.getAppId());
@@ -156,4 +166,27 @@ public class OpenOAuthConnectController extends BaseLoginController {
 		}
 	}
 
+
+	@Override
+	public void run(String... args) throws Exception {
+		List<OpenOauth2ConfigEntity> list = openOauth2ConfigMapper.selectAll();
+		for (OpenOauth2ConfigEntity entity : list) {
+			if(!entity.getEnabled())continue;
+			if(QQConnector.TYPE.equals(entity.getOpenType())){
+				oauthConnectors.put(QQConnector.TYPE, new QQConnector(entity.getAppId(), entity.getAppSecret()));
+			}else if(WeiboConnector.TYPE.equals(entity.getOpenType())){
+				oauthConnectors.put(WeiboConnector.TYPE, new WeiboConnector(entity.getAppId(), entity.getAppSecret()));
+			}else if(WinxinConnector.TYPE.equals(entity.getOpenType())){
+				if("mp".equals(entity.getAppType())){
+					weixinGzhConnector.addConfig(entity.getBindClientId(), entity.getAppId(), entity.getAppSecret());
+				}else if("miniapp".equals(entity.getAppType())){
+					
+				}else{
+					oauthConnectors.put(WinxinConnector.TYPE, new WinxinConnector(entity.getAppId(), entity.getAppSecret()));
+				}
+			}
+		}
+	}
+
+	
 }

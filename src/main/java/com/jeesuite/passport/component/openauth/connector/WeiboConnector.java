@@ -12,7 +12,7 @@ import com.jeesuite.passport.component.openauth.OauthUser;
 
 public class WeiboConnector extends OauthConnector {
 
-	public static final String SNS_TYPE = "weibo";
+	public static final String TYPE = "weibo";
 	
 	public WeiboConnector(String appkey, String appSecret) {
 		super(appkey, appSecret);
@@ -65,7 +65,7 @@ public class WeiboConnector extends OauthConnector {
 	
 	@Override
 	public String snsType() {
-		return SNS_TYPE;
+		return TYPE;
 	}
 
 	static Map<String, String> genders = new HashMap<String, String>();

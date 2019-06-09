@@ -6,7 +6,7 @@ import com.jeesuite.passport.component.openauth.OauthUser;
 
 public class WinxinConnector extends OauthConnector {
 
-	public static final String SNS_TYPE = "weixin";
+	public static final String TYPE = "weixin";
 	
 	public WinxinConnector( String appkey, String appSecret) {
 		super(appkey, appSecret);
@@ -104,7 +104,7 @@ public class WinxinConnector extends OauthConnector {
 	
 	@Override
 	public String snsType() {
-		return SNS_TYPE;
+		return TYPE;
 	}
 
 }

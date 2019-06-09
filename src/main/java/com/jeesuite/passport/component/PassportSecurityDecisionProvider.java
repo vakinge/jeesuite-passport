@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jeesuite.common.util.ResourceUtils;
-import com.jeesuite.passport.Constants;
+import com.jeesuite.passport.AppConstants;
 import com.jeesuite.passport.dao.entity.UserEntity;
 import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.service.UserService;
@@ -86,7 +86,7 @@ public class PassportSecurityDecisionProvider extends SecurityDecisionProvider {
 
 	@Override
 	public String superAdminName() {
-		return Constants.SUPER_ADMIN_NAME;
+		return AppConstants.SUPER_ADMIN_NAME;
 	}
 
 	@Override

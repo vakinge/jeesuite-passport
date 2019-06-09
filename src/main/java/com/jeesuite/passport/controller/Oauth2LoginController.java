@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.jeesuite.passport.Constants;
+import com.jeesuite.passport.AppConstants;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.UserInfo;
 import com.jeesuite.passport.service.AppService;
@@ -68,7 +68,7 @@ public class Oauth2LoginController extends BaseLoginController{
                 OAuthResponse response =
                         OAuthASResponse.errorResponse(HttpServletResponse.SC_BAD_REQUEST)
                                 .setError(OAuthError.TokenResponse.INVALID_CLIENT)
-                                .setErrorDescription(Constants.INVALID_CLIENT_ID)
+                                .setErrorDescription(AppConstants.INVALID_CLIENT_ID)
                                 .buildJSONMessage();
                 return new ResponseEntity<Object>(response.getBody(), HttpStatus.valueOf(response.getResponseStatus()));
             }
@@ -132,7 +132,7 @@ public class Oauth2LoginController extends BaseLoginController{
 	                OAuthResponse response =
 	                        OAuthASResponse.errorResponse(HttpServletResponse.SC_BAD_REQUEST)
 	                                .setError(OAuthError.TokenResponse.INVALID_CLIENT)
-	                                .setErrorDescription(Constants.INVALID_CLIENT_ID)
+	                                .setErrorDescription(AppConstants.INVALID_CLIENT_ID)
 	                                .buildJSONMessage();
 	                return new ResponseEntity<Object>(response.getBody(), HttpStatus.valueOf(response.getResponseStatus()));
 	            }
@@ -143,7 +143,7 @@ public class Oauth2LoginController extends BaseLoginController{
 	                OAuthResponse response =
 	                        OAuthASResponse.errorResponse(HttpServletResponse.SC_UNAUTHORIZED)
 	                                .setError(OAuthError.TokenResponse.UNAUTHORIZED_CLIENT)
-	                                .setErrorDescription(Constants.INVALID_CLIENT_ID)
+	                                .setErrorDescription(AppConstants.INVALID_CLIENT_ID)
 	                                .buildJSONMessage();
 	                return new ResponseEntity<Object>(response.getBody(), HttpStatus.valueOf(response.getResponseStatus()));
 	            }
@@ -157,7 +157,7 @@ public class Oauth2LoginController extends BaseLoginController{
 	                    OAuthResponse response = OAuthASResponse
 	                            .errorResponse(HttpServletResponse.SC_BAD_REQUEST)
 	                            .setError(OAuthError.TokenResponse.INVALID_GRANT)
-	                            .setErrorDescription(Constants.INVALID_AUTH_CODE)
+	                            .setErrorDescription(AppConstants.INVALID_AUTH_CODE)
 	                            .buildJSONMessage();
 	                    return new ResponseEntity<Object>(response.getBody(), HttpStatus.valueOf(response.getResponseStatus()));
 	                }

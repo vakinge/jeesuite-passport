@@ -1,6 +1,6 @@
 package com.jeesuite.passport;
 
-public class Constants {
+public class AppConstants {
 	public static final String DEFAULT_CLIENT_ID = "passport";
 	public static final String SUPER_ADMIN_NAME = "sa";
     public static final String RESOURCE_SERVER_NAME = "oauth-server";

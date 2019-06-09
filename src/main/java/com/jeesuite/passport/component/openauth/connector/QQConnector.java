@@ -9,7 +9,7 @@ import com.jeesuite.passport.component.openauth.OauthUser;
 
 public class QQConnector extends OauthConnector {
 
-	public static final String SNS_TYPE = "qq";
+	public static final String TYPE = "qq";
 	
 	public QQConnector(String appkey, String appSecret) {
 		super(appkey, appSecret);
@@ -100,7 +100,7 @@ public class QQConnector extends OauthConnector {
 	
 	@Override
 	public String snsType() {
-		return SNS_TYPE;
+		return TYPE;
 	}
 
 }
