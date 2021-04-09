@@ -1,8 +1,8 @@
 SET NAMES utf8;
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE `users` (
-  `id` int(10)  NOT NULL AUTO_INCREMENT,
+DROP TABLE IF EXISTS `account`;
+CREATE TABLE `account` (
+  `id` varchar(32)  NOT NULL,
   `username` varchar(32) DEFAULT NULL,
   `email` varchar(32) DEFAULT NULL,
   `mobile` char(11) DEFAULT NULL,
@@ -13,10 +13,13 @@ CREATE TABLE `users` (
   `age` int(3)  DEFAULT 0,
   `gender` ENUM('male', 'female') DEFAULT NULL,
   `birthday` date DEFAULT NULL,
-  `source_app_id` VARCHAR(32) DEFAULT NULL COMMENT '用户来源（业务系统）',
   `type` varchar(32) DEFAULT NULL COMMENT '用户类型',
-  `deleted` bit(1) DEFAULT b'0',
+  `id_type` int(1) DEFAULT 1 COMMENT '身份证件类型',
+  `id_number` varchar(20) DEFAULT NULL COMMENT '身份证件号码',
+  `source_app_id` VARCHAR(32) DEFAULT NULL COMMENT '用户来源（业务系统）',
+  `verify_status` int(3) DEFAULT b'0' COMMENT '验证状态(手机、邮箱、身份证bitmap)',
   `enabled` bit(1) DEFAULT b'1',
+  `deleted` bit(1) DEFAULT b'0',
   `reg_ip` varchar(15) DEFAULT NULL COMMENT '注册ip',
   `reg_at` datetime DEFAULT NULL,
   `last_login_ip` varchar(15) DEFAULT NULL COMMENT '最后登录ip',
@@ -26,7 +29,7 @@ CREATE TABLE `users` (
    UNIQUE INDEX `username_uq_index` (`username`),
    UNIQUE INDEX `email_uq_index` (`email`),
    UNIQUE INDEX `mobile_uq_index` (`mobile`) 
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户账号表';
 
 
 DROP TABLE IF EXISTS `open_oauth2_config`;
@@ -46,7 +49,7 @@ CREATE TABLE `open_oauth2_config` (
 DROP TABLE IF EXISTS `open_account_binding`;
 CREATE TABLE `open_account_binding` (
   `id` int(10)  NOT NULL AUTO_INCREMENT,
-  `user_id` int(10)  NOT NULL, 
+  `account_id` varchar(32)  NOT NULL, 
   `open_type` ENUM('weixin', 'weibo','qq','taobao','alipay') NOT NULL,
   `app_type` ENUM('mp','miniapp') DEFAULT NULL,
   `union_id` varchar(32) DEFAULT NULL,
