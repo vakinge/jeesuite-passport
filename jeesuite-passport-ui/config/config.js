@@ -69,29 +69,23 @@ export default defineConfig({
           routes: [
             {
               path: '/',
-              redirect: '/account/center',
+              redirect: '/ucenter/index',
             },
             {
-              name: 'account',
+              name: 'ucenter',
               icon: 'user',
-              path: '/account',
+              path: '/ucenter',
               routes: [
                 {
                   path: '/',
-                  redirect: '/account/center',
+                  redirect: '/ucenter/index',
                 },
                 {
-                  name: 'center',
+                  name: 'index',
                   icon: 'smile',
-                  path: '/account/center',
-                  component: './account/center',
-                },
-                {
-                  name: 'settings',
-                  icon: 'smile',
-                  path: '/account/settings',
-                  component: './account/settings',
-                },
+                  path: '/ucenter/index',
+                  component: './Ucenter/index',
+                }
               ],
             },
             {
