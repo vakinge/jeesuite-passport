@@ -27,7 +27,7 @@ import com.jeesuite.passport.AppConstants;
 import com.jeesuite.passport.dao.entity.AccountEntity;
 import com.jeesuite.passport.dto.AuthUserDetails;
 import com.jeesuite.passport.service.AccountService;
-import com.jeesuite.security.SecurityDecisionProvider;
+import com.jeesuite.security.SecurityConfigurerProvider;
 import com.jeesuite.security.exception.UserNotFoundException;
 import com.jeesuite.security.exception.UserPasswordWrongException;
 import com.jeesuite.security.model.UserSession;
@@ -38,7 +38,7 @@ import com.jeesuite.security.model.UserSession;
  * @date 2018年12月4日
  */
 @Component
-public class PassportSecurityDecisionProvider extends SecurityDecisionProvider<AuthUserDetails> {
+public class PassportSecurityDecisionProvider extends SecurityConfigurerProvider<AuthUserDetails> {
 
 	private @Autowired AccountService userService;
 

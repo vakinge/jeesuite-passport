@@ -2,7 +2,10 @@ package com.jeesuite.passport.component.openauth;
 
 import java.util.Map;
 
-import com.jeesuite.passport.utils.HttpUtils;
+import com.jeesuite.common.JeesuiteBaseException;
+import com.jeesuite.common.http.HttpResponseEntity;
+import com.jeesuite.common.http.HttpUtils;
+import com.jeesuite.common.json.JsonUtils;
 
 
 public abstract class OauthConnector {
@@ -46,11 +49,19 @@ public abstract class OauthConnector {
 	}
 
 	protected String httpGet(String url) {
-		return HttpUtils.httpGet(url);
+		HttpResponseEntity responseEntity = HttpUtils.get(url);
+		if(!responseEntity.isSuccessed()) {
+			throw new JeesuiteBaseException(400, responseEntity.getMessage());
+		}
+		return responseEntity.getBody();
 	}
 	
 	protected String httpPost(String url,Map<String, String> params) {
-		return HttpUtils.httpPost(url, params);
+		HttpResponseEntity responseEntity = HttpUtils.postJson(url, JsonUtils.toJson(params));
+		if(!responseEntity.isSuccessed()) {
+			throw new JeesuiteBaseException(400, responseEntity.getMessage());
+		}
+		return responseEntity.getBody();
 	}
 
 	public abstract String createAuthorizeUrl(String state);

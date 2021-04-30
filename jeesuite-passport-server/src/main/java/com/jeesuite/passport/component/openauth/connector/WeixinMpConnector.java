@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jeesuite.common.JeesuiteBaseException;
+import com.jeesuite.common.http.HttpUtils;
 import com.jeesuite.passport.component.openauth.AppConfig;
 import com.jeesuite.passport.component.openauth.OauthUser;
-import com.jeesuite.passport.utils.HttpUtils;
 
 public class WeixinMpConnector  {
 	
@@ -69,7 +69,7 @@ public class WeixinMpConnector  {
 
 		String url = urlBuilder.toString();
 
-		String httpString = HttpUtils.httpGet(url);
+		String httpString = HttpUtils.get(url).getBody();
 
 		logger.debug("getAccessToken response:{}",httpString);
 		return JSONObject.parseObject(httpString);
@@ -89,7 +89,7 @@ public class WeixinMpConnector  {
 
 		String url = "https://api.weixin.qq.com/sns/userinfo?" + "access_token=" + accessToken + "&openid=" + openId + "&lang=zh_CN";
 
-		String httpString = HttpUtils.httpGet(url);
+		String httpString = HttpUtils.get(url).getBody();
 
 		OauthUser user = new OauthUser();
 		JSONObject json = JSONObject.parseObject(httpString);
