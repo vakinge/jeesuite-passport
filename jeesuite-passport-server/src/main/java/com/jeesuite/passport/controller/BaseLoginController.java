@@ -6,11 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.passport.component.jwt.JwtHelper;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.LoginTicketInfo;
-import com.jeesuite.passport.service.AppService;
 import com.jeesuite.passport.service.AccountService;
+import com.jeesuite.passport.service.AppService;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.UserSession;
 import com.jeesuite.springweb.CurrentRuntimeContext;
@@ -46,17 +45,14 @@ public abstract class BaseLoginController {
 
 		String orignDomain = WebUtils.getDomain(redirectUri);
 		String cookieDomain = getCookiesDomain(CurrentRuntimeContext.getRequest());
-        //		
+        //
 		if(!StringUtils.contains(orignDomain, cookieDomain)){
 			StringBuilder urlBuiler = new StringBuilder(redirectUri);
 			urlBuiler.append("?access_token=").append(session.getSessionId());
 			urlBuiler.append("&expires_in=").append(session.getExpiresIn());
-			String ticket = SecurityDelegating.objectToTicket(new LoginTicketInfo(session.getSessionId(), returnUrl));
+			String ticket = SecurityDelegating.objectToTicket(new LoginTicketInfo(null,session.getSessionId(), returnUrl));
 			urlBuiler.append("&ticket=").append(ticket);
 			redirectUri = urlBuiler.toString();
-		}else if(!StringUtils.equals(orignDomain, cookieDomain)){
-			String jwt = JwtHelper.createToken(session);
-			CurrentRuntimeContext.getResponse().addHeader(JwtHelper.TOKEN_HEADER, jwt);
 		}
 		
 		return redirectTo(redirectUri);
@@ -64,8 +60,17 @@ public abstract class BaseLoginController {
 
 	
 	protected String redirectTo(String url) {
+		if(!url.startsWith("http")) {
+			url = WebUtils.getBaseUrl(CurrentRuntimeContext.getRequest(), true) + url;
+		}
 		return "redirect:" + url;
 	}
+	
+	protected String appendQueryParam(String url,String name,String value) {
+		String spliter = url.contains("?") ? "&" : "?";
+		return new StringBuilder(url).append(spliter).append(name).append("=").append(value).toString();
+	}
+	
 	
 	protected String getCookiesDomain(HttpServletRequest request) {
 		String cookieDomain = SecurityDelegating.getSecurityDecision().cookieDomain();

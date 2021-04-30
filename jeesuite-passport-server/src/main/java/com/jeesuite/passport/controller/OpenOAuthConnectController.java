@@ -49,7 +49,7 @@ import com.jeesuite.springweb.utils.WebUtils;
  * @date 2016年5月23日
  */
 @Controller
-@RequestMapping("/open")
+@RequestMapping("/service/open")
 public class OpenOAuthConnectController extends BaseLoginController implements CommandLineRunner{
 	
 	@Value("${sns.login.next.bind:false}")

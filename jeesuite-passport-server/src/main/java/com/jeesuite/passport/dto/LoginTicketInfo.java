@@ -2,15 +2,26 @@ package com.jeesuite.passport.dto;
 
 public class LoginTicketInfo {
 
+	private String clientId;
 	private String sessionId;
 	private String returnUrl;
 	
 	public LoginTicketInfo() {}
 	
-	public LoginTicketInfo(String sessionId, String returnUrl) {
-		super();
+	public LoginTicketInfo(String clientId,String sessionId, String returnUrl) {
+		this.clientId = clientId;
 		this.sessionId = sessionId;
 		this.returnUrl = returnUrl;
+	}
+	
+	
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
 	}
 
 	public String getSessionId() {

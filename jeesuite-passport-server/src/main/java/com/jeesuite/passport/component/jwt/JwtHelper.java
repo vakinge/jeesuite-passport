@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
-
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.security.model.UserSession;
 
@@ -20,7 +18,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
  * @website <a href="http://www.jeesuite.com">vakin</a>
  * @date 2019年6月4日
  */
-@Component
 public class JwtHelper {
 
     public static final String TOKEN_HEADER = "Authorization";

@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import com.jeesuite.mybatis.core.BaseEntity;
 import com.jeesuite.passport.dto.AuthUserDetails;
 
@@ -248,4 +250,8 @@ public class AccountEntity extends BaseEntity {
         
         return authUser;
     }
+    
+    public static void main(String[] args) {
+		System.out.println(BCrypt.hashpw("123456", BCrypt.gensalt(4)));
+	}
 }

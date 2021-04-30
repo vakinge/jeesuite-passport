@@ -6,7 +6,7 @@ CREATE TABLE `account` (
   `username` varchar(32) DEFAULT NULL,
   `email` varchar(32) DEFAULT NULL,
   `mobile` char(11) DEFAULT NULL,
-  `password` char(32) DEFAULT NULL,
+  `password` char(128) DEFAULT NULL,
   `realname` varchar(32) DEFAULT NULL,
   `nickname` varchar(32) DEFAULT NULL,
   `avatar` varchar(200) DEFAULT NULL,
@@ -32,20 +32,6 @@ CREATE TABLE `account` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户账号表';
 
 
-DROP TABLE IF EXISTS `open_oauth2_config`;
-CREATE TABLE `open_oauth2_config` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `open_type` ENUM('weixin', 'weibo','qq','taobao','alipay') NOT NULL,
-  `app_type` ENUM('mp','miniapp') DEFAULT NULL,
-  `app_id` varchar(32) DEFAULT NULL,
-  `app_secret` varchar(64) DEFAULT NULL,
-  `bind_client_id` varchar(50) DEFAULT NULL,
-  `enabled` TINYINT(1) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS `open_account_binding`;
 CREATE TABLE `open_account_binding` (
   `id` int(10)  NOT NULL AUTO_INCREMENT,
@@ -59,9 +45,42 @@ CREATE TABLE `open_account_binding` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-   UNIQUE INDEX `ao_uq_index` (`user_id`,`open_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='第三方账号绑定';
+   UNIQUE INDEX `ao_uq_index` (`account_id`,`open_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='第三方账号绑定';
 
+DROP TABLE IF EXISTS `account_scopes`;
+CREATE TABLE `account_scopes` (
+  `id` int(10)  NOT NULL AUTO_INCREMENT,
+  `account_id` varchar(32)  NOT NULL ,
+  `scope_type` varchar(16)  NOT NULL COMMENT '范围类型',
+  `system_id` varchar(32) DEFAULT NULL ,
+  `tenant_id` varchar(32) DEFAULT NULL ,
+  `principal_id` varchar(32) DEFAULT NULL COMMENT '业务系统对应的用户id',
+  `supper_admin` tinyint(1) DEFAULT 0  COMMENT '是否超管',
+  `enabled` tinyint(1) DEFAULT 1,
+  `deleted` tinyint(1) DEFAULT 0,
+  `created_at` datetime DEFAULT NULL,
+  `created_by` varchar(32) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  `updated_by` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='系统账号范围';
+
+
+
+DROP TABLE IF EXISTS `open_oauth2_config`;
+CREATE TABLE `open_oauth2_config` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `open_type` ENUM('weixin', 'weibo','qq','taobao','alipay') NOT NULL,
+  `app_type` ENUM('mp','miniapp') DEFAULT NULL,
+  `app_id` varchar(32) DEFAULT NULL,
+  `app_secret` varchar(64) DEFAULT NULL,
+  `bind_client_id` varchar(50) DEFAULT NULL,
+  `enabled` TINYINT(1) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 DROP TABLE IF EXISTS `client_config`;

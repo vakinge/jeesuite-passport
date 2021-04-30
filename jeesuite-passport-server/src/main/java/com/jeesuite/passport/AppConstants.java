@@ -10,4 +10,12 @@ public class AppConstants {
     public static final String INVALID_AUTH_CODE = "错误的授权码。";
     
     public static final String ERROR = "error";
+    
+    
+    public static final String CACHE_KEY_CAPTCHA = "captcha:%s";
+    
+    
+    public static enum SnsType{
+		weixin,weibo,qq
+	}
 }

@@ -36,7 +36,7 @@ import com.jeesuite.springweb.utils.ParameterUtils;
  * @date 2019年6月4日
  */
 @Controller  
-@RequestMapping(value = "/api")
+@RequestMapping(value = "/service")
 public class ClientApiController {
 
 	@Autowired
@@ -51,7 +51,7 @@ public class ClientApiController {
 		
 		if(SecurityDelegating.getSecurityDecision().cacheType() == CacheType.redis){
 			Map<String,String> redisConfig = new HashMap<>();
-			Properties properties = ResourceUtils.getAllProperties("auth.cache");
+			Properties properties = ResourceUtils.getAllProperties("security.cache");
 			properties.forEach((k,v)-> {
 				redisConfig.put(k.toString(), v.toString());
 			});

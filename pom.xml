@@ -9,6 +9,39 @@
 	<artifactId>jeesuite-passport</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>vakin jiang</name>
+			<email>vakinge@gmail.com</email>
+			<organization>github</organization>
+			<organizationUrl>https://github.com/vakinge</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>
+         scm:git:https://github.com/vakinge/jeesuite-passport.git
+      </connection>
+		<developerConnection>
+         scm:git:https://github.com/vakinge/jeesuite-passport.git
+      </developerConnection>
+		<url>https://github.com/vakinge/jeesuite-passport</url>
+		<tag>v2.0</tag>
+	</scm>
+	
+	
+	<properties>
+		<jeesuite.libs.version>1.3.8-SNAPSHOT</jeesuite.libs.version>
+		<jeesuite.config.version>1.3.7</jeesuite.config.version>
+	</properties>
 
     <modules>
 		<module>jeesuite-passport-client</module>

@@ -13,16 +13,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.common.util.AssertUtil;
 import com.jeesuite.common.util.BeanUtils;
 import com.jeesuite.common.util.FormatValidateUtils;
-import com.jeesuite.mybatis.test.entity.SnsAccounyBindingEntity.SnsType;
+import com.jeesuite.passport.AppConstants.SnsType;
 import com.jeesuite.passport.component.openauth.OauthUser;
 import com.jeesuite.passport.component.openauth.connector.WeixinMpConnector;
-import com.jeesuite.passport.dao.entity.OpenAccountBindingEntity;
 import com.jeesuite.passport.dao.entity.AccountEntity;
-import com.jeesuite.passport.dao.mapper.OpenAccountBindingEntityMapper;
+import com.jeesuite.passport.dao.entity.OpenAccountBindingEntity;
 import com.jeesuite.passport.dao.mapper.AccountEntityMapper;
+import com.jeesuite.passport.dao.mapper.OpenAccountBindingEntityMapper;
 import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.passport.dto.RequestMetadata;
 

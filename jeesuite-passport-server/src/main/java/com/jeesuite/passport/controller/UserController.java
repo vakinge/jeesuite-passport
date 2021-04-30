@@ -14,7 +14,7 @@ import com.jeesuite.springweb.model.WrapperResponse;
 import com.jeesuite.springweb.model.WrapperResponseEntity;
 
 @Controller  
-@RequestMapping(value = "/user")
+@RequestMapping(value = "/service")
 public class UserController {
 
 	@Autowired
