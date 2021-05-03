@@ -2,15 +2,23 @@ package com.jeesuite.passport.dto;
 
 public class LoginParam {
 
-	private String loginName;
+	private String loginType;
+	private String account;
 	private String password;
 	private String code;
 	
-	public String getLoginName() {
-		return loginName;
+	
+	public String getLoginType() {
+		return loginType;
 	}
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
+	public void setLoginType(String loginType) {
+		this.loginType = loginType;
+	}
+	public String getAccount() {
+		return account;
+	}
+	public void setAccount(String account) {
+		this.account = account;
 	}
 	public String getPassword() {
 		return password;
@@ -24,4 +32,7 @@ public class LoginParam {
 	public void setCode(String code) {
 		this.code = code;
 	}
+	
+	
+	
 }

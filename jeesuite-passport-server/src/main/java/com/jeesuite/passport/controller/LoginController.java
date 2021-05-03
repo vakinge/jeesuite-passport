@@ -1,5 +1,7 @@
 package com.jeesuite.passport.controller;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -8,19 +10,19 @@ import org.apache.oltu.oauth2.common.OAuth;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.AppConstants;
-import com.jeesuite.passport.dao.entity.ClientConfigEntity;
+import com.jeesuite.passport.dto.LoginClientInfo;
 import com.jeesuite.passport.dto.LoginParam;
-import com.jeesuite.passport.dto.LoginTicketInfo;
 import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.UserSession;
+import com.jeesuite.springweb.model.WrapperResponse;
 import com.jeesuite.springweb.utils.WebUtils;
 
 /**
@@ -31,13 +33,11 @@ import com.jeesuite.springweb.utils.WebUtils;
  * @date 2016年3月26日
  */
 @Controller  
-@RequestMapping(value = "/service")
+@RequestMapping(value = "/sso")
 public class LoginController extends BaseLoginController{
 
-	@Value("${front.login.url}?return_url?=%s&ticket=%s")
+	@Value("${front.login.url}?ticket=%s")
 	private String frontLoginUrl;
-	@Value("${front.ucenter.url}")
-	private String frontUcenterUrl;
 	
 	@RequestMapping(value = "login",method = RequestMethod.GET)
 	public String toLoginpage(HttpServletRequest request,HttpServletResponse response){
@@ -48,50 +48,65 @@ public class LoginController extends BaseLoginController{
 		if(StringUtils.isBlank(returnUrl)){
 			clientId = AppConstants.DEFAULT_CLIENT_ID;
 			returnUrl = frontUcenterUrl;
-		}else if(!returnUrl.startsWith("http")){
-			returnUrl = WebUtils.getBaseUrl(request) + returnUrl;
 		}
 		
 		String redirectUrl;
 		if(StringUtils.isBlank(clientId)){
-			redirectUrl = appendQueryParam(returnUrl, "errorMessage", "client_id is required");
+			redirectUrl = appendQueryParam(returnUrl, "error", "client_id is required");
 		}else {
-			String ticket = SecurityDelegating.objectToTicket(new LoginTicketInfo(clientId,null, returnUrl));
-			redirectUrl = String.format(frontLoginUrl, returnUrl,ticket);
+			LoginClientInfo ticketInfo = new LoginClientInfo(clientId, returnUrl);
+			String ticket = SecurityDelegating.getSessionManager().setTemporaryObject(AppConstants.TICKET, ticketInfo, 60);
+			redirectUrl = String.format(frontLoginUrl,ticket);
 		}
 		
 		return redirectTo(redirectUrl);
 	}
 	
 	@RequestMapping(value = "login",method = RequestMethod.POST)
-	public String login(HttpServletRequest request,@RequestBody LoginParam param){
+	public @ResponseBody String login(HttpServletRequest request,@RequestBody LoginParam pram){
 		String ticket = request.getParameter(SecurityConstants.PARAM_TICKET);
-		String returnUrl = request.getParameter(SecurityConstants.PARAM_RETURN_URL);
-
+		String returnUrl = request.getHeader(HttpHeaders.REFERER);
 		String clientId = AppConstants.DEFAULT_CLIENT_ID;
-		if(StringUtils.isNotBlank(ticket)) {			
-			LoginTicketInfo ticketInfo = SecurityDelegating.ticketToObject(ticket);
-			clientId = ticketInfo.getClientId();
-		}
 		
-		if(StringUtils.isBlank(returnUrl)){
+		try {
+			if(StringUtils.isNotBlank(ticket)) {			
+				LoginClientInfo ticketInfo = SecurityDelegating.getSessionManager().getTemporaryObjectByEncodeKey(ticket);
+				if(ticketInfo == null) {
+					throw new JeesuiteBaseException(4001, "临时票据过期或不正确");
+				}
+				clientId = ticketInfo.getClientId();
+				returnUrl = ticketInfo.getReturnUrl();
+			}
+
+			String username = request.getParameter(OAuth.OAUTH_USERNAME);
+			String password = request.getParameter(OAuth.OAUTH_PASSWORD);
 			
-		}
-		
-		String username = request.getParameter(OAuth.OAUTH_USERNAME);
-		String password = request.getParameter(OAuth.OAUTH_PASSWORD);
-		
-		if (StringUtils.isAnyBlank(username, password)) {
-			throw new JeesuiteBaseException(4001, "用户名或密码不能为空");
-		}
-		
-		UserSession session = SecurityDelegating.doAuthentication(username, password);
-		
-		if(AppConstants.DEFAULT_CLIENT_ID.equals(clientId)){
-			return redirectTo(returnUrl);
-		}else{
-			ClientConfigEntity clientConfig = getClientConfig(clientId);
-			return loginSuccessRedirect(session, clientConfig.getCallbackUri(),returnUrl);
+			if (StringUtils.isAnyBlank(username, password)) {
+				throw new JeesuiteBaseException(4001, "用户名或密码不能为空");
+			}
+			
+			UserSession session = SecurityDelegating.doAuthentication(username, password);
+			
+			if(AppConstants.DEFAULT_CLIENT_ID.equals(clientId)){
+				if(StringUtils.isBlank(returnUrl)) {
+					returnUrl = frontUcenterUrl;
+				}
+				return redirectTo(returnUrl);
+			}else{
+				return loginSuccessRedirect(session,clientId,returnUrl);
+			}
+		} catch (Exception e) {
+			String error = "系统繁忙";
+			if(e instanceof JeesuiteBaseException) {
+				error = e.getMessage();
+			}else {
+				logger.error("登录异常",e);
+			}
+			try {
+				error = java.net.URLEncoder.encode(error, "UTF-8");
+			} catch (UnsupportedEncodingException e1) {}
+			String redirectUrl = String.format(frontLoginUrl, ticket,error);
+			return redirectTo(redirectUrl);
 		}
 	}
 	
@@ -106,22 +121,14 @@ public class LoginController extends BaseLoginController{
 		return "redirect:" + redirctUrl;
 	}
 	
-	@RequestMapping(value = "redirect",method = RequestMethod.GET)
-	public String redirect(Model model,HttpServletRequest request){
-		
-		String clientId = request.getParameter(SecurityConstants.PARAM_CLIENT_ID);
-		String returnUrl = request.getParameter(SecurityConstants.PARAM_RETURN_URL);
-		
+	@RequestMapping(value = "status",method = RequestMethod.GET)
+	public @ResponseBody WrapperResponse<String> status(){
 		UserSession session = SecurityDelegating.getCurrentSession();
-		//未登录跳转回登录页面
+		//未登录
 		if(session == null || session.isAnonymous()){
-			model.addAttribute(SecurityConstants.PARAM_RETURN_URL, returnUrl);
-			model.addAttribute(SecurityConstants.PARAM_CLIENT_ID, clientId);
-			return "login";
+			return new WrapperResponse<>(401, "Unauthorized");
 		}else{
-			//
-			ClientConfigEntity clientConfig = getClientConfig(clientId);
-			return loginSuccessRedirect(session, clientConfig.getCallbackUri(),returnUrl);
+			return new WrapperResponse<>();
 		}
 	}
 

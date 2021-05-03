@@ -3,13 +3,16 @@ package com.jeesuite.passport.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
-import com.jeesuite.passport.dto.LoginTicketInfo;
 import com.jeesuite.passport.service.AccountService;
 import com.jeesuite.passport.service.AppService;
+import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.UserSession;
 import com.jeesuite.springweb.CurrentRuntimeContext;
@@ -24,11 +27,18 @@ import com.jeesuite.springweb.utils.WebUtils;
  */
 public abstract class BaseLoginController {
 
+	protected final static Logger logger = LoggerFactory.getLogger("com.jeesuite.passport.controller");
 	@Autowired
 	protected AccountService accountService;
 	
 	@Autowired
 	protected AppService appService;
+	
+	@Value("${front.ucenter.url}")
+	protected String frontUcenterUrl;
+	
+	@Value("${front.errorpage.url}?returnUrl=%s&error=%s")
+	protected String frontErrorPageUrl;
 
 	/**
 	 * 验证来源域名合法性
@@ -41,21 +51,25 @@ public abstract class BaseLoginController {
 	}
 	
 
-	protected String loginSuccessRedirect(UserSession session,String redirectUri,String returnUrl){
-
-		String orignDomain = WebUtils.getDomain(redirectUri);
+	protected String loginSuccessRedirect(UserSession session,String clientId,String returnUrl){
+        //如接入应用指定了回调地址
+		ClientConfigEntity clientConfig = getClientConfig(clientId);
+		if(StringUtils.isNotBlank(clientConfig.getCallbackUri())) {
+			returnUrl = clientConfig.getCallbackUri();
+		}
+		String orignDomain = WebUtils.getDomain(returnUrl);
 		String cookieDomain = getCookiesDomain(CurrentRuntimeContext.getRequest());
         //
+		String redirectUrl = returnUrl;
 		if(!StringUtils.contains(orignDomain, cookieDomain)){
-			StringBuilder urlBuiler = new StringBuilder(redirectUri);
-			urlBuiler.append("?access_token=").append(session.getSessionId());
-			urlBuiler.append("&expires_in=").append(session.getExpiresIn());
-			String ticket = SecurityDelegating.objectToTicket(new LoginTicketInfo(null,session.getSessionId(), returnUrl));
-			urlBuiler.append("&ticket=").append(ticket);
-			redirectUri = urlBuiler.toString();
+			StringBuilder urlBuiler = new StringBuilder(returnUrl);
+			//获取用户信息的ticket
+			String ticket = SecurityDelegating.getSessionManager().setTemporaryObject(SecurityConstants.AUTHN_SUC_TICKET, session.getSessionId(), 60);
+			urlBuiler.append("?").append(SecurityConstants.AUTHN_SUC_TICKET).append("=").append(ticket);
+			redirectUrl = urlBuiler.toString();
 		}
 		
-		return redirectTo(redirectUri);
+		return redirectTo(redirectUrl);
 	}
 
 	
@@ -73,10 +87,10 @@ public abstract class BaseLoginController {
 	
 	
 	protected String getCookiesDomain(HttpServletRequest request) {
-		String cookieDomain = SecurityDelegating.getSecurityDecision().cookieDomain();
+		String cookieDomain = SecurityDelegating.getConfigurerProvider().cookieDomain();
 		if(cookieDomain == null){
 			//未指定则为当前根域名
-			cookieDomain = WebUtils.getRootDomain(request);
+			cookieDomain = request.getServerName();
 		}
 		return cookieDomain;
 	}

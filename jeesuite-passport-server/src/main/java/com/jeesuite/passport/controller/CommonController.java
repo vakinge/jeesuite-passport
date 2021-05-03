@@ -22,10 +22,10 @@ import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 
 @Controller  
-@RequestMapping(value = "/service")
+@RequestMapping(value = "/api/common")
 public class CommonController {
 
-	@RequestMapping(value = "send_code", method = RequestMethod.POST)
+	@RequestMapping(value = "/send_code", method = RequestMethod.POST)
 	public @ResponseBody WrapperResponseEntity register(@RequestParam("to") String sendTo){
 		RedisString cache = new RedisString("send_code:"+ sendTo);
 		String code = cache.get();
@@ -61,9 +61,7 @@ public class CommonController {
         // 设置类型，纯数字、纯字母、字母数字混合
         specCaptcha.setCharType(Captcha.TYPE_ONLY_NUMBER);
 
-        String sessionId = SecurityDelegating.getCurrentSession().getSessionId();
-        new RedisString(String.format(AppConstants.CACHE_KEY_CAPTCHA, sessionId)).set(specCaptcha.text(), 60);
-
+        SecurityDelegating.getSessionManager().setTemporaryObject(AppConstants.CAPTCHA, specCaptcha.text(), 60);
         // 输出图片流
         specCaptcha.out(response.getOutputStream());
     }

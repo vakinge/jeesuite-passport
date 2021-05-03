@@ -48,7 +48,7 @@ import com.jeesuite.security.model.AccessToken;
  * @date 2017年3月18日
  */
 @Controller  
-@RequestMapping(value = "/service/oauth2")
+@RequestMapping(value = "/sso/oauth2")
 public class Oauth2LoginController extends BaseLoginController{ 
 	
 	@Autowired

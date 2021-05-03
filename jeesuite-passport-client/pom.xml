@@ -10,12 +10,6 @@
 	<artifactId>jeesuite-passport-client</artifactId>
 
 	<dependencies>
-	    <dependency>
-			<groupId>com.jeesuite</groupId>
-			<artifactId>jeesuite-common</artifactId>
-			<version>${jeesuite.libs.version}</version>
-		</dependency>
-		
 		 <dependency>
 			<groupId>com.jeesuite</groupId>
 			<artifactId>jeesuite-springweb</artifactId>

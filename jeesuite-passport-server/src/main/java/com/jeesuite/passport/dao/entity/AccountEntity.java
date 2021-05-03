@@ -11,7 +11,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import com.jeesuite.mybatis.core.BaseEntity;
 import com.jeesuite.passport.dto.AuthUserDetails;
 
-@Table(name = "users")
+@Table(name = "account")
 public class AccountEntity extends BaseEntity {
 	
 	@Id

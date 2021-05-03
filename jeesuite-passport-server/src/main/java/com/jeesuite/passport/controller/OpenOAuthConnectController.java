@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +29,6 @@ import com.jeesuite.passport.component.openauth.connector.WeiboConnector;
 import com.jeesuite.passport.component.openauth.connector.WeixinMpConnector;
 import com.jeesuite.passport.component.openauth.connector.WinxinConnector;
 import com.jeesuite.passport.dao.entity.AccountEntity;
-import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dao.entity.OpenOauth2ConfigEntity;
 import com.jeesuite.passport.dao.mapper.OpenOauth2ConfigEntityMapper;
 import com.jeesuite.passport.dto.AccountBindParam;
@@ -49,11 +47,10 @@ import com.jeesuite.springweb.utils.WebUtils;
  * @date 2016年5月23日
  */
 @Controller
-@RequestMapping("/service/open")
+@RequestMapping("/sso/open")
 public class OpenOAuthConnectController extends BaseLoginController implements CommandLineRunner{
 	
-	@Value("${sns.login.next.bind:false}")
-	private boolean snsLoginBind;
+
 	@Autowired
 	private OpenOauth2ConfigEntityMapper openOauth2ConfigMapper;
 	private Map<String, OauthConnector> oauthConnectors = new HashMap<>();
@@ -131,7 +128,6 @@ public class OpenOAuthConnectController extends BaseLoginController implements C
 			return AppConstants.ERROR; 
 		}
 		
-		getClientConfig(loginState.getAppId());
 		oauthUser.setOpenType(loginState.getSnsType());
 		oauthUser.setFromClientId(loginState.getAppId());
 		//绑定
@@ -143,26 +139,19 @@ public class OpenOAuthConnectController extends BaseLoginController implements C
 		//根据openid 找用户
 		AccountEntity account = accountService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
 		if(account == null){
-			//跳转去绑定页面
-			if(snsLoginBind){
-				model.addAttribute("oauthUser", oauthUser);
-				model.addAttribute(SecurityConstants.PARAM_RETURN_URL, loginState.getReturnUrl());
-				return "bind";
-			}else{
-				//创建用户
-				AccountBindParam bindParam = new AccountBindParam();
-				bindParam.setAppId(loginState.getAppId());
-				bindParam.setIpAddr(IpUtils.getIpAddr(request));
-				account = accountService.createUserByOauthInfo(oauthUser,bindParam);
-			}
+			//TODO 跳转去绑定页面
+			//创建用户
+			AccountBindParam bindParam = new AccountBindParam();
+			bindParam.setAppId(loginState.getAppId());
+			bindParam.setIpAddr(IpUtils.getIpAddr(request));
+			account = accountService.createUserByOauthInfo(oauthUser,bindParam);
 		}
 		
 		UserSession session = SecurityDelegating.updateSession(account.toAuthUser());
 		if(AppConstants.DEFAULT_CLIENT_ID.equals(loginState.getAppId())){
 			return redirectTo(loginState.getReturnUrl());
 		}else{
-			ClientConfigEntity clientConfig = getClientConfig(loginState.getAppId());
-			return loginSuccessRedirect(session, clientConfig.getCallbackUri(),loginState.getReturnUrl());
+			return loginSuccessRedirect(session,loginState.getAppId(),loginState.getReturnUrl());
 		}
 	}
 

@@ -12,7 +12,9 @@ public class AppConstants {
     public static final String ERROR = "error";
     
     
-    public static final String CACHE_KEY_CAPTCHA = "captcha:%s";
+    public static final String CAPTCHA = "captcha";
+    
+    public static final String TICKET = "ticket";
     
     
     public static enum SnsType{

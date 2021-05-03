@@ -3,7 +3,6 @@ package com.jeesuite.passport.controller;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,14 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.common.JeesuiteBaseException;
+import com.jeesuite.common.model.AuthUser;
 import com.jeesuite.common.util.DigestUtils;
-import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.component.jwt.JwtHelper;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
-import com.jeesuite.passport.dto.LoginTicketInfo;
-import com.jeesuite.passport.dto.TicketExchangeResult;
+import com.jeesuite.passport.dto.JWTAuthnResponse;
 import com.jeesuite.passport.service.AppService;
-import com.jeesuite.security.SecurityConstants.CacheType;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.UserSession;
 import com.jeesuite.springweb.model.WrapperResponse;
@@ -36,27 +33,18 @@ import com.jeesuite.springweb.utils.ParameterUtils;
  * @date 2019年6月4日
  */
 @Controller  
-@RequestMapping(value = "/service")
+@RequestMapping(value = "/api")
 public class ClientApiController {
 
 	@Autowired
 	private AppService appService;
 	
-	@RequestMapping(value = "metadaatas", method = RequestMethod.GET)
+	@RequestMapping(value = "configs", method = RequestMethod.GET)
 	public @ResponseBody WrapperResponse<Map<String,Map<String,String>>> getMetadaatas(HttpServletRequest request){
 		preCheck(request);
 		
 		Map<String, Map<String,String>> data = new HashMap<>();
 		data.put("jwtConfig", JwtHelper.getJwtConfigs());
-		
-		if(SecurityDelegating.getSecurityDecision().cacheType() == CacheType.redis){
-			Map<String,String> redisConfig = new HashMap<>();
-			Properties properties = ResourceUtils.getAllProperties("security.cache");
-			properties.forEach((k,v)-> {
-				redisConfig.put(k.toString(), v.toString());
-			});
-			data.put("redisConfig", redisConfig);
-		}
 		
  		return new WrapperResponse<>();
 	}
@@ -68,21 +56,30 @@ public class ClientApiController {
 		return new WrapperResponse<>(validated);
 	}
 	
-	@RequestMapping(value = "ticket_exchange", method = RequestMethod.GET)
-	public @ResponseBody WrapperResponse<TicketExchangeResult> ticketExchangeJWT(HttpServletRequest request,String ticket){
+	@RequestMapping(value = "ticket_exchange_jwt", method = RequestMethod.GET)
+	public @ResponseBody WrapperResponse<JWTAuthnResponse> ticketExchangeJWT(HttpServletRequest request,String ticket){
 		preCheck(request);
-		LoginTicketInfo ticketInfo = SecurityDelegating.ticketToObject(ticket);
-		if(ticketInfo == null)throw new JeesuiteBaseException(500, "ticket不存在或已过期");
-		UserSession session = SecurityDelegating.genUserSession(ticketInfo.getSessionId());
+		
+		String sessionId = SecurityDelegating.getSessionManager().getTemporaryObjectByEncodeKey(ticket);
+		if(sessionId == null)throw new JeesuiteBaseException(500, "ticket不存在或已过期");
+		UserSession session = SecurityDelegating.genUserSession(sessionId);
 		String payload = JwtHelper.createToken(session);
 		
-		TicketExchangeResult result = new TicketExchangeResult();
+		JWTAuthnResponse result = new JWTAuthnResponse();
 		result.setAccessToken(session.getSessionId());
 		result.setExpiresIn(session.getExpiresIn());
 		result.setPayload(payload);
-		result.setReturnUrl(ticketInfo.getReturnUrl());
 		
 		return new WrapperResponse<>(result);
+	}
+	
+	@RequestMapping(value = "ticket_exchange_user", method = RequestMethod.GET)
+	public @ResponseBody WrapperResponse<AuthUser> ticketExchangeUserInfo(HttpServletRequest request,String ticket){
+		preCheck(request);
+		String sessionId = SecurityDelegating.getSessionManager().getTemporaryObjectByEncodeKey(ticket);
+		if(sessionId == null)throw new JeesuiteBaseException(500, "ticket不存在或已过期");
+		UserSession session = SecurityDelegating.genUserSession(sessionId);
+		return new WrapperResponse<>(session.getUserInfo());
 	}
 	
 	private void preCheck(HttpServletRequest request){
