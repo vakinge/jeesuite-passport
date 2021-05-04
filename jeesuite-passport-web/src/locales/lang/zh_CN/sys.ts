@@ -64,8 +64,8 @@ export default {
     signUpFormTitle: '注册',
     forgetFormTitle: '重置密码',
 
-    signInTitle: '开箱即用的中后台管理系统',
-    signInDesc: '输入您的个人详细信息开始使用！',
+    signInTitle: '企业级一站式统一登录平台',
+    signInDesc: '支持微信、企业微信及多种社交账号、Oauth2.0，JWT多种集成模式',
     policy: '我同意xxx隐私政策',
     scanSign: `扫码后点击"确认"，即可完成登录`,
 

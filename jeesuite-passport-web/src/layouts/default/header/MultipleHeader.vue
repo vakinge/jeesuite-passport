@@ -2,14 +2,12 @@
   <div :style="getPlaceholderDomStyle" v-if="getIsShowPlaceholderDom"></div>
   <div :style="getWrapStyle" :class="getClass">
     <LayoutHeader v-if="getShowInsetHeaderRef" />
-    <MultipleTabs v-if="getShowTabs" />
   </div>
 </template>
 <script lang="ts">
   import { defineComponent, unref, computed, CSSProperties } from 'vue';
 
   import LayoutHeader from './index.vue';
-  import MultipleTabs from '../tabs/index.vue';
 
   import { useHeaderSetting } from '/@/hooks/setting/useHeaderSetting';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
@@ -19,12 +17,12 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { headerHeightRef } from '../content/useContentViewHeight';
 
-  const HEADER_HEIGHT = 48;
+  const HEADER_HEIGHT = 24;
 
   const TABS_HEIGHT = 32;
   export default defineComponent({
     name: 'LayoutMultipleHeader',
-    components: { LayoutHeader, MultipleTabs },
+    components: { LayoutHeader },
     setup() {
       const { prefixCls } = useDesign('layout-multiple-header');
 

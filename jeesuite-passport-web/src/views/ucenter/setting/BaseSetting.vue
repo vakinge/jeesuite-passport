@@ -6,7 +6,7 @@
       </a-col>
       <a-col :span="10">
         <div class="change-avatar">
-          <div class="mb-2"> 头像 </div>
+          <div class="mb-2"></div>
           <img width="140" :src="headerImg" />
           <Upload :showUploadList="false">
             <Button class="ml-5"> <Icon icon="feather:upload" />更换头像 </Button>

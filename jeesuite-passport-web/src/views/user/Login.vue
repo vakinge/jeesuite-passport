@@ -1,9 +1,5 @@
 <template>
   <div :class="prefixCls" class="relative w-full h-full px-4">
-    <AppLocalePicker
-      class="absolute top-4 right-4 enter-x text-white xl:text-gray-600"
-      :showText="false"
-    />
     <AppDarkModeToggle class="absolute top-3 right-7 enter-x" />
 
     <span class="-enter-x xl:hidden">
@@ -17,7 +13,7 @@
           <div class="my-auto">
             <img
               :alt="title"
-              src="../../../assets/svg/login-box-bg.svg"
+              src="../../assets/svg/login-box-bg.svg"
               class="w-1/2 -mt-16 -enter-x"
             />
             <div class="mt-10 font-medium text-white -enter-x">
@@ -48,7 +44,7 @@
   import { defineComponent, computed } from 'vue';
 
   import { AppLogo } from '/@/components/Application';
-  import { AppLocalePicker, AppDarkModeToggle } from '/@/components/Application';
+  import { AppDarkModeToggle } from '/@/components/Application';
   import LoginForm from './LoginForm.vue';
   import ForgetPasswordForm from './ForgetPasswordForm.vue';
   import RegisterForm from './RegisterForm.vue';
@@ -69,7 +65,6 @@
       RegisterForm,
       MobileForm,
       QrCodeForm,
-      AppLocalePicker,
       AppDarkModeToggle,
     },
     setup() {

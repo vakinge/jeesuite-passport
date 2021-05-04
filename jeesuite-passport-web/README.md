@@ -10,6 +10,8 @@ yarn install
 - 运行
 
 ```bash
+yarn dev
+或者
 yarn serve
 ```
 
