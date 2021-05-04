@@ -27,7 +27,7 @@
     "test:gzip": "http-server dist --cors --gzip -c-1",
     "test:br": "http-server dist --cors --brotli -c-1",
     "reinstall": "rimraf yarn.lock && rimraf package.lock.json && rimraf node_modules && npm run bootstrap",
-    "install:husky": "is-ci || husky install",
+    "install:husky": "is-ci || cd .. && husky install jeesuite-passport-web/.husky",
     "gen:icon": "esno ./build/generate/icon/index.ts",
     "postinstall": "npm run install:husky"
   },
