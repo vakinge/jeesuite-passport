@@ -1,5 +1,7 @@
 package com.jeesuite.passport.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.jeesuite.common.model.AuthUser;
 
 /**
@@ -12,6 +14,7 @@ import com.jeesuite.common.model.AuthUser;
  * @version 1.0.0
  * @date 2018年12月4日
  */
+@JsonInclude(Include.NON_NULL)
 public class AuthUserDetails extends AuthUser {
 
 	private String nickname;

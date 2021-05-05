@@ -1,10 +1,10 @@
 <template>
   <CollapseContainer title="基本设置" :canExpan="false">
     <a-row :gutter="24">
-      <a-col :span="14">
+      <a-col :span="16">
         <BasicForm @register="register" />
       </a-col>
-      <a-col :span="10">
+      <a-col :span="8">
         <div class="change-avatar">
           <div class="mb-2"></div>
           <img width="140" :src="headerImg" />

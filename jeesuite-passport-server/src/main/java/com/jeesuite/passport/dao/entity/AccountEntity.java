@@ -242,7 +242,7 @@ public class AccountEntity extends BaseEntity {
     public AuthUserDetails toAuthUser() {
     	AuthUserDetails authUser = new AuthUserDetails();
         authUser.setId(this.getId());
-        authUser.setName(this.getUsername());
+        authUser.setUsername(this.getUsername());
         authUser.setNickname(this.getNickname());
         authUser.setMobile(this.getMobile());
         authUser.setEmail(this.getEmail());

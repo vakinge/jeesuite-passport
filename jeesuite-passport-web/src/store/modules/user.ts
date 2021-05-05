@@ -10,12 +10,11 @@ import { ROLES_KEY, TOKEN_KEY, USER_INFO_KEY } from '/@/enums/cacheEnum';
 
 import { getAuthCache, setAuthCache } from '/@/utils/auth';
 import {
-  GetUserInfoByUserIdModel,
-  GetUserInfoByUserIdParams,
+  UserInfoModel,
   LoginParams,
 } from '/@/api/sys/model/userModel';
 
-import { getUserInfoById, loginApi } from '/@/api/sys/user';
+import { getCurrentUserInfo, loginApi } from '/@/api/sys/user';
 
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -53,10 +52,6 @@ export const useUserStore = defineStore({
       this.token = info;
       setAuthCache(TOKEN_KEY, info);
     },
-    setRoleList(roleList: RoleEnum[]) {
-      this.roleList = roleList;
-      setAuthCache(ROLES_KEY, roleList);
-    },
     setUserInfo(info: UserInfo) {
       this.userInfo = info;
       setAuthCache(USER_INFO_KEY, info);
@@ -71,33 +66,27 @@ export const useUserStore = defineStore({
      */
     async login(
       params: LoginParams & {
-        goHome?: boolean;
         mode?: ErrorMessageMode;
       }
-    ): Promise<GetUserInfoByUserIdModel | null> {
+    ): Promise<UserInfoModel | null> {
       try {
-        const { goHome = true, mode, ...loginParams } = params;
+        const { mode, ...loginParams } = params;
         const data = await loginApi(loginParams, mode);
-        const { token, userId } = data;
-
+        const { token ,redirect} = data;
         // save token
         this.setToken(token);
         // get user info
-        const userInfo = await this.getUserInfoAction({ userId });
-
-        goHome && (await router.replace(PageEnum.BASE_HOME));
+        const userInfo = await getCurrentUserInfo();
+        this.setUserInfo(userInfo);
+        if(redirect){
+          
+        }else{
+          await router.replace(PageEnum.BASE_HOME)
+        }
         return userInfo;
       } catch (error) {
         return null;
       }
-    },
-    async getUserInfoAction({ userId }: GetUserInfoByUserIdParams) {
-      const userInfo = await getUserInfoById({ userId });
-      const { roles } = userInfo;
-      const roleList = roles.map((item) => item.value) as RoleEnum[];
-      this.setUserInfo(userInfo);
-      this.setRoleList(roleList);
-      return userInfo;
     },
     /**
      * @description: logout

@@ -30,7 +30,7 @@
           <div :class="`${prefixCls}-entry__header enter-x`">
             <img :src="headerImg" :class="`${prefixCls}-entry__header-img`" />
             <p :class="`${prefixCls}-entry__header-name`">
-              {{ realName }}
+              {{ nickname }}
             </p>
           </div>
           <InputPassword
@@ -108,9 +108,9 @@
 
       const { t } = useI18n();
 
-      const realName = computed(() => {
-        const { realName } = userStore.getUserInfo || {};
-        return realName;
+      const nickname = computed(() => {
+        const { nickname } = userStore.getUserInfo || {};
+        return nickname;
       });
 
       /**
@@ -141,7 +141,7 @@
 
       return {
         goLogin,
-        realName,
+        nickname,
         unLock,
         errMsg,
         loading,

@@ -1,35 +1,24 @@
 import { MockMethod } from 'vite-plugin-mock';
 import { resultError, resultSuccess } from '../_util';
+import { getToken } from '/@/utils/auth';
 
 function createFakeUserList() {
   return [
     {
-      userId: '1',
+      id: '1',
       username: 'vben',
-      realName: 'Vben Admin',
-      desc: 'manager',
+      nickname: 'Vben Admin',
+      avatar: 'manager',
       password: '123456',
       token: 'fakeToken1',
-      roles: [
-        {
-          roleName: 'Super Admin',
-          value: 'super',
-        },
-      ],
     },
     {
-      userId: '2',
+      id: '2',
       username: 'test',
+      nickname: 'xyz',
       password: '123456',
-      realName: 'test user',
-      desc: 'tester',
+      avatar: 'test user',
       token: 'fakeToken2',
-      roles: [
-        {
-          roleName: 'Tester',
-          value: 'test',
-        },
-      ],
     },
   ];
 }
@@ -46,30 +35,25 @@ export default [
     timeout: 200,
     method: 'post',
     response: ({ body }) => {
-      const { username, password } = body;
+      const { account, password } = body;
       const checkUser = createFakeUserList().find(
-        (item) => item.username === username && password === item.password
+        (item) => item.username === account && password === item.password
       );
       if (!checkUser) {
         return resultError('Incorrect account or password！');
       }
-      const { userId, username: _username, token, realName, desc, roles } = checkUser;
       return resultSuccess({
-        roles,
-        userId,
-        username: _username,
-        token,
-        realName,
-        desc,
+        uid: checkUser.id,
+        token: checkUser.token
       });
     },
   },
   {
-    url: '/basic-api/getUserInfoById',
+    url: '/basic-api/current_user',
     method: 'get',
-    response: ({ query }) => {
-      const { userId } = query;
-      const checkUser = createFakeUserList().find((item) => item.userId === userId);
+    response: ({}) => {
+      const token = getToken();
+      const checkUser = createFakeUserList().find((item) => item.token === token);
       if (!checkUser) {
         return resultError('The corresponding user information was not obtained!');
       }
@@ -77,17 +61,12 @@ export default [
     },
   },
   {
-    url: '/basic-api/getPermCodeByUserId',
-    timeout: 200,
-    method: 'get',
-    response: ({ query }) => {
-      const { userId } = query;
-      if (!userId) {
-        return resultError('userId is not null!');
-      }
-      const codeList = fakeCodeList[userId];
-
-      return resultSuccess(codeList);
+      url: '/basic-api/current_permssions',
+      timeout: 200,
+      method: 'get',
+      response: () => {
+        const codeList = ['1000', '3000', '5000'];
+        return resultSuccess(codeList);
+      },
     },
-  },
 ] as MockMethod[];

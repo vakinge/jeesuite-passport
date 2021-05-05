@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.AppConstants;
+import com.jeesuite.passport.dto.AuthUserDetails;
 import com.jeesuite.passport.dto.LoginClientInfo;
 import com.jeesuite.passport.dto.LoginParam;
 import com.jeesuite.security.SecurityConstants;
@@ -119,6 +120,14 @@ public class LoginController extends BaseLoginController{
 		}
 		SecurityDelegating.doLogout();
 		return "redirect:" + redirctUrl;
+	}
+	
+	
+	@RequestMapping(value = "current_user", method = RequestMethod.GET)
+	public @ResponseBody WrapperResponse<AuthUserDetails> getMyInfo(){
+		UserSession session = SecurityDelegating.getCurrentSession();
+		AuthUserDetails account = accountService.findAcctountById(session.getUserId()).toAuthUser();
+		return new WrapperResponse<>(account);
 	}
 	
 	@RequestMapping(value = "status",method = RequestMethod.GET)

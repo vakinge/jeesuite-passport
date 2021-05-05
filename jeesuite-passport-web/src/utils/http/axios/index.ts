@@ -43,55 +43,28 @@ const transform: AxiosTransform = {
     }
     // 错误的时候返回
 
-    const { data } = res;
-    if (!data) {
+    let resData = res.data;
+    if (!resData) {
       // return '[HTTP] Request has no return value';
       return errorResult;
     }
     //  这里 code，result，message为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
-    const { code, result, message } = data;
+    const { code, data, msg } = resData;
 
     // 这里逻辑可以根据项目进行修改
-    const hasSuccess = data && Reflect.has(data, 'code') && code === ResultEnum.SUCCESS;
-    if (!hasSuccess) {
-      if (message) {
-        // errorMessageMode=‘modal’的时候会显示modal错误弹窗，而不是消息提示，用于一些比较重要的错误
-        if (options.errorMessageMode === 'modal') {
-          createErrorModal({ title: t('sys.api.errorTip'), content: message });
-        } else if (options.errorMessageMode === 'message') {
-          createMessage.error(message);
-        }
-      }
-      Promise.reject(new Error(message));
-      return errorResult;
-    }
-
+    const hasSuccess = resData && Reflect.has(resData, 'code') && code === ResultEnum.SUCCESS;
     // 接口请求成功，直接返回结果
-    if (code === ResultEnum.SUCCESS) {
-      return result;
+    if (hasSuccess) {
+      return data;
     }
-    // 接口请求错误，统一提示错误信息
-    if (code === ResultEnum.ERROR) {
-      if (message) {
-        createMessage.error(data.message);
-        Promise.reject(new Error(message));
-      } else {
-        const msg = t('sys.api.errorMessage');
-        createMessage.error(msg);
-        Promise.reject(new Error(msg));
-      }
-      return errorResult;
+    
+    let errorMsg = msg || t('sys.api.errorMessage');
+    if (options.errorMessageMode === 'modal') {
+      createErrorModal({ title: t('sys.api.errorTip'), content: msg });
+    } else if (options.errorMessageMode === 'message') {
+      createMessage.error(msg);
     }
-    // 登录超时
-    if (code === ResultEnum.TIMEOUT) {
-      const timeoutMsg = t('sys.api.timeoutMessage');
-      createErrorModal({
-        title: t('sys.api.operationFailed'),
-        content: timeoutMsg,
-      });
-      Promise.reject(new Error(timeoutMsg));
-      return errorResult;
-    }
+    Promise.reject(new Error(msg));
     return errorResult;
   },
 

@@ -2,16 +2,16 @@ package com.jeesuite.passport.dto;
 
 public class LoginParam {
 
-	private String loginType;
+	private int loginType; //1：账号登录,2:手机验证码
 	private String account;
 	private String password;
 	private String code;
 	
 	
-	public String getLoginType() {
+	public int getLoginType() {
 		return loginType;
 	}
-	public void setLoginType(String loginType) {
+	public void setLoginType(int loginType) {
 		this.loginType = loginType;
 	}
 	public String getAccount() {

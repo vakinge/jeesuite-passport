@@ -140,14 +140,15 @@
           loading.value = true;
           const userInfo = await userStore.login(
             toRaw({
+              loginType: 1,
+              account: data.account,
               password: data.password,
-              username: data.account,
             })
           );
           if (userInfo) {
             notification.success({
               message: t('sys.login.loginSuccessTitle'),
-              description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.realName}`,
+              description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.nickname}`,
               duration: 3,
             });
           }
