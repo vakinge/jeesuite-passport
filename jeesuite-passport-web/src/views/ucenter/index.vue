@@ -57,6 +57,7 @@
   import Icon from '/@/components/Icon/index';
   import Settings from './Settings.vue';
   import Workbench from './Workbench.vue';
+  import LoginLog from './LoginLog.vue';
 
   import headerImg from '/@/assets/images/header.jpg';
   import {
@@ -75,6 +76,7 @@
       TabPane: Tabs.TabPane,
       Settings,
       Workbench,
+      LoginLog,
       [Row.name]: Row,
       [Col.name]: Col,
     },

@@ -27,7 +27,7 @@
   import { useMessage } from '/@/hooks/web/useMessage';
 
   import headerImg from '/@/assets/images/header.jpg';
-  import { accountInfoApi } from '/@/api/account';
+  import { getCurrentUserDetails } from '/@/api/user';
   import { baseSetschemas } from './data';
 
   export default defineComponent({
@@ -50,7 +50,7 @@
       });
 
       onMounted(async () => {
-        const data = await accountInfoApi();
+        const data = await getCurrentUserDetails();
         setFieldsValue(data);
       });
 

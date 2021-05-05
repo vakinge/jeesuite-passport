@@ -22,7 +22,20 @@ export interface LoginResultModel {
  */
 export interface UserInfoModel {
   id: string | number;
-  name: string;
+  username: string;
   nickname: string;
+  avatar: string;
+}
+
+export interface UserDetailsModel {
+  id: string | number;
+  username: string;
+  nickname: string;
+  realname: string;
+  email: string;
+  mobile: string;
+  birthday: string;
+  age: number;
+  gender: string;
   avatar: string;
 }

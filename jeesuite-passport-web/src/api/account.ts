@@ -1,10 +1,10 @@
 import { defHttp } from '/@/utils/http/axios';
-import { GetAccountInfoModel } from './model/accountModel';
+import { AccountBaseInfoModel } from './model/accountModel';
 
 enum Api {
-  ACCOUNT_INFO = '/account/getAccountInfo',
+  ACCOUNT_INFO = '/account/baseInfo',
 }
 
 // Get personal center-basic settings
 
-export const accountInfoApi = () => defHttp.get<GetAccountInfoModel>({ url: Api.ACCOUNT_INFO });
+export const accountInfoApi = () => defHttp.get<AccountBaseInfoModel>({ url: Api.ACCOUNT_INFO });

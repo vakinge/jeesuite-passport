@@ -51,7 +51,7 @@ public class JwtHelper {
 	// 创建token
     public static String createToken(UserSession session) {
         HashMap<String, Object> map = new HashMap<>(1);
-        map.put(USER_CLAIMS[0], session.getUserInfo().getName());
+        map.put(USER_CLAIMS[0], session.getUserInfo().getUsername());
         return Jwts.builder()
                 .signWith(signatureAlgorithm, SECRET)
                 .setClaims(map)

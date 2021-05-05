@@ -12,9 +12,9 @@ import { getAuthCache, setAuthCache } from '/@/utils/auth';
 import {
   UserInfoModel,
   LoginParams,
-} from '/@/api/sys/model/userModel';
+} from '/@/api/model/userModel';
 
-import { getCurrentUserInfo, loginApi } from '/@/api/sys/user';
+import { getCurrentUserInfo, loginApi } from '/@/api/user';
 
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';

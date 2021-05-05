@@ -79,6 +79,11 @@ export const achieveList: TabItem[] = [
     name: '工作台',
     component: 'Workbench',
   },
+  {
+    key: '3',
+    name: '登录日志',
+    component: 'LoginLog',
+  },
 ];
 
 export const actions: any[] = [
