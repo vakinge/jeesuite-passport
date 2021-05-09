@@ -21,6 +21,7 @@ import com.jeesuite.cache.CacheExpires;
 import com.jeesuite.cache.command.RedisObject;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.AppConstants;
+import com.jeesuite.passport.AppConstants.OpenSubType;
 import com.jeesuite.passport.component.openauth.OauthConnector;
 import com.jeesuite.passport.component.openauth.OauthUser;
 import com.jeesuite.passport.component.openauth.SnsLoginState;
@@ -28,14 +29,12 @@ import com.jeesuite.passport.component.openauth.connector.QQConnector;
 import com.jeesuite.passport.component.openauth.connector.WeiboConnector;
 import com.jeesuite.passport.component.openauth.connector.WeixinMpConnector;
 import com.jeesuite.passport.component.openauth.connector.WinxinConnector;
-import com.jeesuite.passport.dao.entity.AccountEntity;
 import com.jeesuite.passport.dao.entity.OpenOauth2ConfigEntity;
+import com.jeesuite.passport.dao.entity.UserPrincipalEntity;
 import com.jeesuite.passport.dao.mapper.OpenOauth2ConfigEntityMapper;
-import com.jeesuite.passport.dto.AccountBindParam;
 import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.UserSession;
-import com.jeesuite.springweb.utils.IpUtils;
 import com.jeesuite.springweb.utils.WebUtils;
 
 
@@ -47,7 +46,7 @@ import com.jeesuite.springweb.utils.WebUtils;
  * @date 2016年5月23日
  */
 @Controller
-@RequestMapping("/sso/open")
+@RequestMapping("/auth/open")
 public class OpenOAuthConnectController extends BaseLoginController implements CommandLineRunner{
 	
 
@@ -58,7 +57,7 @@ public class OpenOAuthConnectController extends BaseLoginController implements C
 	
 	@RequestMapping(value = "login/{type}", method = RequestMethod.GET)
 	public String loginRedirect(HttpServletRequest request,@PathVariable("type") String type
-			,@RequestParam(value="client_id",required=false,defaultValue = AppConstants.DEFAULT_CLIENT_ID) String clientId
+			,@RequestParam(value="client_id",required=false) String clientId
 			,@RequestParam(value="return_url",required=false) String returnUrl){
 		
 		boolean isWxGzh = WeixinMpConnector.SNS_TYPE.equals(type);
@@ -69,7 +68,7 @@ public class OpenOAuthConnectController extends BaseLoginController implements C
 			if(connector == null)throw new JeesuiteBaseException(1001,"未找到登录类型["+type+"]配置");
 		}
 		
-		if(AppConstants.DEFAULT_CLIENT_ID.equals(clientId)){
+		if(StringUtils.isBlank(clientId)){
 			returnUrl = WebUtils.getBaseUrl(request) + "/ucenter/index";
 		}else{
 			getClientConfig(clientId);
@@ -118,37 +117,27 @@ public class OpenOAuthConnectController extends BaseLoginController implements C
 		}
 
 		OauthUser oauthUser;
-		if(WeixinMpConnector.SNS_TYPE.equals(loginState.getSnsType())){
+		if(WeixinMpConnector.SNS_TYPE.equals(loginState.getOpenType())){
 			oauthUser = weixinGzhConnector.getUser(loginState.getAppId(), code);
 		}else{
-			oauthUser = oauthConnectors.get(loginState.getSnsType()).getUser(code);
+			oauthUser = oauthConnectors.get(loginState.getOpenType()).getUser(code);
 		}
 		if(StringUtils.isBlank(oauthUser.getOpenId())){
 			model.addAttribute(AppConstants.ERROR, "callback error");
 			return AppConstants.ERROR; 
 		}
 		
-		oauthUser.setOpenType(loginState.getSnsType());
+		oauthUser.setOpenType(loginState.getOpenType());
 		oauthUser.setFromClientId(loginState.getAppId());
-		//绑定
-		if(!loginState.loginAction()){
-			accountService.addSnsAccountBind(loginState.getLognUserId(), oauthUser);
-			return redirectTo(WebUtils.getBaseUrl(request) + "/ucenter/snsbinding");
-		}
-		
+
 		//根据openid 找用户
-		AccountEntity account = accountService.findAcctountBySnsOpenId(loginState.getSnsType(), oauthUser.getOpenId());
-		if(account == null){
-			//TODO 跳转去绑定页面
-			//创建用户
-			AccountBindParam bindParam = new AccountBindParam();
-			bindParam.setAppId(loginState.getAppId());
-			bindParam.setIpAddr(IpUtils.getIpAddr(request));
-			account = accountService.createUserByOauthInfo(oauthUser,bindParam);
+		UserPrincipalEntity userPrincipal = userService.findUserByOpenId(oauthUser.getOpenType(), oauthUser.getOpenId());
+		if(userPrincipal == null){
+			userPrincipal = userService.createUserIfAbent(oauthUser);
 		}
 		
-		UserSession session = SecurityDelegating.updateSession(account.toAuthUser());
-		if(AppConstants.DEFAULT_CLIENT_ID.equals(loginState.getAppId())){
+		UserSession session = SecurityDelegating.updateSession(userPrincipal.toAuthUser());
+		if(loginState.getAppId() == null){
 			return redirectTo(loginState.getReturnUrl());
 		}else{
 			return loginSuccessRedirect(session,loginState.getAppId(),loginState.getReturnUrl());
@@ -166,9 +155,9 @@ public class OpenOAuthConnectController extends BaseLoginController implements C
 			}else if(WeiboConnector.TYPE.equals(entity.getOpenType())){
 				oauthConnectors.put(WeiboConnector.TYPE, new WeiboConnector(entity.getAppId(), entity.getAppSecret()));
 			}else if(WinxinConnector.TYPE.equals(entity.getOpenType())){
-				if("mp".equals(entity.getAppType())){
-					weixinGzhConnector.addConfig(entity.getBindClientId(), entity.getAppId(), entity.getAppSecret());
-				}else if("miniapp".equals(entity.getAppType())){
+				if(OpenSubType.gzh.name().equals(entity.getSubType())){
+					weixinGzhConnector.addConfig(entity.getBindClientIds(), entity.getAppId(), entity.getAppSecret());
+				}else if(OpenSubType.xcx.name().equals(entity.getSubType())){
 					
 				}else{
 					oauthConnectors.put(WinxinConnector.TYPE, new WinxinConnector(entity.getAppId(), entity.getAppSecret()));

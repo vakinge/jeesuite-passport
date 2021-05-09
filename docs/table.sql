@@ -3,21 +3,12 @@ SET NAMES utf8;
 DROP TABLE IF EXISTS `account`;
 CREATE TABLE `account` (
   `id` varchar(32)  NOT NULL,
-  `username` varchar(32) DEFAULT NULL,
+  `user_id` varchar(32)  NOT NULL, 
+  `name` varchar(32) DEFAULT NULL,
   `email` varchar(32) DEFAULT NULL,
   `mobile` char(11) DEFAULT NULL,
   `password` char(128) DEFAULT NULL,
-  `realname` varchar(32) DEFAULT NULL,
-  `nickname` varchar(32) DEFAULT NULL,
-  `avatar` varchar(200) DEFAULT NULL,
-  `age` int(3)  DEFAULT 0,
-  `gender` ENUM('male', 'female') DEFAULT NULL,
-  `birthday` date DEFAULT NULL,
-  `type` varchar(32) DEFAULT NULL COMMENT '用户类型',
-  `id_type` int(1) DEFAULT 1 COMMENT '身份证件类型',
-  `id_number` varchar(20) DEFAULT NULL COMMENT '身份证件号码',
-  `source_app_id` VARCHAR(32) DEFAULT NULL COMMENT '用户来源（业务系统）',
-  `verify_status` int(3) DEFAULT b'0' COMMENT '验证状态(手机、邮箱、身份证bitmap)',
+  `source_client_id` VARCHAR(32) DEFAULT NULL COMMENT '用户来源（业务系统）',
   `enabled` bit(1) DEFAULT b'1',
   `deleted` bit(1) DEFAULT b'0',
   `reg_ip` varchar(15) DEFAULT NULL COMMENT '注册ip',
@@ -26,18 +17,57 @@ CREATE TABLE `account` (
   `last_login_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-   UNIQUE INDEX `username_uq_index` (`username`),
+   UNIQUE INDEX `name_uq_index` (`name`),
    UNIQUE INDEX `email_uq_index` (`email`),
    UNIQUE INDEX `mobile_uq_index` (`mobile`) 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户账号表';
 
 
+DROP TABLE IF EXISTS `user_principal`;
+CREATE TABLE `user_principal` (
+  `id` varchar(32)  NOT NULL,
+  `email` varchar(32) DEFAULT NULL,
+  `mobile` char(11) DEFAULT NULL,
+  `realname` varchar(32) DEFAULT NULL,
+  `avatar` varchar(200) DEFAULT NULL,
+  `age` int(3)  DEFAULT 0,
+  `gender` ENUM('male', 'female') DEFAULT NULL,
+  `birthday` date DEFAULT NULL,
+  `id_type` int(1) DEFAULT 1 COMMENT '身份证件类型',
+  `id_number` varchar(20) DEFAULT NULL COMMENT '身份证件号码',
+  `employee_id` varchar(64) DEFAULT NULL COMMENT '员工id',
+  `department_id` varchar(100) DEFAULT NULL COMMENT '部门id',
+  `department_name` varchar(100) DEFAULT NULL COMMENT '部门id',
+  `post_name` varchar(100) DEFAULT NULL COMMENT '职位名称',
+  `nickname` varchar(32) DEFAULT NULL,
+  `verify_status` int(3) DEFAULT b'0' COMMENT '验证状态(手机、邮箱、身份证bitmap)',
+  `enabled` bit(1) DEFAULT b'1',
+  `deleted` bit(1) DEFAULT b'0',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` varchar(32) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  `updated_by` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+   UNIQUE INDEX `email_uq_index` (`email`),
+   UNIQUE INDEX `mobile_uq_index` (`mobile`) 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户主体表';
+
+DROP TABLE IF EXISTS `user_system_scopes`;
+CREATE TABLE `user_system_scopes` (
+  `user_id` varchar(32)  NOT NULL ,
+  `system_id` varchar(32) NOT NULL ,
+  `created_at` datetime DEFAULT NULL,
+  `created_by` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`user_id`,`system_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='用户系统范围';
+
+
 DROP TABLE IF EXISTS `open_account_binding`;
 CREATE TABLE `open_account_binding` (
   `id` int(10)  NOT NULL AUTO_INCREMENT,
-  `account_id` varchar(32)  NOT NULL, 
+  `user_id` varchar(32)  NOT NULL, 
   `open_type` ENUM('weixin', 'weibo','qq','taobao','alipay') NOT NULL,
-  `app_type` ENUM('mp','miniapp') DEFAULT NULL,
+  `sub_type` ENUM('gzh','xcx','oauth') DEFAULT 'oauth',
   `union_id` varchar(32) DEFAULT NULL,
   `open_id` varchar(32) DEFAULT NULL,
   `source_client_id` VARCHAR(32) DEFAULT NULL COMMENT '用户来源（业务系统）',
@@ -45,40 +75,24 @@ CREATE TABLE `open_account_binding` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-   UNIQUE INDEX `ao_uq_index` (`account_id`,`open_id`)
+   UNIQUE INDEX `uo_uq_index` (`user_id`,`open_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='第三方账号绑定';
-
-DROP TABLE IF EXISTS `account_scopes`;
-CREATE TABLE `account_scopes` (
-  `id` int(10)  NOT NULL AUTO_INCREMENT,
-  `account_id` varchar(32)  NOT NULL ,
-  `scope_type` varchar(16)  NOT NULL COMMENT '范围类型',
-  `system_id` varchar(32) DEFAULT NULL ,
-  `tenant_id` varchar(32) DEFAULT NULL ,
-  `principal_id` varchar(32) DEFAULT NULL COMMENT '业务系统对应的用户id',
-  `supper_admin` tinyint(1) DEFAULT 0  COMMENT '是否超管',
-  `enabled` tinyint(1) DEFAULT 1,
-  `deleted` tinyint(1) DEFAULT 0,
-  `created_at` datetime DEFAULT NULL,
-  `created_by` varchar(32) DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
-  `updated_by` varchar(32) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='系统账号范围';
-
 
 
 DROP TABLE IF EXISTS `open_oauth2_config`;
 CREATE TABLE `open_oauth2_config` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `open_type` ENUM('weixin', 'weibo','qq','taobao','alipay') NOT NULL,
-  `app_type` ENUM('mp','miniapp') DEFAULT NULL,
+  `sub_type` ENUM('gzh','xcx','oauth') DEFAULT 'oauth',
   `app_id` varchar(32) DEFAULT NULL,
   `app_secret` varchar(64) DEFAULT NULL,
-  `bind_client_id` varchar(50) DEFAULT NULL,
-  `enabled` TINYINT(1) DEFAULT NULL,
+  `bind_client_ids` varchar(200) DEFAULT NULL,
+  `enabled` bit(1) DEFAULT b'1',
+  `deleted` bit(1) DEFAULT b'0',
   `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
+  `created_by` varchar(32) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  `updated_by` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -89,15 +103,15 @@ CREATE TABLE `client_config` (
   `name` varchar(32) DEFAULT NULL,
   `client_id` varchar(32) DEFAULT NULL,
   `client_secret` varchar(64) DEFAULT NULL,
-  `enabled` TINYINT(1) DEFAULT NULL,
-  `is_inner_app` TINYINT(1) DEFAULT 0,
-  `callback_uri` varchar(50) DEFAULT NULL,
+  `is_inner_app` bit(1) DEFAULT b'0',
+  `domains` varchar(200) DEFAULT NULL,
+  `callback_uri` varchar(100) DEFAULT NULL,
+  `enabled` bit(1) DEFAULT b'1',
+  `deleted` bit(1) DEFAULT b'0',
   `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
+  `created_by` varchar(32) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  `updated_by` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `client_id_uq_index` (`client_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-
-

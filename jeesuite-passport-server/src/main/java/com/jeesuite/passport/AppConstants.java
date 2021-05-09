@@ -1,7 +1,6 @@
 package com.jeesuite.passport;
 
 public class AppConstants {
-	public static final String DEFAULT_CLIENT_ID = "passport";
 	public static final String SUPER_ADMIN_NAME = "sa";
     public static final String RESOURCE_SERVER_NAME = "oauth-server";
     public static final String INVALID_CLIENT_ID = "客户端验证失败，如错误的client_id/client_secret。";
@@ -17,7 +16,15 @@ public class AppConstants {
     public static final String TICKET = "ticket";
     
     
-    public static enum SnsType{
-		weixin,weibo,qq
+    public static enum OpenType{
+		weixin,weibo,qq,taobao,alipay
+	}
+    
+    public static enum OpenSubType{
+    	gzh,xcx,oauth
+	}
+    
+    public static enum Gender{
+    	male,female,unknow
 	}
 }

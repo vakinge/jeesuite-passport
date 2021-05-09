@@ -1,5 +1,7 @@
 package com.jeesuite.passport;
 
+import com.jeesuite.common.model.AuthUser;
+
 /**
  * session存储
  * 
@@ -15,4 +17,6 @@ public interface SessionStorageProvider {
 	void set(String sessionId,Object o);
 	
 	void remove(String sessionId);
+	
+	AuthUser get(String sessionId);
 }

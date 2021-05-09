@@ -14,7 +14,7 @@
 			<property name="mappers" value="com.jeesuite.mybatis.core.BaseMapper" />
 		</plugin>
 
-		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
+		<jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
 			connectionURL="jdbc:mysql://localhost:3306/passport" userId="root" password="123456">
 		</jdbcConnection>
 
@@ -26,13 +26,18 @@
 		<javaClientGenerator targetPackage="com.jeesuite.passport.dao.mapper"
 			targetProject="src/main/java" type="XMLMAPPER" />
 
-		<table tableName="open_oauth2_config" domainObjectName="OpenOauth2ConfigEntity">
-			<generatedKey column="id" sqlStatement="Mysql" identity="true" />
+		<table tableName="account" domainObjectName="TempAccountEntity">
 		</table>
-		
-		<table tableName="open_account_binding" domainObjectName="OpenAccountBindingEntity">
-			<generatedKey column="id" sqlStatement="Mysql" identity="true" />
+		<table tableName="open_account_binding" domainObjectName="TempOpenAccountBindingEntity">
+		  <generatedKey column="id" sqlStatement="Mysql" identity="true" />
 		</table>
+		<table tableName="open_oauth2_config" domainObjectName="TempOpenOauth2ConfigEntity">
+		   <generatedKey column="id" sqlStatement="Mysql" identity="true" />
+		</table>
+		<table tableName="client_config" domainObjectName="TempClientConfigEntity">
+		   <generatedKey column="id" sqlStatement="Mysql" identity="true" />
+		</table>
+	
 
 		
 	</context>

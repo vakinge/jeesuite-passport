@@ -14,7 +14,7 @@ import {
   LoginParams,
 } from '/@/api/model/userModel';
 
-import { getCurrentUserInfo, loginApi } from '/@/api/user';
+import { getCurrentUserInfo, loginApi ,logoutApi} from '/@/api/user';
 
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -59,7 +59,6 @@ export const useUserStore = defineStore({
     resetState() {
       this.userInfo = null;
       this.token = '';
-      this.roleList = [];
     },
     /**
      * @description: login
@@ -70,8 +69,10 @@ export const useUserStore = defineStore({
       }
     ): Promise<UserInfoModel | null> {
       try {
+        const ticket = params.ticket;
+        delete params.ticket;
         const { mode, ...loginParams } = params;
-        const data = await loginApi(loginParams, mode);
+        const data = await loginApi(loginParams, mode,ticket);
         const { token ,redirect} = data;
         // save token
         this.setToken(token);
@@ -79,7 +80,7 @@ export const useUserStore = defineStore({
         const userInfo = await getCurrentUserInfo();
         this.setUserInfo(userInfo);
         if(redirect){
-          
+          window.location.href = redirect;
         }else{
           await router.replace(PageEnum.BASE_HOME)
         }
@@ -91,7 +92,9 @@ export const useUserStore = defineStore({
     /**
      * @description: logout
      */
-    logout(goLogin = false) {
+    async logout(goLogin = false) {
+      await logoutApi();
+      this.resetState();
       goLogin && router.push(PageEnum.BASE_LOGIN);
     },
 

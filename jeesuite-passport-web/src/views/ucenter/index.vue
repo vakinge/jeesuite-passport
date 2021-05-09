@@ -5,8 +5,8 @@
         <a-row>
           <a-col :span="16">
             <div :class="`${prefixCls}-left__avatar`">
-              <img :src="headerImg" />
-              <span>Vben</span>
+              <img :src="currentUser.avatar" />
+              <span>{{currentUser.realname ? currentUser.realname : currentUser.nickname}}</span>
               <div>海纳百川，有容乃大</div>
             </div>
           </a-col>
@@ -15,12 +15,18 @@
         <a-row>
           <a-col :span="19">
             <div :class="`${prefixCls}-left__detail`">
-              <template v-for="(detail, index) in details" :key="index">
-                <p>
-                  <Icon :icon="detail.icon" />
-                  {{ detail.title }}
-                </p>
-              </template>
+              <p v-if="currentUser.employeeId">
+                <Icon icon="ic:outline-contacts" />
+                {{ currentUser.employeeId }}
+              </p>
+              <p v-if="currentUser.departmentName">
+                <Icon icon="ant-design:tags-filled" />
+                {{ currentUser.departmentName }}
+              </p>
+              <p v-if="currentUser.postName">
+                <Icon icon="ant-design:paper-clip-outlined" />
+                {{ currentUser.postName }}
+              </p>
             </div>
           </a-col>
         </a-row>
@@ -29,7 +35,7 @@
       <a-col :span="18">
         <div :class="`${prefixCls}-right`">
           <Tabs>
-            <template v-for="item in achieveList" :key="item.key">
+            <template v-for="item in tabItems" :key="item.key">
               <TabPane :tab="item.name">
                 <component :is="item.component" />
               </TabPane>
@@ -49,7 +55,7 @@
     Col
   } from 'ant-design-vue';
   import {
-    defineComponent
+    defineComponent,computed
   } from 'vue';
   import {
     CollapseContainer
@@ -58,14 +64,10 @@
   import Settings from './Settings.vue';
   import Workbench from './Workbench.vue';
   import LoginLog from './LoginLog.vue';
-
-  import headerImg from '/@/assets/images/header.jpg';
+  import { TabItem } from '/@/api/model/baseModel';
   import {
-    tags,
-    teams,
-    details,
-    achieveList
-  } from './data';
+    useUserStore
+  } from '/@/store/modules/user';
 
   export default defineComponent({
     components: {
@@ -81,13 +83,29 @@
       [Col.name]: Col,
     },
     setup() {
+      const userStore = useUserStore();
+      const currentUser = computed(() => userStore.getUserInfo);
+      const tabItems: TabItem[] = [
+        {
+          key: '1',
+          name: '设置',
+          component: 'Settings',
+        },
+        {
+          key: '2',
+          name: '工作台',
+          component: 'Workbench',
+        },
+        {
+          key: '3',
+          name: '登录日志',
+          component: 'LoginLog',
+        },
+      ]
       return {
         prefixCls: 'account-center',
-        headerImg,
-        tags,
-        teams,
-        details,
-        achieveList,
+        currentUser,
+        tabItems,
       };
     },
   });

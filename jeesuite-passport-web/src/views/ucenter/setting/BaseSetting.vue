@@ -7,7 +7,7 @@
       <a-col :span="8">
         <div class="change-avatar">
           <div class="mb-2"></div>
-          <img width="140" :src="headerImg" />
+          <img width="140" :src="currentUser.avatar" />
           <Upload :showUploadList="false">
             <Button class="ml-5"> <Icon icon="feather:upload" />更换头像 </Button>
           </Upload>
@@ -19,16 +19,16 @@
 </template>
 <script lang="ts">
   import { Button, Upload, Row, Col } from 'ant-design-vue';
-  import { defineComponent, onMounted } from 'vue';
+  import { defineComponent, onMounted, computed } from 'vue';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { CollapseContainer } from '/@/components/Container/index';
   import Icon from '/@/components/Icon/index';
 
   import { useMessage } from '/@/hooks/web/useMessage';
 
-  import headerImg from '/@/assets/images/header.jpg';
   import { getCurrentUserDetails } from '/@/api/user';
   import { baseSetschemas } from './data';
+  import { useUserStore } from '/@/store/modules/user';
 
   export default defineComponent({
     components: {
@@ -42,7 +42,8 @@
     },
     setup() {
       const { createMessage } = useMessage();
-
+      const userStore = useUserStore();
+      const currentUser = computed(() => userStore.getUserInfo);
       const [register, { setFieldsValue }] = useForm({
         labelWidth: 120,
         schemas: baseSetschemas,
@@ -55,7 +56,7 @@
       });
 
       return {
-        headerImg,
+        currentUser,
         register,
         handleSubmit: () => {
           createMessage.success('更新成功！');

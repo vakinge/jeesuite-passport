@@ -8,9 +8,9 @@
   >
     <div :class="`${prefixCls}__entry`">
       <div :class="`${prefixCls}__header`">
-        <img :src="headerImg" :class="`${prefixCls}__header-img`" />
+        <img :src="currentUser.avatar" :class="`${prefixCls}__header-img`" />
         <p :class="`${prefixCls}__header-name`">
-          {{ nickname }}
+          {{ currentUser.nickname }}
         </p>
       </div>
 
@@ -33,7 +33,6 @@
 
   import { useUserStore } from '/@/store/modules/user';
   import { useLockStore } from '/@/store/modules/lock';
-  import headerImg from '/@/assets/images/header.jpg';
   export default defineComponent({
     name: 'LockModal',
     components: { BasicModal, BasicForm },
@@ -44,7 +43,7 @@
       const userStore = useUserStore();
       const lockStore = useLockStore();
 
-      const nickname = computed(() => userStore.getUserInfo?.nickname);
+      const currentUser = computed(() => userStore.getUserInfo);
       const [register, { closeModal }] = useModalInner();
 
       const [registerForm, { validateFields, resetFields }] = useForm({
@@ -74,11 +73,10 @@
       return {
         t,
         prefixCls,
-        nickname,
         register,
         registerForm,
         handleLock,
-        headerImg,
+        currentUser
       };
     },
   });

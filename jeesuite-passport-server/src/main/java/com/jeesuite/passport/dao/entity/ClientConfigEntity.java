@@ -24,16 +24,32 @@ public class ClientConfigEntity extends BaseEntity {
     @Column(name = "client_secret")
     private String clientSecret;
 
-    private Boolean enabled;
+    @Column(name = "is_inner_app")
+    private Boolean isInnerApp;
+    
+    private String domains;
 
     @Column(name = "callback_uri")
     private String callbackUri;
 
+    private Boolean enabled;
+
+    private Boolean deleted;
+
     @Column(name = "created_at")
     private Date createdAt;
 
+    @Column(name = "created_by")
+    private String createdBy;
+
+    /**
+     * 更新时间
+     */
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
 
     /**
      * @return id
@@ -92,6 +108,43 @@ public class ClientConfigEntity extends BaseEntity {
     }
 
     /**
+     * @return is_inner_app
+     */
+    public Boolean getIsInnerApp() {
+        return isInnerApp;
+    }
+
+    /**
+     * @param isInnerApp
+     */
+    public void setIsInnerApp(Boolean isInnerApp) {
+        this.isInnerApp = isInnerApp;
+    }
+    
+
+    public String getDomains() {
+		return domains;
+	}
+
+	public void setDomains(String domains) {
+		this.domains = domains;
+	}
+
+	/**
+     * @return callback_uri
+     */
+    public String getCallbackUri() {
+        return callbackUri;
+    }
+
+    /**
+     * @param callbackUri
+     */
+    public void setCallbackUri(String callbackUri) {
+        this.callbackUri = callbackUri;
+    }
+
+    /**
      * @return enabled
      */
     public Boolean getEnabled() {
@@ -105,15 +158,21 @@ public class ClientConfigEntity extends BaseEntity {
         this.enabled = enabled;
     }
 
-    public String getCallbackUri() {
-		return callbackUri;
-	}
+    /**
+     * @return deleted
+     */
+    public Boolean getDeleted() {
+        return deleted;
+    }
 
-	public void setCallbackUri(String callbackUri) {
-		this.callbackUri = callbackUri;
-	}
+    /**
+     * @param deleted
+     */
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
 
-	/**
+    /**
      * @return created_at
      */
     public Date getCreatedAt() {
@@ -128,16 +187,48 @@ public class ClientConfigEntity extends BaseEntity {
     }
 
     /**
-     * @return updated_at
+     * @return created_by
+     */
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    /**
+     * @param createdBy
+     */
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    /**
+     * 获取更新时间
+     *
+     * @return updated_at - 更新时间
      */
     public Date getUpdatedAt() {
         return updatedAt;
     }
 
     /**
-     * @param updatedAt
+     * 设置更新时间
+     *
+     * @param updatedAt 更新时间
      */
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    /**
+     * @return updated_by
+     */
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    /**
+     * @param updatedBy
+     */
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }

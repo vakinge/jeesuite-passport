@@ -36,34 +36,48 @@ export const settingList = [
 // 基础设置 form
 export const baseSetschemas: FormSchema[] = [
   {
+    field: 'realname',
+    component: 'Input',
+    label: '姓名',
+    colProps: { span: 18 },
+  },
+  {
     field: 'email',
     component: 'Input',
     label: '邮箱',
     colProps: { span: 18 },
   },
   {
-    field: 'name',
+    field: 'mobile',
     component: 'Input',
-    label: '昵称',
+    label: '手机',
     colProps: { span: 18 },
   },
   {
-    field: 'introduction',
-    component: 'InputTextArea',
-    label: '个人简介',
+    field: 'birthday',
+    component: 'DatePicker',
+    label: '生日',
     colProps: { span: 18 },
   },
   {
-    field: 'phone',
-    component: 'Input',
-    label: '联系电话',
-    colProps: { span: 18 },
-  },
-  {
-    field: 'address',
-    component: 'Input',
-    label: '所在地区',
-    colProps: { span: 18 },
+    field: 'gender',
+    component: 'CheckboxGroup',
+    label: '性别',
+    colProps: {
+      span: 18,
+    },
+    componentProps: {
+      options: [
+        {
+          label: '男',
+          value: 'male',
+        },
+        {
+          label: '女',
+          value: 'female',
+        },
+      ],
+    },
   },
 ];
 

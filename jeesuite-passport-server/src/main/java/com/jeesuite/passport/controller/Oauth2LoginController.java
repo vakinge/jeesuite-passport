@@ -35,8 +35,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.jeesuite.passport.AppConstants;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.AuthUserDetails;
-import com.jeesuite.passport.service.AccountService;
 import com.jeesuite.passport.service.AppService;
+import com.jeesuite.passport.service.UserService;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.AccessToken;
 
@@ -48,13 +48,13 @@ import com.jeesuite.security.model.AccessToken;
  * @date 2017年3月18日
  */
 @Controller  
-@RequestMapping(value = "/sso/oauth2")
+@RequestMapping(value = "/auth/oauth2")
 public class Oauth2LoginController extends BaseLoginController{ 
 	
 	@Autowired
     private AppService appService;
 	@Autowired
-	protected AccountService userService;
+	private UserService userService;
 
 	@RequestMapping(value = "authorize")
 	public Object authorize( Model model, HttpServletRequest request ) throws URISyntaxException, OAuthSystemException {
@@ -150,10 +150,10 @@ public class Oauth2LoginController extends BaseLoginController{
 
 	            String authCode = oauthRequest.getParam(OAuth.OAUTH_CODE);
 	            // 检查验证类型，此处只检查AUTHORIZATION_CODE类型，其他的还有PASSWORD或REFRESH_TOKEN
-	            String accountId = null;
+	            String userId = null;
 	            if (oauthRequest.getParam(OAuth.OAUTH_GRANT_TYPE).equals(GrantType.AUTHORIZATION_CODE.toString())) {
-	            	accountId = SecurityDelegating.oauth2AuthCode2UserId(authCode);
-	                if (accountId == null) {
+	            	userId = SecurityDelegating.oauth2AuthCode2UserId(authCode);
+	                if (userId == null) {
 	                    OAuthResponse response = OAuthASResponse
 	                            .errorResponse(HttpServletResponse.SC_BAD_REQUEST)
 	                            .setError(OAuthError.TokenResponse.INVALID_GRANT)
@@ -163,7 +163,7 @@ public class Oauth2LoginController extends BaseLoginController{
 	                }
 	            }
 
-	            AuthUserDetails authUser = userService.findAcctountById(accountId).toAuthUser();
+	            AuthUserDetails authUser = userService.findUserById(userId).toAuthUser();
 	            
 	            AccessToken accessToken = SecurityDelegating.createOauth2AccessToken(authUser);
 	            //生成OAuth响应

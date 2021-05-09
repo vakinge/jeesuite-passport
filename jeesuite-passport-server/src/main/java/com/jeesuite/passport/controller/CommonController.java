@@ -22,7 +22,7 @@ import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 
 @Controller  
-@RequestMapping(value = "/api/common")
+@RequestMapping(value = "/auth/common")
 public class CommonController {
 
 	@RequestMapping(value = "/send_code", method = RequestMethod.POST)

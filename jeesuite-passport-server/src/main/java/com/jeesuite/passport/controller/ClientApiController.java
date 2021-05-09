@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.common.model.AuthUser;
 import com.jeesuite.common.util.DigestUtils;
 import com.jeesuite.passport.component.jwt.JwtHelper;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
-import com.jeesuite.passport.dto.JWTAuthnResponse;
+import com.jeesuite.passport.dto.AuthnResponse;
 import com.jeesuite.passport.service.AppService;
+import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.UserSession;
 import com.jeesuite.springweb.model.WrapperResponse;
@@ -33,20 +33,25 @@ import com.jeesuite.springweb.utils.ParameterUtils;
  * @date 2019年6月4日
  */
 @Controller  
-@RequestMapping(value = "/api")
+@RequestMapping(value = "/auth")
 public class ClientApiController {
 
+	private static final int SIGN_EXPIRE_MILLIS = 5 * 60 * 1000;
+	
 	@Autowired
 	private AppService appService;
 	
 	@RequestMapping(value = "configs", method = RequestMethod.GET)
-	public @ResponseBody WrapperResponse<Map<String,Map<String,String>>> getMetadaatas(HttpServletRequest request){
+	public @ResponseBody WrapperResponse<Map<String,String>> getMetadaatas(HttpServletRequest request){
 		preCheck(request);
 		
-		Map<String, Map<String,String>> data = new HashMap<>();
-		data.put("jwtConfig", JwtHelper.getJwtConfigs());
+		Map<String,String> data = new HashMap<>();
+		Map<String, String> jwtConfigs = JwtHelper.getJwtConfigs();
+		jwtConfigs.forEach( (k,v) -> {
+			data.put("jwtconfig." + k, v);
+		} );
 		
- 		return new WrapperResponse<>();
+ 		return new WrapperResponse<>(data);
 	}
 	
 	@RequestMapping(value = "check_access_token", method = RequestMethod.GET)
@@ -56,44 +61,37 @@ public class ClientApiController {
 		return new WrapperResponse<>(validated);
 	}
 	
-	@RequestMapping(value = "ticket_exchange_jwt", method = RequestMethod.GET)
-	public @ResponseBody WrapperResponse<JWTAuthnResponse> ticketExchangeJWT(HttpServletRequest request,String ticket){
+	@RequestMapping(value = "ticket_exchange", method = RequestMethod.GET)
+	public @ResponseBody WrapperResponse<AuthnResponse> ticketExchangeJWT(HttpServletRequest request,String ticket){
 		preCheck(request);
 		
 		String sessionId = SecurityDelegating.getSessionManager().getTemporaryObjectByEncodeKey(ticket);
 		if(sessionId == null)throw new JeesuiteBaseException(500, "ticket不存在或已过期");
 		UserSession session = SecurityDelegating.genUserSession(sessionId);
-		String payload = JwtHelper.createToken(session);
 		
-		JWTAuthnResponse result = new JWTAuthnResponse();
+		AuthnResponse result = new AuthnResponse();
 		result.setAccessToken(session.getSessionId());
 		result.setExpiresIn(session.getExpiresIn());
-		result.setPayload(payload);
+		result.setAuthUser(session.getUserInfo());
 		
 		return new WrapperResponse<>(result);
-	}
-	
-	@RequestMapping(value = "ticket_exchange_user", method = RequestMethod.GET)
-	public @ResponseBody WrapperResponse<AuthUser> ticketExchangeUserInfo(HttpServletRequest request,String ticket){
-		preCheck(request);
-		String sessionId = SecurityDelegating.getSessionManager().getTemporaryObjectByEncodeKey(ticket);
-		if(sessionId == null)throw new JeesuiteBaseException(500, "ticket不存在或已过期");
-		UserSession session = SecurityDelegating.genUserSession(sessionId);
-		return new WrapperResponse<>(session.getUserInfo());
 	}
 	
 	private void preCheck(HttpServletRequest request){
 		Map<String, Object> params = ParameterUtils.queryParamsToMap(request);
 		
-		String appId = Objects.toString(params.get("appId"), null);
-		String timestamp = Objects.toString(params.get("timestamp"), null); 
+		String clientId = Objects.toString(params.get(SecurityConstants.PARAM_CLIENT_ID), null);
+		String timestamp = Objects.toString(params.get(SecurityConstants.PARAM_TIMESTAMP), null); 
 		String sign = Objects.toString(params.get("sign"), null); 
-		if(StringUtils.isAnyBlank(appId,timestamp,sign)){
-			throw new JeesuiteBaseException(500, "Parameter[appId,timestamp,sign] is required");
+		if(StringUtils.isAnyBlank(clientId,timestamp,sign)){
+			throw new JeesuiteBaseException(500, "Parameter[client_id,timestamp,sign] is required");
 		}
-		ClientConfigEntity entity = appService.findByClientId(params.get("appId").toString());
+		ClientConfigEntity entity = appService.findByClientId(clientId);
 		if(entity == null)throw new JeesuiteBaseException(500, "appId不存在");
 		
+		if(System.currentTimeMillis() - Long.parseLong(timestamp) > SIGN_EXPIRE_MILLIS) {
+			throw new JeesuiteBaseException(500, "请求签名过期");
+		}
 		String signBase = ParameterUtils.mapToQueryParams(params) + entity.getClientSecret();
 		String expectSign = DigestUtils.md5(signBase);
 		

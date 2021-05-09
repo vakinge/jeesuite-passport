@@ -27,4 +27,10 @@ public interface OpenAccountBindingEntityMapper extends BaseMapper<OpenAccountBi
 	@Update("UPDATE open_account_binding SET enabled=0 WHERE user_id=#{userId} AND open_type=#{openType} AND app_type IS NULL")
 	@ResultType(Integer.class)
 	Integer unbindSnsAccount(@Param("userId") int userId,@Param("openType") String openType);
+	
+	@Cache
+	@Select("SELECT user_id FROM open_account_binding WHERE open_type = #{openType} and union_id = #{unionId} LIMIT 1")
+	@ResultType(String.class)
+	String findUserIdByUnionId(@Param("openType") String openType,@Param("union_id") String unionId);
+	
 }

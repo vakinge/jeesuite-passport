@@ -89,6 +89,7 @@
   import { LoginStateEnum, useLoginState, useFormRules, useFormValid } from './useLogin';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { onKeyStroke } from '@vueuse/core';
+  import { useRoute } from 'vue-router'
 
   export default defineComponent({
     name: 'LoginForm',
@@ -123,9 +124,11 @@
       const rememberMe = ref(false);
 
       const formData = reactive({
-        account: 'vben',
+        account: 'test',
         password: '123456',
       });
+      
+      const ticket = useRoute().query.ticket;
 
       const { validForm } = useFormValid(formRef);
 
@@ -143,6 +146,7 @@
               loginType: 1,
               account: data.account,
               password: data.password,
+              ticket: ticket
             })
           );
           if (userInfo) {

@@ -13,7 +13,7 @@ public class SnsLoginState implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private String appId;
-	private String snsType;
+	private String openType;
 	@Transient
 	private String state;
 	private String returnUrl;
@@ -21,10 +21,10 @@ public class SnsLoginState implements Serializable{
 	
 	public SnsLoginState() {}
 
-	public SnsLoginState(String appId,String snsType, String returnUrl, String lognUserId) {
+	public SnsLoginState(String appId,String openType, String returnUrl, String lognUserId) {
 		this.state = TokenGenerator.generate();
 		this.appId = appId;
-		this.snsType = snsType;
+		this.openType = openType;
 		this.returnUrl = returnUrl;
 		this.lognUserId = lognUserId;
 	}
@@ -37,12 +37,14 @@ public class SnsLoginState implements Serializable{
 		this.appId = appId;
 	}
 
-	public String getSnsType() {
-		return snsType;
+	
+
+	public String getOpenType() {
+		return openType;
 	}
 
-	public void setSnsType(String snsType) {
-		this.snsType = snsType;
+	public void setOpenType(String openType) {
+		this.openType = openType;
 	}
 
 	public String getState() {

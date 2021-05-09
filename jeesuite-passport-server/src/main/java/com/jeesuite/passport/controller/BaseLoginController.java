@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.jeesuite.common.JeesuiteBaseException;
+import com.jeesuite.passport.component.jwt.JwtHelper;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
-import com.jeesuite.passport.service.AccountService;
+import com.jeesuite.passport.dto.LoginResult;
 import com.jeesuite.passport.service.AppService;
+import com.jeesuite.passport.service.UserService;
 import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.UserSession;
@@ -29,10 +31,13 @@ public abstract class BaseLoginController {
 
 	protected final static Logger logger = LoggerFactory.getLogger("com.jeesuite.passport.controller");
 	@Autowired
-	protected AccountService accountService;
+	protected UserService userService;
 	
 	@Autowired
 	protected AppService appService;
+	
+	@Value("${security.jwt.enabled:false}")
+	protected boolean jwtEnabled;
 	
 	@Value("${front.ucenter.url}")
 	protected String frontUcenterUrl;
@@ -50,26 +55,45 @@ public abstract class BaseLoginController {
 		return appEntity;
 	}
 	
-
-	protected String loginSuccessRedirect(UserSession session,String clientId,String returnUrl){
-        //如接入应用指定了回调地址
-		ClientConfigEntity clientConfig = getClientConfig(clientId);
-		if(StringUtils.isNotBlank(clientConfig.getCallbackUri())) {
-			returnUrl = clientConfig.getCallbackUri();
-		}
-		String orignDomain = WebUtils.getDomain(returnUrl);
-		String cookieDomain = getCookiesDomain(CurrentRuntimeContext.getRequest());
-        //
-		String redirectUrl = returnUrl;
-		if(!StringUtils.contains(orignDomain, cookieDomain)){
+	protected ClientConfigEntity getClientConfig(HttpServletRequest request){
+		String clientId = request.getParameter(SecurityConstants.PARAM_CLIENT_ID);
+		if(StringUtils.isBlank(clientId))return null;
+		ClientConfigEntity appEntity = appService.findByClientId(clientId);
+		if(appEntity == null)throw new JeesuiteBaseException(4001,"App不存在，clientId["+clientId+"]");
+		return appEntity;
+	}
+	
+	protected LoginResult buildLoginResult(UserSession session,String clientId,String returnUrl) {
+		//应用内登录，前端自行跳转
+		if(StringUtils.isBlank(clientId)){
+			returnUrl = null;
+		}else {
+			ClientConfigEntity clientConfig = getClientConfig(clientId);
+			if(StringUtils.isNotBlank(clientConfig.getCallbackUri())) {
+				returnUrl = clientConfig.getCallbackUri();
+			}
 			StringBuilder urlBuiler = new StringBuilder(returnUrl);
 			//获取用户信息的ticket
-			String ticket = SecurityDelegating.getSessionManager().setTemporaryObject(SecurityConstants.AUTHN_SUC_TICKET, session.getSessionId(), 60);
-			urlBuiler.append("?").append(SecurityConstants.AUTHN_SUC_TICKET).append("=").append(ticket);
-			redirectUrl = urlBuiler.toString();
+			String ticket = SecurityDelegating.getSessionManager().setTemporaryObject(SecurityConstants.AUTHN_HANDLE, session.getSessionId(), 60);
+			urlBuiler.append("?").append(SecurityConstants.AUTHN_HANDLE).append("=login");
+			urlBuiler.append("&").append(SecurityConstants.PARAM_TICKET).append("=").append(ticket);
+			if(jwtEnabled) {
+				String payload = JwtHelper.createToken(session);
+				urlBuiler.append("&payload=").append(payload);
+			}
+			returnUrl = urlBuiler.toString();
 		}
+		LoginResult result = new LoginResult();
+		result.setUid(session.getUserId());
+		result.setToken(session.getSessionId());
+		result.setRedirect(returnUrl);
 		
-		return redirectTo(redirectUrl);
+		return result;
+	}
+
+	protected String loginSuccessRedirect(UserSession session,String clientId,String returnUrl){
+		LoginResult result = buildLoginResult(session, clientId, returnUrl);
+		return redirectTo(result.getRedirect());
 	}
 
 	

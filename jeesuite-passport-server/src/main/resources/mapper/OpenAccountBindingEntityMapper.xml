@@ -6,15 +6,15 @@
       WARNING - @mbggenerated
     -->
     <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="account_id" property="accountId" jdbcType="VARCHAR" />
-    <result column="open_type" property="openType" jdbcType="CHAR" />
-    <result column="app_type" property="appType" jdbcType="CHAR" />
-    <result column="union_id" property="unionId" jdbcType="VARCHAR" />
-    <result column="open_id" property="openId" jdbcType="VARCHAR" />
-    <result column="source_client_id" property="sourceClientId" jdbcType="VARCHAR" />
-    <result column="enabled" property="enabled" jdbcType="BIT" />
-    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
-    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="open_type" jdbcType="CHAR" property="openType" />
+    <result column="sub_type" jdbcType="CHAR" property="subType" />
+    <result column="union_id" jdbcType="VARCHAR" property="unionId" />
+    <result column="open_id" jdbcType="VARCHAR" property="openId" />
+    <result column="source_client_id" jdbcType="VARCHAR" property="sourceClientId" />
+    <result column="enabled" jdbcType="BIT" property="enabled" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
   </resultMap>
   
 </mapper>

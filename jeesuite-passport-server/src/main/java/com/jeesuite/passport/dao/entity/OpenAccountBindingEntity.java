@@ -10,14 +10,14 @@ public class OpenAccountBindingEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "account_id")
-    private String accountId;
+    @Column(name = "user_id")
+    private String userId;
 
     @Column(name = "open_type")
     private String openType;
 
-    @Column(name = "app_type")
-    private String appType;
+    @Column(name = "sub_type")
+    private String subType;
 
     @Column(name = "union_id")
     private String unionId;
@@ -53,16 +53,21 @@ public class OpenAccountBindingEntity extends BaseEntity {
         this.id = id;
     }
 
+    /**
+     * @return user_id
+     */
+    public String getUserId() {
+        return userId;
+    }
 
-    public String getAccountId() {
-		return accountId;
-	}
+    /**
+     * @param userId
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-	public void setAccountId(String accountId) {
-		this.accountId = accountId;
-	}
-
-	/**
+    /**
      * @return open_type
      */
     public String getOpenType() {
@@ -76,21 +81,17 @@ public class OpenAccountBindingEntity extends BaseEntity {
         this.openType = openType;
     }
 
-    /**
-     * @return app_type
-     */
-    public String getAppType() {
-        return appType;
-    }
+    
 
-    /**
-     * @param appType
-     */
-    public void setAppType(String appType) {
-        this.appType = appType;
-    }
+    public String getSubType() {
+		return subType;
+	}
 
-    /**
+	public void setSubType(String subType) {
+		this.subType = subType;
+	}
+
+	/**
      * @return union_id
      */
     public String getUnionId() {

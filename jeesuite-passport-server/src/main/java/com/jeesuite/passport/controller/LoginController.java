@@ -1,12 +1,9 @@
 package com.jeesuite.passport.controller;
 
-import java.io.UnsupportedEncodingException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.oltu.oauth2.common.OAuth;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
@@ -17,9 +14,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.AppConstants;
+import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.AuthUserDetails;
 import com.jeesuite.passport.dto.LoginClientInfo;
 import com.jeesuite.passport.dto.LoginParam;
+import com.jeesuite.passport.dto.LoginResult;
 import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.security.SecurityDelegating;
 import com.jeesuite.security.model.UserSession;
@@ -34,99 +33,102 @@ import com.jeesuite.springweb.utils.WebUtils;
  * @date 2016年3月26日
  */
 @Controller  
-@RequestMapping(value = "/sso")
+@RequestMapping(value = "/auth")
 public class LoginController extends BaseLoginController{
 
 	@Value("${front.login.url}?ticket=%s")
 	private String frontLoginUrl;
 	
 	@RequestMapping(value = "login",method = RequestMethod.GET)
-	public String toLoginpage(HttpServletRequest request,HttpServletResponse response){
+	public String toLoginPage(HttpServletRequest request,HttpServletResponse response){
 		
 		String clientId = request.getParameter(SecurityConstants.PARAM_CLIENT_ID);
 		String returnUrl = request.getParameter(SecurityConstants.PARAM_RETURN_URL);
 		if(StringUtils.isBlank(returnUrl))returnUrl = request.getHeader(HttpHeaders.REFERER);
 		if(StringUtils.isBlank(returnUrl)){
-			clientId = AppConstants.DEFAULT_CLIENT_ID;
 			returnUrl = frontUcenterUrl;
 		}
 		
-		String redirectUrl;
+		UserSession session = SecurityDelegating.getCurrentSession();
+		//已登录
+		if(session != null && !session.isAnonymous()) {
+			LoginResult loginResult = buildLoginResult(session, clientId, returnUrl);
+			return redirectTo(loginResult.getRedirect());
+		}
+		
+		String ticket;
 		if(StringUtils.isBlank(clientId)){
-			redirectUrl = appendQueryParam(returnUrl, "error", "client_id is required");
+			ticket = StringUtils.EMPTY;
 		}else {
 			LoginClientInfo ticketInfo = new LoginClientInfo(clientId, returnUrl);
-			String ticket = SecurityDelegating.getSessionManager().setTemporaryObject(AppConstants.TICKET, ticketInfo, 60);
-			redirectUrl = String.format(frontLoginUrl,ticket);
+			ticket = SecurityDelegating.getSessionManager().setTemporaryObject(AppConstants.TICKET, ticketInfo, 60);
 		}
+		String redirectUrl = String.format(frontLoginUrl,ticket);
 		
 		return redirectTo(redirectUrl);
 	}
 	
 	@RequestMapping(value = "login",method = RequestMethod.POST)
-	public @ResponseBody String login(HttpServletRequest request,@RequestBody LoginParam pram){
+	public @ResponseBody WrapperResponse<LoginResult> login(HttpServletRequest request,@RequestBody LoginParam param){
 		String ticket = request.getParameter(SecurityConstants.PARAM_TICKET);
-		String returnUrl = request.getHeader(HttpHeaders.REFERER);
-		String clientId = AppConstants.DEFAULT_CLIENT_ID;
+		String returnUrl = null;
+		String clientId = null;
 		
-		try {
-			if(StringUtils.isNotBlank(ticket)) {			
-				LoginClientInfo ticketInfo = SecurityDelegating.getSessionManager().getTemporaryObjectByEncodeKey(ticket);
-				if(ticketInfo == null) {
-					throw new JeesuiteBaseException(4001, "临时票据过期或不正确");
-				}
-				clientId = ticketInfo.getClientId();
-				returnUrl = ticketInfo.getReturnUrl();
+		if(StringUtils.isNotBlank(ticket)) {			
+			LoginClientInfo ticketInfo = SecurityDelegating.getSessionManager().getTemporaryObjectByEncodeKey(ticket);
+			if(ticketInfo == null) {
+				throw new JeesuiteBaseException(4001, "临时票据过期或不正确");
 			}
-
-			String username = request.getParameter(OAuth.OAUTH_USERNAME);
-			String password = request.getParameter(OAuth.OAUTH_PASSWORD);
-			
-			if (StringUtils.isAnyBlank(username, password)) {
-				throw new JeesuiteBaseException(4001, "用户名或密码不能为空");
-			}
-			
-			UserSession session = SecurityDelegating.doAuthentication(username, password);
-			
-			if(AppConstants.DEFAULT_CLIENT_ID.equals(clientId)){
-				if(StringUtils.isBlank(returnUrl)) {
-					returnUrl = frontUcenterUrl;
-				}
-				return redirectTo(returnUrl);
-			}else{
-				return loginSuccessRedirect(session,clientId,returnUrl);
-			}
-		} catch (Exception e) {
-			String error = "系统繁忙";
-			if(e instanceof JeesuiteBaseException) {
-				error = e.getMessage();
-			}else {
-				logger.error("登录异常",e);
-			}
-			try {
-				error = java.net.URLEncoder.encode(error, "UTF-8");
-			} catch (UnsupportedEncodingException e1) {}
-			String redirectUrl = String.format(frontLoginUrl, ticket,error);
-			return redirectTo(redirectUrl);
+			clientId = ticketInfo.getClientId();
+			returnUrl = ticketInfo.getReturnUrl();
 		}
+
+		String username = param.getAccount();
+		String password = param.getPassword();
+		
+		if (StringUtils.isAnyBlank(username, password)) {
+			throw new JeesuiteBaseException(4001, "用户名或密码不能为空");
+		}
+		
+		UserSession session = SecurityDelegating.doAuthentication(username, password);
+		
+		return new WrapperResponse<>(buildLoginResult(session, clientId, returnUrl));
 	}
 	
 	@RequestMapping(value = "logout",method = {RequestMethod.POST,RequestMethod.GET})
 	public String logout(HttpServletRequest request ,HttpServletResponse response){
-		String redirctUrl = request.getHeader(HttpHeaders.REFERER);
-		String baseUrl = WebUtils.getBaseUrl(request);
-		if(redirctUrl.startsWith(baseUrl)){
-			redirctUrl = baseUrl + "/login";
+		
+		UserSession session = SecurityDelegating.getCurrentSession();
+		if(session == null) {
+			return redirectTo(frontLoginUrl);
 		}
+		
+		String returnUrl = null;
+		ClientConfigEntity clientConfig = getClientConfig(request);
+		if(clientConfig != null) {			
+			returnUrl = request.getParameter(SecurityConstants.PARAM_RETURN_URL);
+			if(StringUtils.isNotBlank(returnUrl)) {
+			   //TODO 验证域名合法性	
+			}
+		}
+		
+		if(StringUtils.isBlank(returnUrl)) {
+			returnUrl = frontLoginUrl;
+		}
+		
+		//TODO 异步发送登出
+		
+		
 		SecurityDelegating.doLogout();
-		return "redirect:" + redirctUrl;
+		
+		return redirectTo(returnUrl);
 	}
 	
 	
 	@RequestMapping(value = "current_user", method = RequestMethod.GET)
 	public @ResponseBody WrapperResponse<AuthUserDetails> getMyInfo(){
 		UserSession session = SecurityDelegating.getCurrentSession();
-		AuthUserDetails account = accountService.findAcctountById(session.getUserId()).toAuthUser();
+		AuthUserDetails account = userService.findUserById(session.getUserId()).toAuthUser();
 		return new WrapperResponse<>(account);
 	}
 	

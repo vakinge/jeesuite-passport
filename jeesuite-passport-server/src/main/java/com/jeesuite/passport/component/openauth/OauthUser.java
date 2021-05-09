@@ -2,6 +2,11 @@ package com.jeesuite.passport.component.openauth;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.jeesuite.passport.AppConstants.OpenSubType;
+import com.jeesuite.passport.AppConstants.OpenType;
+
 public class OauthUser implements Serializable {
 
 	private static final String UNKOWN = "unkown";
@@ -14,7 +19,8 @@ public class OauthUser implements Serializable {
 	private String avatar;
 	private String gender; // male/female/unknow
 	private String unionId;
-	private String openType;
+	private OpenType openType;
+	private OpenSubType openSubType;
 
 	public String getFromClientId() {
 		return fromClientId;
@@ -64,12 +70,22 @@ public class OauthUser implements Serializable {
 		this.unionId = unionId;
 	}
 	
-	public String getOpenType() {
+	public void setOpenType(String openType) {
+		String[] parts = StringUtils.split(openType, ":");
+		this.openType = OpenType.valueOf(parts[0]);
+		if(parts.length == 2) {
+			this.openSubType = OpenSubType.valueOf(parts[1]);
+		}else {
+			this.openSubType = OpenSubType.oauth;
+		}
+	}
+
+	public OpenType getOpenType() {
 		return openType;
 	}
 
-	public void setOpenType(String openType) {
-		this.openType = openType;
+	public OpenSubType getOpenSubType() {
+		return openSubType;
 	}
 
 	public String userInfoToUrlQueryString(){

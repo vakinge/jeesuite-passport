@@ -9,23 +9,35 @@ import {
 import { ErrorMessageMode } from '/@/utils/http/axios/types';
 
 enum Api {
-  Login = '/user/login',
-  CurrentUser = '/user/current',
-  CurrentUserDetails = '/user/details'
+  Login = '/auth/login?ticket=',
+  Logout = '/auth/logout',
+  CurrentUser = '/auth/current_user',
+  CurrentUserDetails = '/auth/user/baseInfo'
 }
 
 /**
  * @description: user login api
  */
-export function loginApi(params: LoginParams, mode: ErrorMessageMode = 'modal') {
+export function loginApi(params: LoginParams, mode: ErrorMessageMode = 'modal',ticket: string = '') {
   return defHttp.post<LoginResultModel>(
     {
-      url: Api.Login,
+      url: Api.Login + ticket,
       params,
     },
     {
       errorMessageMode: mode,
     }
+  );
+}
+
+/**
+ * @description: user logout api
+ */
+export function logoutApi() {
+  return defHttp.post<Any>(
+    {
+      url: Api.Logout
+    },
   );
 }
 

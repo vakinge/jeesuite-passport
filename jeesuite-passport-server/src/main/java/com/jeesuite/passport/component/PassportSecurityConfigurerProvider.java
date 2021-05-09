@@ -16,7 +16,6 @@
 package com.jeesuite.passport.component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -25,9 +24,9 @@ import org.springframework.stereotype.Component;
 
 import com.jeesuite.common.util.ResourceUtils;
 import com.jeesuite.passport.AppConstants;
-import com.jeesuite.passport.dao.entity.AccountEntity;
+import com.jeesuite.passport.dao.entity.UserPrincipalEntity;
 import com.jeesuite.passport.dto.AuthUserDetails;
-import com.jeesuite.passport.service.AccountService;
+import com.jeesuite.passport.service.UserService;
 import com.jeesuite.security.SecurityConfigurerProvider;
 import com.jeesuite.security.exception.UserNotFoundException;
 import com.jeesuite.security.exception.UserPasswordWrongException;
@@ -41,8 +40,8 @@ import com.jeesuite.security.model.UserSession;
 @Component
 public class PassportSecurityConfigurerProvider extends SecurityConfigurerProvider<AuthUserDetails> {
 
-	private @Autowired AccountService accountService;
-
+	private @Autowired UserService userService;
+	
 	@Override
 	public String contextPath() {
 		return ResourceUtils.getProperty("server.servlet.context-path", "");
@@ -52,12 +51,12 @@ public class PassportSecurityConfigurerProvider extends SecurityConfigurerProvid
 
 	@Override
 	public AuthUserDetails validateUser(String name, String password) throws UserNotFoundException, UserPasswordWrongException {
-		AccountEntity account = accountService.findAcctountByLoginName(name);
-		if(account == null)throw new UserNotFoundException();
-		if(!BCrypt.checkpw(password, account.getPassword())){
+		UserPrincipalEntity userPrincipal = userService.findUserByAccount(name);
+		if(userPrincipal == null)throw new UserNotFoundException();
+		if(!BCrypt.checkpw(password, userPrincipal.getAccount().getPassword())){
 			throw new UserPasswordWrongException();
 		}
-		AuthUserDetails details = account.toAuthUser();
+		AuthUserDetails details = userPrincipal.toAuthUser();
 		return details;
 	}
 
@@ -93,7 +92,7 @@ public class PassportSecurityConfigurerProvider extends SecurityConfigurerProvid
 
 	@Override
 	public List<String> anonymousUrlPatterns() {
-		return Arrays.asList("/sso/*","/api/common/*");
+		return ResourceUtils.getList("global.anonymousUris");
 	}
 
 
