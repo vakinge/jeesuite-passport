@@ -3,6 +3,7 @@ package com.jeesuite.passport.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.oltu.oauth2.common.OAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.component.jwt.JwtHelper;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
+import com.jeesuite.passport.dto.AuthUserDetails;
 import com.jeesuite.passport.dto.LoginResult;
 import com.jeesuite.passport.service.AppService;
 import com.jeesuite.passport.service.UserService;
@@ -61,6 +63,17 @@ public abstract class BaseLoginController {
 		ClientConfigEntity appEntity = appService.findByClientId(clientId);
 		if(appEntity == null)throw new JeesuiteBaseException(4001,"App不存在，clientId["+clientId+"]");
 		return appEntity;
+	}
+	
+	protected AuthUserDetails validateUserFromRequestParam( HttpServletRequest request) {
+		String username = StringUtils.trimToNull(request.getParameter(OAuth.OAUTH_USERNAME));
+		String password = StringUtils.trimToNull(request.getParameter(OAuth.OAUTH_PASSWORD));
+		return validateUser(username, password);
+	}
+	
+	protected AuthUserDetails validateUser(String username,String password) {
+		AuthUserDetails authUser = SecurityDelegating.validateUser(username, password);
+		return authUser;
 	}
 	
 	protected LoginResult buildLoginResult(UserSession session,String clientId,String returnUrl) {

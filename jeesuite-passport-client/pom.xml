@@ -17,6 +17,12 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>com.jeesuite</groupId>
+			<artifactId>jeesuite-log</artifactId>
+			<version>${jeesuite.libs.version}</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<scope>provided</scope>

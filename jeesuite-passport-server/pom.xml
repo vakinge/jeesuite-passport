@@ -189,6 +189,12 @@
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml</artifactId>
+			<version>2.6.4</version>
+		</dependency>
 	</dependencies>
 
 
