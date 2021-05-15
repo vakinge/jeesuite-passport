@@ -118,17 +118,25 @@ export const useUserStore = defineStore({
         },
       });
     },
-    checkLoginStatus(){
+    async checkLoginStatus(){
        const token = this.getToken;
-       console.log(' token ===>>> ' +  token);
-       axios.get('/auth/status')
-         .then(function (response) {
-           console.log(response);
-         })
-         .catch(function (error) {
-           console.log(error);
-           this.logout(true);
-         });
+       const response = await axios.get('/auth/status');
+       let data = response.data;
+       if(data.code == 200){
+         const currentToken = data.data.access_token;
+         if(currentToken !== token){
+           console.log("new token:" + currentToken + ",oldToken:" + token);
+            // save token
+            this.setToken(currentToken);
+            // get user info
+            const userInfo = await getCurrentUserInfo();
+            this.setUserInfo(userInfo);
+         }
+         router.push(PageEnum.BASE_HOME);
+       }else if(data.code == 401){
+          this.resetState();
+          router.push(PageEnum.BASE_LOGIN);
+       }
     },
   },
 });

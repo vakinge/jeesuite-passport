@@ -42,8 +42,8 @@ public abstract class BaseLoginController {
 	@Value("${security.jwt.enabled:false}")
 	protected boolean jwtEnabled;
 	
-	@Value("${front.ucenter.url}")
-	protected String frontUcenterUrl;
+	@Value("${front.landing.url}")
+	protected String frontLandingUrl;
 	
 	@Value("${front.errorpage.url}?returnUrl=%s&error=%s")
 	protected String frontErrorPageUrl;

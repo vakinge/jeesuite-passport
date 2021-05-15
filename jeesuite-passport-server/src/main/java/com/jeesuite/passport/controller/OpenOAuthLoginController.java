@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jeesuite.common.JeesuiteBaseException;
-import com.jeesuite.passport.AppConstants;
 import com.jeesuite.passport.AppConstants.OpenSubType;
 import com.jeesuite.passport.component.openauth.OauthConnector;
 import com.jeesuite.passport.component.openauth.OauthUser;
@@ -118,7 +117,7 @@ public class OpenOAuthLoginController extends BaseLoginController implements Com
 		
 		UserSession session = SecurityDelegating.updateSession(userPrincipal.toAuthUser());
 		if(clientInfo.getClientId() == null){
-			return redirectTo(frontUcenterUrl);
+			return redirectTo(frontLandingUrl);
 		}else{
 			return loginSuccessRedirect(session, clientInfo.getClientId() , clientInfo.getReturnUrl());
 		}

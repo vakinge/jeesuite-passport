@@ -42,6 +42,7 @@ export const LandingRoute: AppRouteRecordRaw = {
   component: () => import('/@/views/user/Landing.vue'),
   meta: {
     title: '跳转中..',
+    ignoreAuth: true
   },
 };
 

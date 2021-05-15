@@ -51,16 +51,13 @@ public class LoginController extends BaseLoginController{
 		String clientId = request.getParameter(SecurityConstants.PARAM_CLIENT_ID);
 		String returnUrl = request.getParameter(SecurityConstants.PARAM_RETURN_URL);
 		if(StringUtils.isBlank(returnUrl))returnUrl = request.getHeader(HttpHeaders.REFERER);
-		if(StringUtils.isBlank(returnUrl)){
-			returnUrl = frontUcenterUrl;
-		}
-		
+
 		UserSession session = SecurityDelegating.getCurrentSession();
 		//已登录
 		if(session != null && !session.isAnonymous()) {
 			String redirect = buildLoginResult(session, clientId, returnUrl).getRedirect();
 			if(redirect == null) {
-				redirect = frontUcenterUrl;
+				redirect = frontLandingUrl;
 			}
 			return redirectTo(redirect);
 		}
