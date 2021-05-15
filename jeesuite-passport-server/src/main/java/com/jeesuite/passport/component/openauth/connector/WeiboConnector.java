@@ -64,7 +64,7 @@ public class WeiboConnector extends OauthConnector {
 	}
 	
 	@Override
-	public String snsType() {
+	public String type() {
 		return TYPE;
 	}
 

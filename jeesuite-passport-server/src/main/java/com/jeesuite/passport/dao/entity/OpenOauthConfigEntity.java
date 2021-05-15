@@ -4,8 +4,8 @@ import com.jeesuite.mybatis.core.BaseEntity;
 import java.util.Date;
 import javax.persistence.*;
 
-@Table(name = "open_oauth2_config")
-public class OpenOauth2ConfigEntity extends BaseEntity {
+@Table(name = "open_oauth_config")
+public class OpenOauthConfigEntity extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

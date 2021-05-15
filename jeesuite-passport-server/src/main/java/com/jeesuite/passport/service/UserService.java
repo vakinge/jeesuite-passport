@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jeesuite.common.guid.GUID;
+import com.jeesuite.common.util.TokenGenerator;
 import com.jeesuite.passport.AppConstants.OpenType;
 import com.jeesuite.passport.component.openauth.OauthUser;
 import com.jeesuite.passport.dao.entity.AccountEntity;
@@ -79,6 +81,7 @@ public class UserService {
 		}
 		
 		UserPrincipalEntity entity = new UserPrincipalEntity();
+		entity.setId(String.valueOf(GUID.guid()));
 		entity.setAvatar(oauthUser.getAvatar());
 		entity.setNickname(oauthUser.getNickname());
 		entity.setGender(oauthUser.getGender());

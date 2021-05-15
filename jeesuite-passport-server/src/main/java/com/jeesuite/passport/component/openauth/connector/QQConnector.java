@@ -99,7 +99,7 @@ public class QQConnector extends OauthConnector {
 	}
 	
 	@Override
-	public String snsType() {
+	public String type() {
 		return TYPE;
 	}
 

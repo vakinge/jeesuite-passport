@@ -40,8 +40,6 @@
       <FullScreen v-if="getShowFullScreen" :class="`${prefixCls}-action__item fullscreen-item`" />
 
       <UserDropDown :theme="getHeaderTheme" />
-
-      <SettingDrawer v-if="getShowSetting" :class="`${prefixCls}-action__item`" />
     </div>
   </Header>
 </template>

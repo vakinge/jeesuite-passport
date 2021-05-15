@@ -19,6 +19,7 @@ import { getCurrentUserInfo, loginApi ,logoutApi} from '/@/api/user';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
 import router from '/@/router';
+import axios from 'axios'
 
 interface UserState {
   userInfo: Nullable<UserInfo>;
@@ -93,9 +94,13 @@ export const useUserStore = defineStore({
      * @description: logout
      */
     async logout(goLogin = false) {
-      await logoutApi();
+      const data = await logoutApi();
       this.resetState();
-      goLogin && router.push(PageEnum.BASE_LOGIN);
+      if(data.redirect){
+        window.location.href = data.redirect;
+      }else{
+        goLogin && router.push(PageEnum.BASE_LOGIN);
+      }
     },
 
     /**
@@ -112,6 +117,18 @@ export const useUserStore = defineStore({
           await this.logout(true);
         },
       });
+    },
+    checkLoginStatus(){
+       const token = this.getToken;
+       console.log(' token ===>>> ' +  token);
+       axios.get('/auth/status')
+         .then(function (response) {
+           console.log(response);
+         })
+         .catch(function (error) {
+           console.log(error);
+           this.logout(true);
+         });
     },
   },
 });

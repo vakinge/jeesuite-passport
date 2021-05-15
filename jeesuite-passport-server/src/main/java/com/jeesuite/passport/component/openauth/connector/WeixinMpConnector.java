@@ -17,7 +17,7 @@ public class WeixinMpConnector  {
 	
 	private static Logger logger = LoggerFactory.getLogger(WeixinMpConnector.class);
 
-	public static final String SNS_TYPE = "weixin:gzh";
+	public static final String TYPE = "weixin:gzh";
 	
 	public static final String SNSAPI_BASE = "snsapi_base";
 	
@@ -104,7 +104,7 @@ public class WeixinMpConnector  {
 	}
 	
 	public String snsType() {
-		return SNS_TYPE;
+		return TYPE;
 	}
 
 }

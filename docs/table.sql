@@ -79,8 +79,8 @@ CREATE TABLE `open_account_binding` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COMMENT='第三方账号绑定';
 
 
-DROP TABLE IF EXISTS `open_oauth2_config`;
-CREATE TABLE `open_oauth2_config` (
+DROP TABLE IF EXISTS `open_oauth_config`;
+CREATE TABLE `open_oauth_config` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `open_type` ENUM('weixin', 'weibo','qq','taobao','alipay') NOT NULL,
   `sub_type` ENUM('gzh','xcx','oauth') DEFAULT 'oauth',

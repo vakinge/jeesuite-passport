@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jeesuite.passport.dao.mapper.OpenOauth2ConfigEntityMapper" >
-  <resultMap id="BaseResultMap" type="com.jeesuite.passport.dao.entity.OpenOauth2ConfigEntity" >
+<mapper namespace="com.jeesuite.passport.dao.mapper.OpenOauthConfigEntityMapper" >
+  <resultMap id="BaseResultMap" type="com.jeesuite.passport.dao.entity.OpenOauthConfigEntity" >
     <!--
       WARNING - @mbggenerated
     -->

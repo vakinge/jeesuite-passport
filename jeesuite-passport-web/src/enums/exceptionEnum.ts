@@ -2,6 +2,8 @@
  * @description: Exception related enumeration
  */
 export enum ExceptionEnum {
+  
+  Unauthorized = 401,
   // page not access
   PAGE_NOT_ACCESS = 403,
 

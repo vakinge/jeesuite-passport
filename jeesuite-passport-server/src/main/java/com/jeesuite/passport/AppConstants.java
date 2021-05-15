@@ -17,7 +17,7 @@ public class AppConstants {
     
     
     public static enum OpenType{
-		weixin,weibo,qq,taobao,alipay
+		weixin,weibo,qq,taobao,alipay,osc
 	}
     
     public static enum OpenSubType{

@@ -80,12 +80,12 @@ public class PassportSecurityConfigurerProvider extends SecurityConfigurerProvid
 
 	@Override
 	public String error401Page() {
-		return "/404.html";
+		return "/#/error/401";
 	}
 
 	@Override
 	public String error403Page() {
-		return null;
+		return "/#/error/403";
 	}
 
 

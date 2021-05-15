@@ -61,11 +61,11 @@
     <Divider class="enter-x">{{ t('sys.login.otherSignIn') }}</Divider>
 
     <div class="flex justify-evenly enter-x" :class="`${prefixCls}-sign-in-way`">
-      <GithubFilled />
-      <WechatFilled />
+      <WechatOutlined @click="handleOauthLogin('osc')" />
+      <QqOutlined />
       <AlipayCircleFilled />
-      <GoogleCircleFilled />
-      <TwitterCircleFilled />
+      <TaobaoCircleOutlined />
+      <WeiboCircleOutlined />
     </div>
   </Form>
 </template>
@@ -74,11 +74,11 @@
 
   import { Checkbox, Form, Input, Row, Col, Button, Divider } from 'ant-design-vue';
   import {
-    GithubFilled,
-    WechatFilled,
+    WechatOutlined,
+    QqOutlined,
     AlipayCircleFilled,
-    GoogleCircleFilled,
-    TwitterCircleFilled,
+    TaobaoCircleOutlined,
+    WeiboCircleOutlined,
   } from '@ant-design/icons-vue';
   import LoginFormTitle from './LoginFormTitle.vue';
 
@@ -104,11 +104,11 @@
       Divider,
       LoginFormTitle,
       InputPassword: Input.Password,
-      GithubFilled,
-      WechatFilled,
+      WechatOutlined,
+      QqOutlined,
       AlipayCircleFilled,
-      GoogleCircleFilled,
-      TwitterCircleFilled,
+      TaobaoCircleOutlined,
+      WeiboCircleOutlined,
     },
     setup() {
       const { t } = useI18n();
@@ -160,6 +160,11 @@
           loading.value = false;
         }
       }
+      
+      function handleOauthLogin(type){
+        let url = '/auth/openlogin/'+ type
+        window.location.href = url;
+      }
 
       return {
         t,
@@ -169,6 +174,7 @@
         getFormRules,
         rememberMe,
         handleLogin,
+        handleOauthLogin,
         loading,
         setLoginState,
         LoginStateEnum,

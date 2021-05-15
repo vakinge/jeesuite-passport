@@ -6,7 +6,7 @@ import { mainOutRoutes } from './mainOut';
 import { PageEnum } from '/@/enums/pageEnum';
 import { t } from '/@/hooks/web/useI18n';
 
-const modules = import.meta.globEager('./modules/**/*.ts');
+const modules = import.meta.globEager('./modules/*.ts');
 
 const routeModuleList: AppRouteModule[] = [];
 
@@ -36,5 +36,14 @@ export const LoginRoute: AppRouteRecordRaw = {
   },
 };
 
+export const LandingRoute: AppRouteRecordRaw = {
+  path: '/landing',
+  name: 'Landing',
+  component: () => import('/@/views/user/Landing.vue'),
+  meta: {
+    title: '跳转中..',
+  },
+};
+
 // Basic routing without permission
-export const basicRoutes = [LoginRoute, RootRoute, ...mainOutRoutes, REDIRECT_ROUTE];
+export const basicRoutes = [LoginRoute,LandingRoute , RootRoute, ...mainOutRoutes, REDIRECT_ROUTE];

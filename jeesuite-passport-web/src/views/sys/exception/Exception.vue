@@ -72,6 +72,15 @@
 
       const backLoginI18n = t('sys.exception.backLogin');
       const backHomeI18n = t('sys.exception.backHome');
+      
+      unref(statusMapRef).set(ExceptionEnum.Unauthorized, {
+        title: '401',
+        status: `${ExceptionEnum.Unauthorized}`,
+        subTitle: '401 Unauthorized',
+        btnText: props.full ? backLoginI18n : backHomeI18n,
+        handler: () => (props.full ? go(PageEnum.BASE_LOGIN) : go()),
+        icon: notDataSvg,
+      });
 
       unref(statusMapRef).set(ExceptionEnum.PAGE_NOT_ACCESS, {
         title: '403',

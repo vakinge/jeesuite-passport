@@ -1,5 +1,8 @@
 package com.jeesuite.passport.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.common.JeesuiteBaseException;
+import com.jeesuite.common.json.JsonUtils;
 import com.jeesuite.passport.AppConstants;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.AuthUserDetails;
@@ -21,8 +25,11 @@ import com.jeesuite.passport.dto.LoginParam;
 import com.jeesuite.passport.dto.LoginResult;
 import com.jeesuite.security.SecurityConstants;
 import com.jeesuite.security.SecurityDelegating;
+import com.jeesuite.security.model.AccessToken;
 import com.jeesuite.security.model.UserSession;
+import com.jeesuite.springweb.exception.UnauthorizedException;
 import com.jeesuite.springweb.model.WrapperResponse;
+import com.jeesuite.springweb.utils.WebUtils;
 
 /**
  * 账号密码登录
@@ -51,8 +58,11 @@ public class LoginController extends BaseLoginController{
 		UserSession session = SecurityDelegating.getCurrentSession();
 		//已登录
 		if(session != null && !session.isAnonymous()) {
-			LoginResult loginResult = buildLoginResult(session, clientId, returnUrl);
-			return redirectTo(loginResult.getRedirect());
+			String redirect = buildLoginResult(session, clientId, returnUrl).getRedirect();
+			if(redirect == null) {
+				redirect = frontUcenterUrl;
+			}
+			return redirectTo(redirect);
 		}
 		
 		String ticket;
@@ -97,30 +107,20 @@ public class LoginController extends BaseLoginController{
 	@RequestMapping(value = "logout",method = {RequestMethod.POST,RequestMethod.GET})
 	public String logout(HttpServletRequest request ,HttpServletResponse response){
 		
-		UserSession session = SecurityDelegating.getCurrentSession();
-		if(session == null) {
-			return redirectTo(frontLoginUrl);
-		}
-		
-		String returnUrl = null;
-		ClientConfigEntity clientConfig = getClientConfig(request);
-		if(clientConfig != null) {			
-			returnUrl = request.getParameter(SecurityConstants.PARAM_RETURN_URL);
-			if(StringUtils.isNotBlank(returnUrl)) {
-			   //TODO 验证域名合法性	
-			}
-		}
-		
-		if(StringUtils.isBlank(returnUrl)) {
-			returnUrl = frontLoginUrl;
-		}
-		
-		//TODO 异步发送登出
-		
+		ClientConfigEntity clientConfig = validateAndGetClientConfig(request);
 		
 		SecurityDelegating.doLogout();
+		//TODO 异步发送登出
 		
-		return redirectTo(returnUrl);
+		if(clientConfig == null) {
+			Map<String, String> data = new HashMap<>(1);
+			data.put("redirect", String.format(frontLoginUrl, StringUtils.EMPTY));
+			WebUtils.responseOutJson(response, JsonUtils.toJson(new WrapperResponse<>(data)));
+			return null;
+		}else {
+			String returnUrl = request.getParameter(SecurityConstants.PARAM_RETURN_URL);	
+			return redirectTo(returnUrl);
+		}
 	}
 	
 	
@@ -132,13 +132,13 @@ public class LoginController extends BaseLoginController{
 	}
 	
 	@RequestMapping(value = "status",method = RequestMethod.GET)
-	public @ResponseBody WrapperResponse<String> status(){
+	public @ResponseBody WrapperResponse<AccessToken> getLonginStatus(){
 		UserSession session = SecurityDelegating.getCurrentSession();
 		//未登录
 		if(session == null || session.isAnonymous()){
-			return new WrapperResponse<>(401, "Unauthorized");
+			throw new UnauthorizedException();
 		}else{
-			return new WrapperResponse<>();
+			return new WrapperResponse<>(session.asAccessToken());
 		}
 	}
 

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.passport.component.jwt.JwtHelper;
@@ -51,18 +52,29 @@ public abstract class BaseLoginController {
 	 * 验证来源域名合法性
 	 * @param domain
 	 */
-	protected ClientConfigEntity getClientConfig(String clientId){
+	protected ClientConfigEntity validateAndGetClientConfig(String clientId,String clientUrl){
+		if(StringUtils.isBlank(clientId))return null;
 		ClientConfigEntity appEntity = appService.findByClientId(clientId);
-		if(appEntity == null)throw new JeesuiteBaseException(4001,"App不存在，clientId["+clientId+"]");
+		if(appEntity == null) {
+			throw new JeesuiteBaseException(4001,"App不存在，clientId["+clientId+"]");
+		}
+		
+		if(appEntity.getDomains() != null && StringUtils.isNotBlank(clientUrl)) {
+			String domain = WebUtils.getDomain(clientUrl);
+			if(!appEntity.getDomains().contains(domain)) {
+				throw new JeesuiteBaseException(4003,"域名不合法");
+			}
+		}
 		return appEntity;
 	}
 	
-	protected ClientConfigEntity getClientConfig(HttpServletRequest request){
+	protected ClientConfigEntity validateAndGetClientConfig(HttpServletRequest request){
 		String clientId = request.getParameter(SecurityConstants.PARAM_CLIENT_ID);
-		if(StringUtils.isBlank(clientId))return null;
-		ClientConfigEntity appEntity = appService.findByClientId(clientId);
-		if(appEntity == null)throw new JeesuiteBaseException(4001,"App不存在，clientId["+clientId+"]");
-		return appEntity;
+		String clientUrl = request.getHeader(HttpHeaders.REFERER);
+		if(StringUtils.isBlank(clientUrl)) {				
+			clientUrl = request.getParameter(SecurityConstants.PARAM_RETURN_URL);
+		}
+		return validateAndGetClientConfig(clientId, clientUrl);
 	}
 	
 	protected AuthUserDetails validateUserFromRequestParam( HttpServletRequest request) {
@@ -81,7 +93,7 @@ public abstract class BaseLoginController {
 		if(StringUtils.isBlank(clientId)){
 			returnUrl = null;
 		}else {
-			ClientConfigEntity clientConfig = getClientConfig(clientId);
+			ClientConfigEntity clientConfig = validateAndGetClientConfig(clientId,returnUrl);
 			if(StringUtils.isNotBlank(clientConfig.getCallbackUri())) {
 				returnUrl = clientConfig.getCallbackUri();
 			}
@@ -115,6 +127,10 @@ public abstract class BaseLoginController {
 			url = WebUtils.getBaseUrl(CurrentRuntimeContext.getRequest(), true) + url;
 		}
 		return "redirect:" + url;
+	}
+	
+	protected String redirectError(String errorMessage) {
+		return redirectTo(frontErrorPageUrl);
 	}
 	
 	protected String appendQueryParam(String url,String name,String value) {

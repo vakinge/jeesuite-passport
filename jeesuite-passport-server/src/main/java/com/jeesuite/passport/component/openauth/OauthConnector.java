@@ -68,7 +68,7 @@ public abstract class OauthConnector {
 
 	protected abstract OauthUser getOauthUser(String code);
 
-	public abstract String snsType();
+	public abstract String type();
 	
 	public OauthUser getUser(String code) {
 		return getOauthUser(code);
