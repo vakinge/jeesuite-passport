@@ -17,8 +17,8 @@ import org.springframework.http.HttpHeaders;
 import com.jeesuite.common.http.HttpMethod;
 import com.jeesuite.common.util.PathMatcher;
 import com.jeesuite.common.util.ResourceUtils;
-import com.jeesuite.log.Log;
-import com.jeesuite.log.LogFactory;
+import com.jeesuite.logging.LogFactory;
+import com.jeesuite.logging.Logger;
 import com.jeesuite.passport.ClientConstants;
 import com.jeesuite.passport.PassportConfigHolder;
 import com.jeesuite.passport.SessionUtils;
@@ -36,7 +36,7 @@ import com.jeesuite.springweb.utils.WebUtils;
  */
 public class SSOGlobalFilter implements Filter {
 	
-	private static Log log = LogFactory.getLog("com.jeesuite.passport");
+	private static Logger log = LogFactory.getLog("com.jeesuite.passport");
 
 	private static String apiUriSuffix = ResourceUtils.getProperty("api.uri.suffix");
 	private static final String DOT = ".";
@@ -56,7 +56,7 @@ public class SSOGlobalFilter implements Filter {
 			chain.doFilter(req, res);
 			return;
 		}
-		
+
 		if(request.getMethod().equals(HttpMethod.OPTIONS.name())) {
 			chain.doFilter(req, res);
 			return;
@@ -88,7 +88,7 @@ public class SSOGlobalFilter implements Filter {
 		String handleName = request.getParameter(ClientConstants.AUTHN_HANDLE);
 		if(StringUtils.isNotBlank(handleName)) {
 			if(log.isDebugEnabled()) {
-				
+				log.debug("SSO_AUTHN_HANDLE:{}", handleName);
 			}
 			if(handleName.equals(ClientConstants.LOGIN_HANDLE)) {
 				SessionUtils.createSession(request, response);
