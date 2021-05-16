@@ -20,8 +20,9 @@ Jeesuite-passport是面向企业级单点登录、统一认证的一站式解决
 * [sonatype](https://oss.sonatype.org/content/repositories/releases/com/jeesuite/) 
 * [http://mvnrepository.com/search?q=jeesuite](http://mvnrepository.com/search?q=jeesuite)
 
-## 截图
-
+## 截图 (前端使用UI框架vue-vben-admin)
+<img src="https://jeesuite.oss-cn-guangzhou.aliyuncs.com/passport-login.png" width="800" height="600" />
+<img src="https://jeesuite.oss-cn-guangzhou.aliyuncs.com/passport-ucenter.png" width="800" height="600" />
 
 ## 微信交流群(如果群二维码过期，请先加作者微信[图2])
 <img src="https://jeesuite.oss-cn-guangzhou.aliyuncs.com/weixin_group_qrcode.jpg" width="180" height="180" />
