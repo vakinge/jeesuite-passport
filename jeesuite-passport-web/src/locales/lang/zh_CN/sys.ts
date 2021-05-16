@@ -65,7 +65,7 @@ export default {
     forgetFormTitle: '重置密码',
 
     signInTitle: '企业级一站式统一登录平台',
-    signInDesc: '支持微信、企业微信及多种社交账号、Oauth2.0，JWT多种集成模式',
+    signInDesc: '支持微信、企业微信、主流开放平台OAuth、Oauth2.0，JWT、SAML2.0多种集成模式',
     policy: '我同意xxx隐私政策',
     scanSign: `扫码后点击"确认"，即可完成登录`,
 

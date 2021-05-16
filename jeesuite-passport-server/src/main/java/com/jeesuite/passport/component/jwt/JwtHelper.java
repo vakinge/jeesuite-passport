@@ -22,7 +22,7 @@ public class JwtHelper {
 
     public static final String TOKEN_HEADER = "Authorization";
 
-    private static final String SECRET = ResourceUtils.getProperty("auth.jwt.secret");
+    private static final String SECRET = ResourceUtils.getProperty("security.jwt.secret");
     private static final String ISS = "jeesuite-passport";
     private static SignatureAlgorithm signatureAlgorithm;
     private static Map<String, String> jwtConfigs = new HashMap<>(2);

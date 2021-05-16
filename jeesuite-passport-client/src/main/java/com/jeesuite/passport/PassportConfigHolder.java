@@ -116,6 +116,10 @@ public class PassportConfigHolder {
 		return sessionStorageProvider;
 	}
 	
+	public static void setSessionStorageProvider(SessionStorageProvider sessionStorageProvider) {
+		PassportConfigHolder.sessionStorageProvider = sessionStorageProvider;
+	}
+
 	public static boolean isJwtEnabled() {
 		return jwtEnabled;
 	}

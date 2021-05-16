@@ -92,7 +92,7 @@ public class PassportSecurityConfigurerProvider extends SecurityConfigurerProvid
 
 	@Override
 	public List<String> anonymousUrlPatterns() {
-		return ResourceUtils.getList("global.anonymousUris");
+		return ResourceUtils.getList("security.anonymousUris");
 	}
 
 

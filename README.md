@@ -1,32 +1,28 @@
-## 欢迎加交流群→ 230192763 （不限于讨论该框架热爱技术就行）
+## 介绍
+Jeesuite-passport是面向企业级单点登录、统一认证的一站式解决方案。支持微信、企业微信、主流开放平台OAuth、Oauth2.0，JWT、SAML2.0多种集成模式。
 
-#### 统一用户认证中心(Unified authentication platform)
-提供统一用户管理，统一认证授权，第三方接入、对方开放接入等基础能力。
-#### 实现功能
-   1. 基础用户注册、认证授权、找回密码、用户中心
-   2. 第三方开放平台(微信、QQ、微博)接入
-   3. 微信公众号登录授权接入(支持多公众号)
-   4. 微信小程序登录授权接入
-   5. 跨域SSO支持
-   6. 分布式session支持
-   7. JWT授权模式支持
-   8. oauth2.0登录协议支持
-   9. springMVC,jersey,spring cloud等零成本接入SDK
- 
-#### 文档
- - [部署文档](http://www.jeesuite.com/docs/quickstart/passport.html) 
- - [使用文档](http://www.jeesuite.com/docs/integration/passport.html) 
+## 主要功能清单
+   1. SSO单点登录、无域名限制
+   1. 除了账号密码外还支持微信、企业微信、主流开放平台OAuth、Oauth2.0等多种登录方式
+   2. 支持多个微信公众号及微信小程序模式
+   3. 支持SDK,JWT、SAML2.0多种集成模式
+   4. 支持单机与集群部署模式
 
-#### 关联项目
- - 基础库
-  - [http://git.oschina.net/vakinge/jeesuite-libs](http://git.oschina.net/vakinge/jeesuite-libs)
-  - [https://github.com/vakinge/jeesuite-libs](https://github.com/vakinge/jeesuite-libs)
- - 配置中心
-  - [http://git.oschina.net/vakinge/jeesuite-config](http://git.oschina.net/vakinge/jeesuite-config)
-  - [https://github.com/vakinge/jeesuite-config](https://github.com/vakinge/jeesuite-config)
+## 特点
+ - 轻量级：不依赖Shiro、Spring Secrity以及任何第三方认证框架
+ - 代码简单：二开成本低，可定制性高
+ - 前后端分离 （前端基于`vue-vben-admin`）
 
-#### 页面截图
+## 部署及集成
+* [在线文档](http://docs.jeesuite.com/docments/auth-center.html) 
+
+## 版本
+* [sonatype](https://oss.sonatype.org/content/repositories/releases/com/jeesuite/) 
+* [http://mvnrepository.com/search?q=jeesuite](http://mvnrepository.com/search?q=jeesuite)
+
+## 截图
 
 
-
-
+## 微信交流群(如果群二维码过期，请先加作者微信[图2])
+<img src="https://jeesuite.oss-cn-guangzhou.aliyuncs.com/weixin_group_qrcode.jpg" width="180" height="180" />
+<img src="https://jeesuite.oss-cn-guangzhou.aliyuncs.com/weixin_qrcode.jpeg" width="180" height="180" />

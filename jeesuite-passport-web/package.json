@@ -1,10 +1,10 @@
 {
-  "name": "vben-admin",
-  "version": "2.3.0",
+  "name": "jeesuite-passport",
+  "version": "1.0.0",
   "author": {
-    "name": "vben",
-    "email": "anncwb@126.com",
-    "url": "https://github.com/anncwb"
+    "name": "vakinge",
+    "email": "",
+    "url": "https://github.com/vakinge/jeesuite-passport"
   },
   "scripts": {
     "bootstrap": "yarn install",
@@ -13,6 +13,7 @@
     "mock": "cross-env  --max_old_space_size=4096  vite --mode mock",
     "build": "vite build && esno ./build/script/postBuild.ts",
     "build:no-cache": "yarn clean:cache && npm run build",
+    "build:prod": "yarn clean:cache && npm run build --mode production",
     "report": "cross-env REPORT=true npm run build",
     "type:check": "vue-tsc --noEmit --skipLibCheck",
     "preview": "npm run build && vite preview",

@@ -19,4 +19,5 @@ yarn serve
 
 ```bash
 yarn build
+yarn build:prod
 ```
