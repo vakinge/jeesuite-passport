@@ -39,11 +39,11 @@ public class PassportApplicationStarter {
     }
 
     @Bean
-	public FilterRegistrationBean<SecurityDelegatingFilter> someFilterRegistration() {
+	public FilterRegistrationBean<SecurityDelegatingFilter> securityFilterRegistration() {
 	    FilterRegistrationBean<SecurityDelegatingFilter> registration = new FilterRegistrationBean<>();
 	    registration.setFilter(new SecurityDelegatingFilter());
 	    registration.addUrlPatterns("/*");
-	    registration.setName("authFilter");
+	    registration.setName("securityFilter");
 	    registration.setOrder(0);
 	    return registration;
 	} 

@@ -61,11 +61,11 @@
     <Divider class="enter-x">{{ t('sys.login.otherSignIn') }}</Divider>
 
     <div class="flex justify-evenly enter-x" :class="`${prefixCls}-sign-in-way`">
-      <WechatOutlined @click="handleOauthLogin('osc')" />
-      <QqOutlined />
-      <AlipayCircleFilled />
-      <TaobaoCircleOutlined />
-      <WeiboCircleOutlined />
+      <WechatOutlined @click="handleOauthLogin('wechat')" />
+      <QqOutlined @click="handleOauthLogin('qq')" />
+      <AlipayCircleFilled @click="handleOauthLogin('alipay')" />
+      <TaobaoCircleOutlined @click="handleOauthLogin('taobao')" />
+      <WeiboCircleOutlined @click="handleOauthLogin('weibo')" />
     </div>
   </Form>
 </template>

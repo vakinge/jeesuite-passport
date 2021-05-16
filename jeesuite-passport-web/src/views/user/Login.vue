@@ -55,6 +55,7 @@
   import { useI18n } from '/@/hooks/web/useI18n';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useLocaleStore } from '/@/store/modules/locale';
+  import { useUserStore } from '/@/store/modules/user';
 
   export default defineComponent({
     name: 'Login',
@@ -68,6 +69,8 @@
       AppDarkModeToggle,
     },
     setup() {
+      const userStore = useUserStore();
+      userStore.checkLoginStatus();
       const globSetting = useGlobSetting();
       const { prefixCls } = useDesign('login');
       const { t } = useI18n();

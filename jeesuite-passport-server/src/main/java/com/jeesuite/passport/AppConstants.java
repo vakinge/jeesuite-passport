@@ -13,11 +13,8 @@ public class AppConstants {
     
     public static final String CAPTCHA = "captcha";
     
-    public static final String TICKET = "ticket";
-    
-    
     public static enum OpenType{
-		weixin,weibo,qq,taobao,alipay,osc
+    	wechat,weibo,qq,taobao,alipay,osc
 	}
     
     public static enum OpenSubType{

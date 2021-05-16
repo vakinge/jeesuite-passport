@@ -61,7 +61,7 @@ export const baseSetschemas: FormSchema[] = [
   },
   {
     field: 'gender',
-    component: 'CheckboxGroup',
+    component: 'RadioGroup',
     label: '性别',
     colProps: {
       span: 18,

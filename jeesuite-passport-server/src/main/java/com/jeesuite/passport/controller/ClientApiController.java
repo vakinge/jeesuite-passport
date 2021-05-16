@@ -65,7 +65,7 @@ public class ClientApiController {
 	public @ResponseBody WrapperResponse<AuthnResponse> ticketExchangeJWT(HttpServletRequest request,String ticket){
 		preCheck(request);
 		
-		String sessionId = SecurityDelegating.getSessionManager().getTemporaryObjectByEncodeKey(ticket);
+		String sessionId = SecurityDelegating.getSessionAttributeByKey(ticket);
 		if(sessionId == null)throw new JeesuiteBaseException(500, "ticket不存在或已过期");
 		UserSession session = SecurityDelegating.genUserSession(sessionId);
 		

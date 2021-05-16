@@ -156,7 +156,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
         // baseURL: globSetting.apiUrl,
         // 接口可能会有通用的地址部分，可以统一抽取出来
         prefixUrl: prefix,
-        headers: { 'Content-Type': ContentTypeEnum.JSON },
+        headers: { 'Content-Type': ContentTypeEnum.JSON, 'X-Requested-With': 'XMLHttpRequest' },
         // 如果是form-data格式
         // headers: { 'Content-Type': ContentTypeEnum.FORM_URLENCODED },
         // 数据处理方式

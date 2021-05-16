@@ -64,11 +64,19 @@ public class OpenOAuthLoginController extends BaseLoginController implements Com
 			connector = oauthConnectors.get(type);
 			if(connector == null)throw new JeesuiteBaseException(1001,"未找到登录类型["+type+"]配置");
 		}
+		//
+		if(StringUtils.isBlank(clientId)) {
+			LoginClientInfo clientInfo = SecurityDelegating.getSessionAttribute(SecurityConstants.PARAM_TICKET);
+			if(clientInfo != null) {
+				clientId = clientInfo.getClientId();
+				returnUrl = clientInfo.getReturnUrl();
+			}
+		}
 		
 		validateAndGetClientConfig(clientId,returnUrl);
 		//
 		LoginClientInfo clientInfo = new LoginClientInfo(clientId, type, returnUrl);
-		String state = SecurityDelegating.getSessionManager().setTemporaryObject(clientId, clientInfo, 60);
+		String state = SecurityDelegating.setSessionAttribute(clientId, clientInfo, 60);
 		
 		String callBackUri = request.getRequestURL().toString().split("/" + type)[0] + "/callback";
 		String redirectUrl;
@@ -91,7 +99,7 @@ public class OpenOAuthLoginController extends BaseLoginController implements Com
 		if(StringUtils.isBlank(state)){
 			return redirectError("Parameter[state] is required");
 		}
-		LoginClientInfo clientInfo = SecurityDelegating.getSessionManager().getTemporaryObjectByEncodeKey(state);
+		LoginClientInfo clientInfo = SecurityDelegating.getSessionAttributeByKey(state);
 		if(clientInfo == null){
 			return redirectError("Request is expired");
 		}

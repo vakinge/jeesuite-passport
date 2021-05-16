@@ -99,7 +99,8 @@ public abstract class BaseLoginController {
 			}
 			StringBuilder urlBuiler = new StringBuilder(returnUrl);
 			//获取用户信息的ticket
-			String ticket = SecurityDelegating.getSessionManager().setTemporaryObject(SecurityConstants.AUTHN_HANDLE, session.getSessionId(), 60);
+			
+			String ticket = SecurityDelegating.setSessionAttribute(SecurityConstants.AUTHN_HANDLE, session.getSessionId(), 60);
 			urlBuiler.append("?").append(SecurityConstants.AUTHN_HANDLE).append("=login");
 			urlBuiler.append("&").append(SecurityConstants.PARAM_TICKET).append("=").append(ticket);
 			if(jwtEnabled) {

@@ -26,4 +26,7 @@ public class ClientConstants {
 	
 	public static final String ACCESSTOKEN = "access_token";
 	
+	public static final String SSO_LOGIN_URI = "/sso/login";
+	public static final String SSO_LOGOUT_URI = "/sso/logout";
+	
 }

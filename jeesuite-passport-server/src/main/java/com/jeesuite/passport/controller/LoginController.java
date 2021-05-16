@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jeesuite.common.JeesuiteBaseException;
 import com.jeesuite.common.json.JsonUtils;
-import com.jeesuite.passport.AppConstants;
 import com.jeesuite.passport.dao.entity.ClientConfigEntity;
 import com.jeesuite.passport.dto.AuthUserDetails;
 import com.jeesuite.passport.dto.LoginClientInfo;
@@ -67,7 +66,7 @@ public class LoginController extends BaseLoginController{
 			ticket = StringUtils.EMPTY;
 		}else {
 			LoginClientInfo ticketInfo = new LoginClientInfo(clientId, returnUrl);
-			ticket = SecurityDelegating.getSessionManager().setTemporaryObject(AppConstants.TICKET, ticketInfo, 60);
+			ticket = SecurityDelegating.setSessionAttribute(SecurityConstants.PARAM_TICKET, ticketInfo, 60);
 		}
 		String redirectUrl = String.format(frontLoginUrl,ticket);
 		
@@ -81,7 +80,7 @@ public class LoginController extends BaseLoginController{
 		String clientId = null;
 		
 		if(StringUtils.isNotBlank(ticket)) {			
-			LoginClientInfo ticketInfo = SecurityDelegating.getSessionManager().getTemporaryObjectByEncodeKey(ticket);
+			LoginClientInfo ticketInfo = SecurityDelegating.getSessionAttributeByKey(ticket);
 			if(ticketInfo == null) {
 				throw new JeesuiteBaseException(4001, "临时票据过期或不正确");
 			}

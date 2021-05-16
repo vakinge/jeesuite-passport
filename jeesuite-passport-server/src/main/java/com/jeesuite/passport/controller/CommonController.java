@@ -61,7 +61,7 @@ public class CommonController {
         // 设置类型，纯数字、纯字母、字母数字混合
         specCaptcha.setCharType(Captcha.TYPE_ONLY_NUMBER);
 
-        SecurityDelegating.getSessionManager().setTemporaryObject(AppConstants.CAPTCHA, specCaptcha.text(), 60);
+        SecurityDelegating.setSessionAttribute(AppConstants.CAPTCHA, specCaptcha.text(), 60);
         // 输出图片流
         specCaptcha.out(response.getOutputStream());
     }

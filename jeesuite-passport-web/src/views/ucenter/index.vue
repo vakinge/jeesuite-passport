@@ -70,6 +70,7 @@
   } from '/@/store/modules/user';
 
   export default defineComponent({
+    name: 'Ucenter',
     components: {
       CollapseContainer,
       Icon,

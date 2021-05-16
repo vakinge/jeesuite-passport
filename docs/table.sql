@@ -66,7 +66,7 @@ DROP TABLE IF EXISTS `open_account_binding`;
 CREATE TABLE `open_account_binding` (
   `id` int(10)  NOT NULL AUTO_INCREMENT,
   `user_id` varchar(32)  NOT NULL, 
-  `open_type` ENUM('weixin', 'weibo','qq','taobao','alipay') NOT NULL,
+  `open_type` ENUM('wechat', 'weibo','qq','taobao','alipay') NOT NULL,
   `sub_type` ENUM('gzh','xcx','oauth') DEFAULT 'oauth',
   `union_id` varchar(32) DEFAULT NULL,
   `open_id` varchar(32) DEFAULT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE `open_account_binding` (
 DROP TABLE IF EXISTS `open_oauth_config`;
 CREATE TABLE `open_oauth_config` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
-  `open_type` ENUM('weixin', 'weibo','qq','taobao','alipay') NOT NULL,
+  `open_type` ENUM('wechat', 'weibo','qq','taobao','alipay') NOT NULL,
   `sub_type` ENUM('gzh','xcx','oauth') DEFAULT 'oauth',
   `app_id` varchar(32) DEFAULT NULL,
   `app_secret` varchar(64) DEFAULT NULL,

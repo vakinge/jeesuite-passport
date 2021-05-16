@@ -6,7 +6,7 @@ import com.jeesuite.passport.component.openauth.OauthUser;
 
 public class WinxinConnector extends OauthConnector {
 
-	public static final String TYPE = "weixin";
+	public static final String TYPE = "wechat";
 	
 	public WinxinConnector( String appkey, String appSecret) {
 		super(appkey, appSecret);

@@ -71,11 +71,11 @@ public class SSOGlobalFilter implements Filter {
 		if(returnUrl == null) {
 			returnUrl = WebUtils.getBaseUrl(request) + PassportConfigHolder.defaultLoginSuccessRedirctUri();
 		}
-		if("/sso/login".equals(request.getRequestURI())) {
+		if(request.getRequestURI().endsWith(ClientConstants.SSO_LOGIN_URI)) {
 			String loginUrl = PassportConfigHolder.getLoginUrl(returnUrl);
 			response.sendRedirect(loginUrl);
 			return;
-		}else if("/sso/logout".equals(request.getRequestURI())) {
+		}else if(request.getRequestURI().endsWith(ClientConstants.SSO_LOGOUT_URI)) {
 			SessionUtils.destroySession(request, response);
 			String loginUrl = PassportConfigHolder.getLogoutUrl(returnUrl);
 			response.sendRedirect(loginUrl);
