@@ -40,6 +40,10 @@
 
 
 	<properties>
+	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
 		<spring-cloud.version>Hoxton.SR8</spring-cloud.version>
 		<spring-boot.version>2.3.4.RELEASE</spring-boot.version>
@@ -68,11 +72,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
-						<configuration>
-							<source>${compiler.jdk.version}</source>
-							<target>${compiler.jdk.version}</target>
-							<encoding>${output.encoding}</encoding>
-						</configuration>
 					</plugin>
 
 					<plugin>
@@ -124,6 +123,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
 			</plugin>
 
 			<plugin>
