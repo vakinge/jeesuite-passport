@@ -12,7 +12,7 @@ enum Api {
   Login = '/auth/login?ticket=',
   Logout = '/auth/logout',
   CurrentUser = '/auth/current_user',
-  CurrentUserDetails = '/auth/user/baseInfo'
+  CurrentUserDetails = '/api/user/baseInfo'
 }
 
 /**

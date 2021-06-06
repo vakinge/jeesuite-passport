@@ -14,7 +14,7 @@ import com.jeesuite.security.model.UserSession;
 import com.jeesuite.springweb.model.WrapperResponse;
 
 @RestController  
-@RequestMapping(value = "/auth/user")
+@RequestMapping(value = "/api/user")
 public class UserController {
 	
 	@Autowired

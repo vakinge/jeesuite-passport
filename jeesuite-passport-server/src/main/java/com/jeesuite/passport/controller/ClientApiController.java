@@ -33,7 +33,7 @@ import com.jeesuite.springweb.utils.ParameterUtils;
  * @date 2019年6月4日
  */
 @Controller  
-@RequestMapping(value = "/auth")
+@RequestMapping(value = "/api")
 public class ClientApiController {
 
 	private static final int SIGN_EXPIRE_MILLIS = 5 * 60 * 1000;

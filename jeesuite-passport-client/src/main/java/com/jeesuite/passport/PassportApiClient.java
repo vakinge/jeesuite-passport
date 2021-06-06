@@ -27,7 +27,7 @@ public class PassportApiClient {
 
 	public static Map<String, String> getConfigs(){
 		
-		String url = PassportConfigHolder.buildServerUrl("/auth/configs");
+		String url = PassportConfigHolder.buildServerUrl("/api/configs");
 		String body = executeRequest(url, null);
 		return JsonUtils.toHashMap(body, String.class);
 	}
